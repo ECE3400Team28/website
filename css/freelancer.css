@@ -404,3 +404,7 @@ a:focus, a:hover, a:active {
 .row {
   justify-content: center;
 }
+
+.contract-content {
+  text-align: left;
+}
