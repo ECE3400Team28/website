@@ -210,10 +210,74 @@
               <h2 class="text-secondary text-uppercase mb-0">Lab 1: Microcontroller</h2>
               <hr class="star-dark mb-5">
               <img class="img-fluid mb-5" src="Lab1/img/lab1.png" alt="Picture of Arduino Uno">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+            </div>
+          </div>
+        </div>
+        <div class="container text-left">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h3 class="mb-2">Description</h3>
+              <p class="mb-0">This lab introduces the Arduino Uno and Arduino IDE, and ends with the assembly of a basic robot performing autonomous driving. The lab takes approximately three hours, and requires the following <strong>materials</strong>:</p>
+              <ul class="mb-5">
+                <li>1x Arduino Uno</li>
+                <li>1x USB A/B cable</li>
+                <li>2x Continuous Parallax Servos</li>
+                <li>1x Solderless breadboard</li>
+                <li>1x 1k-100k Potentiometer</li>
+                <li>1x LED, any color</li>
+                <li>Several 1k and 330 Ohm resistors</li>
+              </ul>
+
+              <h3 class="mb-2">Blinking LEDs</h3>
+              <p>After installing the <a href="https://www.arduino.cc/en/Main/Software">Arduino IDE</a> and any necessary drivers, we found the Blink.ino example provided under File >> Examples >> 1.Basics >> Blink, which toggles the board’s built-in LED once per second.</p>
+              <p>In order to test the other digital pins provided on the Uno, we created a global variable named <code>LED_PIN</code>, and modified the existing code to use this pin. We then changed the number assigned to the variable to test each digital pin. The following example tests digital pin 7.</p>
+              <pre class="mb-3"><code>
+const short LED_PIN = 7;
+                
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_PIN as an output.
+  pinMode(LED_PIN, OUTPUT);
+}
+                
+// the loop function runs over and over again forever
+void loop() {
+  digitalWrite(LED_PIN, HIGH);       // turn the LED on (HIGH is the voltage level)
+  delay(1000);                       // wait for a second
+  digitalWrite(LED_PIN, LOW);        // turn the LED off by making the voltage LOW
+  delay(1000);                       // wait for a second
+}
+              </code></pre>
+
+              <h3 class="mb-2">Serial Port Readings</h3>
+              <p>For this portion of the lab we used a potentiometer to change the voltages on the analog input pin of the arduino, and then programmed the arduino to output these voltages to the serial monitor. To do this we started serial communication and then read the analog input using <code>analogRead(INPUT_PIN)</code>. It should be noted that this does NOT return the actual voltage. </p>
+              <pre><code>
+int INPUT_PIN = A0;
+                  
+// the setup function runs once when you press reset or power the board
+void setup() {
+  Serial.begin(9600);
+}
+                  
+// the loop function runs over and over again forever
+void loop() {
+  delay(100);
+                  
+  // Analog input read
+  int input = analogRead(INPUT_PIN);
+  Serial.println(input);
+}
+              </code></pre>
+              <p>To set up the circuit we wired the output of the potentiometer to the Arudino’s A0(analog input) pin. We then supplied VCC to the wiper pin of the potentiometer and attached a 330 ohm resistor the the output of the potentiometer and GND to form a voltage divider. </p>
+            </div>
+          </div>
+        </div>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-                <i class="fa fa-close"></i>
-                Close Project</a>
+              <i class="fa fa-close"></i>
+              Close Lab 1</a>
             </div>
           </div>
         </div>

@@ -333,6 +333,34 @@ form .row:first-child .floating-label-form-group {
   background-color: #1a252f;
 }
 
+.team-member {
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.team-member img {
+  width: 225px;
+  height: 225px;
+  border: 7px solid #fff;
+}
+
+.team-member h4 {
+  margin-top: 25px;
+  margin-bottom: 0;
+}
+
+.team-member p {
+  margin-top: 0;
+}
+
+.row {
+  justify-content: center;
+}
+
+.contract-content {
+  text-align: left;
+}
+
 a {
   color: #18BC9C;
 }
@@ -379,32 +407,4 @@ a:focus, a:hover, a:active {
 .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
   background-color: #1a252f;
   border-color: #1a252f;
-}
-
-.team-member {
-  margin-bottom: 50px;
-  text-align: center;
-}
-
-.team-member img {
-  width: 225px;
-  height: 225px;
-  border: 7px solid #fff;
-}
-
-.team-member h4 {
-  margin-top: 25px;
-  margin-bottom: 0;
-}
-
-.team-member p {
-  margin-top: 0;
-}
-
-.row {
-  justify-content: center;
-}
-
-.contract-content {
-  text-align: left;
 }
