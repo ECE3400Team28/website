@@ -210,9 +210,9 @@
               <h2 class="text-secondary text-uppercase mb-0">Lab 1: Microcontroller</h2>
               <hr class="star-dark mb-5">
 
-              <h3 class="mb-2">Description</h3>
-              <p class="mb-0">This lab introduces the Arduino Uno and Arduino IDE, and ends with the assembly of a basic robot performing autonomous driving. The lab takes approximately three hours, and requires the following <strong>materials</strong>:</p>
-              <ul class="mb-5">
+              <h3 class="mb-4">Description</h3>
+              <p class="mb-2 text-left">This lab introduces the Arduino Uno and Arduino IDE, and ends with the assembly of a basic robot performing autonomous driving. The lab takes approximately three hours, and requires the following <strong>materials</strong>:</p>
+              <ul class="mb-5 text-left">
                 <li class="li-center">1x Arduino Uno</li>
                 <li class="li-center">1x USB A/B cable</li>
                 <li class="li-center">2x Continuous Parallax Servos</li>
@@ -221,6 +221,7 @@
                 <li class="li-center">1x LED, any color</li>
                 <li class="li-center">Several 1k and 330 Ohm resistors</li>
               </ul>
+              <hr>
               <div class="media">
 				        <div class="media-left media-middle">
         				  <div class="embed-responsive video">
@@ -233,11 +234,19 @@
       			    </div>
 			        </div>
       			  <hr>
-      			  <div class="media">
+      			  <div class="media mb-2">
       			    <div class="media-body">
       			      <h4 class="media-heading">Blinking an external LED</h4>
                   <span>In order to test the other digital pins provided on the Uno, we created a global variable named <code>LED_PIN</code>, and modified the existing code to use this pin. We then changed the number assigned to the variable to test each digital pin. The following example tests digital pin 7.</span>
-                  <pre class="mb-3"><code>
+      			    </div>
+      			    <div class="media-right media-middle">
+      		       	  <div class="embed-responsive video">
+      				    <iframe class="embed-responsive-item" src="https://youtube.com/embed/-SuszBuhR4I" allowfullscreen></iframe>
+      		 	  	  </div>
+      			    </div>
+      			  </div>
+              <pre class="text-left">
+                <code>
 const short LED_PIN = 7;
                 
 // the setup function runs once when you press reset or power the board
@@ -253,16 +262,10 @@ void loop() {
   digitalWrite(LED_PIN, LOW);        // turn the LED off by making the voltage LOW
   delay(1000);                       // wait for a second
 }
-                  </code></pre>
-      			    </div>
-      			    <div class="media-right media-middle">
-      		       	  <div class="embed-responsive video">
-      				    <iframe class="embed-responsive-item" src="https://youtube.com/embed/-SuszBuhR4I" allowfullscreen></iframe>
-      		 	  	  </div>
-      			    </div>
-      			  </div>
+                </code>
+              </pre>
       			  <hr>
-      			  <div class="media">
+      			  <div class="media mb-3">
       			  	<div class="media-left media-middle">
       		       	  <div class="embed-responsive video">
       				    <iframe class="embed-responsive-item" src="https://youtube.com/embed/9hQ8VjL0_DI" allowfullscreen></iframe>
@@ -270,8 +273,12 @@ void loop() {
       			    </div>
       			    <div class="media-body">
                   <h4 class="media-heading">Reading the value of a potentiometer via the serial port</h4>
-                  <span>For this portion of the lab we used a potentiometer to change the voltages on the analog input pin of the arduino, and then programmed the arduino to output these voltages to the serial monitor. To do this we started serial communication and then read the analog input using <code>analogRead(INPUT_PIN)</code>. It should be noted that this does NOT return the actual voltage. </span>
-                  <pre><code>
+                  <span>For this portion of the lab we used a potentiometer to change the voltages on the analog input pin of the arduino, and then programmed the arduino to output these voltages to the serial monitor.</span>
+      			    </div>
+      			  </div>
+              <p class="mb-2 text-left">To do this we started serial communication and then read the analog input using <code>analogRead(INPUT_PIN)</code>. It should be noted that this does NOT return the actual voltage.</p>
+              <pre class="mb-0 text-left">
+                <code>
 int INPUT_PIN = A0;
                   
 // the setup function runs once when you press reset or power the board
@@ -287,15 +294,14 @@ void loop() {
   int input = analogRead(INPUT_PIN);
   Serial.println(input);
 }
-                  </code></pre>
-      			      <span>To set up the circuit we wired the output of the potentiometer to the Arudino’s A0(analog input) pin. We then supplied VCC to the wiper pin of the potentiometer and attached a 330 ohm resistor the the output of the potentiometer and GND to form a voltage divider. </span>
-      			    </div>
-      			  </div>
+                </code>
+              </pre>
+              <p class="text-left mb-5">To set up the circuit we wired the output of the potentiometer to the Arudino’s A0(analog input) pin. We then supplied VCC to the wiper pin of the potentiometer and attached a 330 ohm resistor the the output of the potentiometer and GND to form a voltage divider. </p>
       			  <hr>
       			  <div class="media">
       			    <div class="media-body">
       			      <h4 class="media-heading">Map the value of the potentiometer to the LED</h4>
-      			      <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</span>
+      			      <span></span>
       			    </div>
       			    <div class="media-right media-middle">
       		       	  <div class="embed-responsive video">
@@ -312,14 +318,14 @@ void loop() {
       			    </div>
       			    <div class="media-body">
       			      <h4 class="media-heading">Map the value of the potentiometer to the servo</h4>
-      			      <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</span>
+      			      <span></span>
       			    </div>
       			  </div>
       			  <hr>
       			  <div class="media">
       			    <div class="media-body">
       			      <h4 class="media-heading">Assembling our robot</h4>
-      			      <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</span>
+      			      <span></span>
       			    </div>
       			    <div class="media-right media-middle">
       				  <img class="media-object" src="..." alt="Assembling our robot">
@@ -334,7 +340,7 @@ void loop() {
       			    </div>
       			    <div class="media-body">
       			      <h4 class="media-heading">Driving our robot autonomously</h4>
-      			      <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</span>
+      			      <span></span>
       			    </div>
       			  </div>
               <a class="btn btn-secondary btn-lg" href="https://github.com/ECE3400Team28/website/tree/master/Lab1">View Lab 1 Code on GitHub</a>
