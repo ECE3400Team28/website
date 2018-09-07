@@ -350,8 +350,6 @@ void loop() {
               <p class="mb-2 text-left">Again, the values had to be scaled, this time to the range of 0 to 180 that the servo library takes in for its write function. We also added some initial code which demonstrates the servo moving at full speed in both directions, and at a stop.</p>
               <pre class="mb-0 text-left">
                 <code>
-#include <Servo.h>
-
 const short SERVO_PIN = 10;
 int INPUT_PIN = A0;
 Servo angrySpin;
@@ -382,17 +380,27 @@ void loop() {
                 </code>
               </pre>
       			  <hr>
-      			  <div class="media">
+      			  <div class="media mb-3">
       			    <div class="media-body">
       			      <h4 class="media-heading">Assembling our robot</h4>
-      			      <span></span>
+      			      <span>To assemble our robot we used:</span>
+                  <ul>
+                    <li>A chassis</li>
+                    <li>Two wheels</li>
+                    <li>Several screws</li>
+                    <li>A 9V battery</li>
+                    <li>Ball bearing</li>
+                    <li>Two servos</li>
+                    <li>Arduino Uno</li>
+                  </ul>
       			    </div>
       			    <div class="media-right media-middle">
-      				  <img class="media-object" src="..." alt="Assembling our robot">
+      				    <img class="media-object" src="..." alt="Assembling our robot">
       			    </div>
       			  </div>
+              <p class="mb-5 text-left">To begin, we attached the servos to the mounts, and then attached them to the base of the robot. We then attached the wheels, which took some time because not all wheels fit nicely into the servos. We had to get a bit creative when attaching the ball bearing because there was only one left and it was too short for our robot. We ended up attaching a piece to the base of the robot to elongate the part where the ball bearing attached. This temporarily solved the issue. Lastly, we mounted the arduino and the battery with velcro.</p>
       			  <hr>
-      			  <div class="media">
+      			  <div class="media mb-3">
       			  	<div class="media-left media-middle">
       		       	  <div class="embed-responsive video">
       				    <iframe class="embed-responsive-item" src="https://youtube.com/embed/JGP3CFYPiuo" allowfullscreen></iframe>
@@ -400,13 +408,48 @@ void loop() {
       			    </div>
       			    <div class="media-body">
       			      <h4 class="media-heading">Driving our robot autonomously</h4>
-      			      <span></span>
+      			      <span>After assembling the robot, we wrote code for it to move autonomously. Initially, it was meant to move in a square, but the code did not work as expected and we did not have enough time to debug. The robot ended up moving in what appeared to be a pentagon.</span>
       			    </div>
       			  </div>
-              <a class="btn btn-secondary btn-lg" href="https://github.com/ECE3400Team28/website/tree/master/Lab1">View Lab 1 Code on GitHub</a>
+              <pre class="mb-0 text-left">
+                <code>
+void setup() {
+  // we set up two of our pins as outputs and attach our servos
+    int PWM1 = 3;
+    int PWM2 = 5;
+    pinMode(PWM1, OUTPUT);
+    pinMode(PWM2, OUTPUT);
+    Motor1.attach(PWM1);
+    Motor2.attach(PWM2);
+}
+
+void loop() {
+  // we write a loop to control the speed and direction that the motors spin
+    Motor1.write(180);
+    Motor2.write(0);
+    delay(1200);
+    Motor1.write(90);
+    Motor2.write(90);
+    delay(600);
+    turn();
+}
+
+void turn(){
+  // this function turns the robot
+    Motor1.write(180);
+    Motor2.write(180);
+    delay(350);
+    Motor1.write(90);
+    Motor2.write(90);
+    delay(250);
+    return;
+}
+                </code>
+              </pre>
+              <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab1">View Lab 1 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-              <i class="fa fa-close"></i>
-              Close Lab 1</a>
+                <i class="fa fa-close"></i>
+                Close Lab 1</a>
             </div>
           </div>
         </div>
