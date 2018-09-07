@@ -271,29 +271,27 @@ header.masthead h2 {
 .media {
   display: table;
   text-align: left;
+  width: 100%;
   margin-top: 40px;
   margin-bottom: 40px;
 }
 
 .media-body {
   display: table-cell;
+  width: 50%;
   vertical-align: middle;
-  max-width: 350px;
 }
 
 .media-right {
+  width: 40%;
   display: table-cell;
   padding-left: 20px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .media-left {
+  width: 40%;
   display: table-cell;
-  padding-right: 20px;
-  vertical-align: top;
-}
-
-.media-middle {
   vertical-align: middle;
 }
 
