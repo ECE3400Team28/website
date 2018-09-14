@@ -32,10 +32,13 @@ void forward(){
     MotorRight.write(95);
     delay(100);
 }
-void right(){
+void turnRight(){
     MotorLeft.write(80);
     MotorRight.write(80);
-    delay(720);
+    delay(600);
+    while (!isOnLine()) {
+      delay(10);
+    }
     MotorLeft.write(90);
     MotorRight.write(90);
     delay(100);
@@ -44,11 +47,18 @@ void right(){
 void turnleft(){
     MotorLeft.write(100);
     MotorRight.write(100);
-    delay(720);
+    delay(600);
+    while (!isOnLine()) {
+      delay(10);
+    }
     MotorLeft.write(90);
     MotorRight.write(90);
     delay(100);
     return;
+}
+
+bool isOnLine(){
+  return LightDataC <= 950 && LightDataL > 950 && LightDataR > 950;
 }
 
 int intersection(){
@@ -76,7 +86,7 @@ void linefollow(){
            return;
      } else if (LightDataC <= 950 && LightDataL <= 950 && LightDataR <= 950) {
            //intersection();
-           return; // do this for now
+           return; // do this for now to go straight
      } else if (LightDataC <= 950 && LightDataL <= 950){
            // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
