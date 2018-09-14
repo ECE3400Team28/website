@@ -115,3 +115,19 @@ void linefollow(){
           // this is a case we did not foresee!! y i k e s
      }
 }
+ void motortest(){
+        MotorLeft.write(90);
+        MotorRight.write(90);
+        Serial.println("Enter a speed");
+        int MotorSpeed = Serial.parseInt();
+        MotorRight.write(MotorSpeed);
+        delay(2000);
+ }
+  void motortestu(){
+        MotorLeft.write(90);
+        MotorRight.write(90);
+        Serial.println("Enter a speed");
+        float MotorSpeed = Serial.parseFloat();
+        MotorRight.writeMicroseconds(MotorSpeed); 
+        delay(2000);
+ }
