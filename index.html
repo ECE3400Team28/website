@@ -590,13 +590,34 @@ void turn(){
             <div class="col-lg-8 mx-auto">
              <h2 class="text-secondary text-uppercase mb-0">Milestone 1</h2>
               <hr class="star-dark mb-5">
-              <h4 class="text-secondary mb-5">Line Following</h4>
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/DCLGwZAPSa0?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-5" allowfullscreen></iframe>
-              <p class="mb-5 text-left">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-3 text-left">
+                The goal of Milestone 1 was to add line tracking and maze traversing functionality to the robot in the absence of walls and treasures. The end goal was to have a robot capable of following a figure eight pattern on the ground. We added the following additional materials:
+              </p>
+              <ul class="mb-5 text-left">
+                <li>3 QRE1113 Sensors on SparkFun breakout boards (https://www.sparkfun.com/products/9453)</li>
+                <li>A breadboard</li>
+                <li>A new 3D printed base for our robot</li>
+                <li>3D printed connector parts</li>
+                <li>White (or black) electrical tape</li>
+                <li>More wires</li>
+              </ul>
               <hr class="mb-5">
-              <h4 class="text-secondary mb-5">Figure 8</h4>
+              <h4 class="text-secondary text-left mb-3">Line Detection</h4>
+              <p class="mb-5 text-left">The robot needed to be able to navigate lines made of the electrical tape on a flat surface arranged in a grid pattern. In order to be able to detect where lines were on the ground, we used QRE1113 analog sensors. These were connected to an analog input pin on the Arduino which gave a value based on the reflectivity of nearby surfaces using IR, and were powered from the same 5V and GND powering the Arduino.<br />
+              <br />
+              We then moved the line sensor above the ground surface at various heights and above both the taped line and the adjacent surface in order to discover some baseline values for what reflectivities mean what surface. We used those baseline values to determine a threshold, below which meant that the line sensor was on a line, and above which the opposite was true. We could now tell whether or not a line sensor on our robot was above a line!
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Line Following</h4>
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/DCLGwZAPSa0?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-5" allowfullscreen></iframe>
+              <p class="mb-5 text-left">We used three sensors (left, center, and right) to figure out where the robot was at any point in time. These sensors were placed at the front of the robot, spaced so that the distance between the left and right sensors is approximately the width of the line. The robot is considered centered when only the center sensor is on the line. When the left and center sensors are on the line, then the robot is veering slightly right, and we must turn slightly left. Similarly, when the right and center sensors are on the line, then the robot is veering slightly left and we must turn slightly right. If only the left sensor is on the line, then the robot is veering too much to the right and we must turn left more quickly. Similarly, if only the right sensor is on the line, the robot is veering too much to the left and we must turn right more quickly.<br />
+              <br />
+              To detect an intersection, the analog value of each sensor is read using the analogRead function and then each value is compared to a light threshold. For example, when both the left AND right sensors read below the threshold value, meaning that both are directly above lines, we have determined that the robot is at an intersection and continue straight through the intersection in order to follow the line.</p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Figure 8</h4>
               <iframe width="560" height="315" src="https://www.youtube.com/embed/iWSI64gUKew?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-5" allowfullscreen></iframe>
-              <p class="mb-5 text-left">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <p class="mb-5 text-left">To accomplish a figure 8 we used our line following code to determine when we are at an intersection. Since all of our IR line sensors are in the front we then continued forward for an additional 350ms to ensure we would begin turning in the center of the intersection. Since we had to turn left and right in a complex pattern, we then referenced an array of integers using a global incrementing variable, if the array was a 1 at that point then we would turn left, if it was 0 we would turn right. To accomplish the turn, we spun around for approximately 500ms and then finished the turn using a while loop which uses our line following code to detect when we have aligned with the line. Once the turn completed we incremented our global variable and continued forward until the next intersection.</p>
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Milestone1">View Milestone 1 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
