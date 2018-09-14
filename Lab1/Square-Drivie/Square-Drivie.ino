@@ -3,12 +3,12 @@
 Servo MotorLeft;
 Servo MotorRight;
 
-int LightData1;
-int LightData2;
-int LightData3;
+int LightDataC;
+int LightDataL;
+int LightDataR;
 int LightCenter = A2;
 int LightRight = A0;
- int LightLeft = A1;
+int LightLeft = A1;
 void setup() {
   // put your setup code here, to run once:
     int PWM1 = 3;
@@ -52,10 +52,12 @@ void turnleft(){
 }
 
 int intersection(){
-     LightData1 = analogRead(LightCenter);
-     LightData2 = analogRead(LightLeft);
-     LightData3 = analogRead(LightRight);
-     if ((LightData1 && (LightData2 || LightData3)) <= 950){
+    // this doens't need to check if it's in an intersection- linefollow() will do that 
+    // therefore we can delete all the code below
+     LightDataC = analogRead(LightCenter);
+     LightDataL = analogRead(LightLeft);
+     LightDataR = analogRead(LightRight);
+     if ((LightDataC && (LightDataL || LightDataR)) <= 950){
       //INSERT CODE FOR HANDLING INTERSECTIONS, will need distance or camera
      }
      else{
@@ -66,21 +68,27 @@ int intersection(){
 void linefollow(){
      //Below 950 is white tape
      //Above 950 is dark
-     LightData1 = analogRead(LightCenter);
-     LightData2 = analogRead(LightLeft);
-     LightData3 = analogRead(LightRight);
-     if (LightData1 <= 950){
-        return;
+     LightDataC = analogRead(LightCenter);
+     LightDataL = analogRead(LightLeft);
+     LightDataR = analogRead(LightRight);
+     if (LightDataC <= 950){
+        if (LightDataL <= 950 || LightDataR <= 950) {
+          //intersection();
+          return; // do this for now
+        }
+        else return;
      }
-     else if (LightData2 <=950){
+     else if (LightDataL <= 950){
+           // bot is veering right, so we turn it left a bit
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(400);
            return;
      }
      else{
-          MotorLeft.write(88);
+          // bot is veering left, so we turn it right a bit
           MotorRight.write(100);
+          MotorLeft.write(88);
           delay(400);
           return;
      }
