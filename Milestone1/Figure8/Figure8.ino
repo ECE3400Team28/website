@@ -28,15 +28,13 @@ void loop() {
   linefollow();
   turnRight();
   linefollow();
-  // forward(50); keep straight
-  linefollow();
   turnLeft();
   linefollow();
   turnLeft();
   linefollow();
   turnLeft();
   linefollow();
-  forward(50);
+  turnLeft();
   linefollow();
   turnRight();
   linefollow();
