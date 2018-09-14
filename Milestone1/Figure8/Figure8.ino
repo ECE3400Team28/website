@@ -24,13 +24,28 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-     forward();
-     linefollow();
+  // linefollow(); if we want to have robot start before line
+  linefollow();
+  turnRight();
+  linefollow();
+  // forward(50); keep straight
+  linefollow();
+  turnLeft();
+  linefollow();
+  turnLeft();
+  linefollow();
+  turnLeft();
+  linefollow();
+  forward(50);
+  linefollow();
+  turnRight();
+  linefollow();
+  turnRight();
 }
-void forward(){
+void forward(int timeDelay){
     MotorLeft.write(83);
     MotorRight.write(95);
-    delay(100);
+    delay(timeDelay);
 }
 void turnRight(){
     MotorLeft.write(80);
@@ -61,21 +76,9 @@ bool isOnLine(){
   return LightDataC <= 950 && LightDataL > 950 && LightDataR > 950;
 }
 
-int intersection(){
-    // this doens't need to check if it's in an intersection- linefollow() will do that 
-    // therefore we can delete all the code below
-     LightDataC = analogRead(LightCenter);
-     LightDataL = analogRead(LightLeft);
-     LightDataR = analogRead(LightRight);
-     if ((LightDataC && (LightDataL || LightDataR)) <= 950){
-      //INSERT CODE FOR HANDLING INTERSECTIONS, will need distance or camera
-     }
-     else{
-      return 0;
-     }
-}
-
 void linefollow(){
+  while(1) {
+     forward(50);
      //Below 950 is white tape
      //Above 950 is dark
      LightDataC = analogRead(LightCenter);
@@ -83,37 +86,39 @@ void linefollow(){
      LightDataR = analogRead(LightRight);
      if (LightDataC <= 950 && LightDataL > 950 && LightDataR > 950){
            // centered
-           return;
+           // return true;
      } else if (LightDataC <= 950 && LightDataL <= 950 && LightDataR <= 950) {
-           //intersection();
-           return; // do this for now to go straight
+           forward(100);
+           break;
      } else if (LightDataC <= 950 && LightDataL <= 950){
            // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(400);
-           return;
+           // return true;
      } else if (LightDataC <= 950 && LightDataR <= 950){
            // bot is veering left slightly, so we turn it right a bit
            MotorRight.write(100);
            MotorLeft.write(88);
            delay(400);
-           return;
+           // return true;
      } else if (LightDataL <= 950){
            // bot is veering right a lot, so we turn it left more
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(400);
-           return;
+           // return true;
      } else if (LightDataR <= 950){
            // bot is veering left a lot, so we turn it right more
            MotorRight.write(100);
            MotorLeft.write(88);
            delay(400);
-           return;
+           // return true;
      } else {
+          break;
           // this is a case we did not foresee!! y i k e s
      }
+  }
 }
  void motortest(){
         MotorLeft.write(90);
