@@ -71,26 +71,37 @@ void linefollow(){
      LightDataC = analogRead(LightCenter);
      LightDataL = analogRead(LightLeft);
      LightDataR = analogRead(LightRight);
-     if (LightDataC <= 950){
-        if (LightDataL <= 950 || LightDataR <= 950) {
-          //intersection();
-          return; // do this for now
-        }
-        else return;
-     }
-     else if (LightDataL <= 950){
-           // bot is veering right, so we turn it left a bit
+     if (LightDataC <= 950 && LightDataL > 950 && LightDataR > 950){
+           // centered
+           return;
+     } else if (LightDataC <= 950 && LightDataL <= 950 && LightDataR <= 950) {
+           //intersection();
+           return; // do this for now
+     } else if (LightDataC <= 950 && LightDataL <= 950){
+           // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(400);
            return;
+     } else if (LightDataC <= 950 && LightDataR <= 950){
+           // bot is veering left slightly, so we turn it right a bit
+           MotorRight.write(100);
+           MotorLeft.write(88);
+           delay(400);
+           return;
+     } else if (LightDataL <= 950){
+           // bot is veering right a lot, so we turn it left more
+           MotorRight.write(92);
+           MotorLeft.write(80);
+           delay(400);
+           return;
+     } else if (LightDataR <= 950){
+           // bot is veering left a lot, so we turn it right more
+           MotorRight.write(100);
+           MotorLeft.write(88);
+           delay(400);
+           return;
+     } else {
+          // this is a case we did not foresee!! y i k e s
      }
-     else{
-          // bot is veering left, so we turn it right a bit
-          MotorRight.write(100);
-          MotorLeft.write(88);
-          delay(400);
-          return;
-     }
-  
 }
