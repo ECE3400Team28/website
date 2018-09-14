@@ -130,7 +130,7 @@
         <hr class="star-dark mb-5">
         <div class="row">
           <div class="col-md-6 col-lg-3">
-            <a class="portfolio-item d-block mx-auto" href="#portfolio-modal-7">
+            <a class="portfolio-item d-block mx-auto" href="#portfolio-modal-5">
               <div class="portfolio-item-caption d-flex position-absolute h-100 w-100">
                 <div class="portfolio-item-caption-content my-auto w-100 text-center text-white">
                   <i class="fa fa-search-plus fa-3x"></i>
@@ -555,28 +555,6 @@ void turn(){
       </div>
     </div>
     <!-- MILESTONES ------------------------------------------------------------------------------>
-        <!-- Portfolio Modal 5 -->
-    <div class="portfolio-modal mfp-hide" id="portfolio-modal-5">
-      <div class="portfolio-modal-dialog bg-white">
-        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
-          <i class="fa fa-3x fa-times"></i>
-        </a>
-        <div class="container text-center">
-          <div class="row">
-            <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Milestone 1</h2>
-              <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/safe.png" alt="">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-                <i class="fa fa-close"></i>
-                Close Project</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Portfolio Modal 6 -->
     <div class="portfolio-modal mfp-hide" id="portfolio-modal-6">
       <div class="portfolio-modal-dialog bg-white">
@@ -588,7 +566,7 @@ void turn(){
             <div class="col-lg-8 mx-auto">
               <h2 class="text-secondary text-uppercase mb-0">Milestone 2</h2>
               <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
+              <img class="img-fluid mb-5" src="img/portfolio/safe.png" alt="">
               <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
@@ -608,13 +586,35 @@ void turn(){
         <div class="container text-center">
           <div class="row">
             <div class="col-lg-8 mx-auto">
+              <h2 class="text-secondary text-uppercase mb-0">Milestone 3</h2>
+              <hr class="star-dark mb-5">
+              <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
+              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
+                <i class="fa fa-close"></i>
+                Close Project</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio Modal 5 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-5">
+      <div class="portfolio-modal-dialog bg-white">
+        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
              <h2 class="text-secondary text-uppercase mb-0">Milestone 1</h2>
               <hr class="star-dark mb-5">
               <h4 class="text-secondary text-left mb-3">Goal</h4>
               <p class="mb-3 text-left">
                 The goal of Milestone 1 was to add line tracking and maze traversing functionality to the robot in the absence of walls and treasures. The end goal was to have a robot capable of following a figure eight pattern on the ground. We added the following additional materials:
               </p>
-              <ul class="mb-5 text-left">
+              <ul class="mb-3 text-left">
                 <li>3 QRE1113 Sensors on SparkFun breakout boards (https://www.sparkfun.com/products/9453)</li>
                 <li>A breadboard</li>
                 <li>A new 3D printed base for our robot</li>
@@ -622,6 +622,7 @@ void turn(){
                 <li>White (or black) electrical tape</li>
                 <li>More wires</li>
               </ul>
+              <img class="img-fluid mb-5" src="img/Robot2.jpg" alt="Our revamped robot">
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Line Detection</h4>
               <p class="mb-5 text-left">The robot needed to be able to navigate lines made of the electrical tape on a flat surface arranged in a grid pattern. In order to be able to detect where lines were on the ground, we used QRE1113 analog sensors. These were connected to an analog input pin on the Arduino which gave a value based on the reflectivity of nearby surfaces using IR, and were powered from the same 5V and GND powering the Arduino.<br />
@@ -630,14 +631,194 @@ void turn(){
               </p>
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Line Following</h4>
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/DCLGwZAPSa0?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-5" allowfullscreen></iframe>
-              <p class="mb-5 text-left">We used three sensors (left, center, and right) to figure out where the robot was at any point in time. These sensors were placed at the front of the robot, spaced so that the distance between the left and right sensors is approximately the width of the line. The robot is considered centered when only the center sensor is on the line. When the left and center sensors are on the line, then the robot is veering slightly right, and we must turn slightly left. Similarly, when the right and center sensors are on the line, then the robot is veering slightly left and we must turn slightly right. If only the left sensor is on the line, then the robot is veering too much to the right and we must turn left more quickly. Similarly, if only the right sensor is on the line, the robot is veering too much to the left and we must turn right more quickly.<br />
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/DCLGwZAPSa0?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-3" allowfullscreen></iframe>
+              <p class="mb-3 text-left">We used three sensors (left, center, and right) to figure out where the robot was at any point in time. These sensors were placed at the front of the robot, spaced so that the distance between the left and right sensors is approximately the width of the line. The robot is considered centered when only the center sensor is on the line. When the left and center sensors are on the line, then the robot is veering slightly right, and we must turn slightly left. Similarly, when the right and center sensors are on the line, then the robot is veering slightly left and we must turn slightly right. If only the left sensor is on the line, then the robot is veering too much to the right and we must turn left more quickly. Similarly, if only the right sensor is on the line, the robot is veering too much to the left and we must turn right more quickly.<br />
               <br />
               To detect an intersection, the analog value of each sensor is read using the analogRead function and then each value is compared to a light threshold. For example, when both the left AND right sensors read below the threshold value, meaning that both are directly above lines, we have determined that the robot is at an intersection and continue straight through the intersection in order to follow the line.</p>
+              <pre class="mb-0 text-left">
+                <code>
+void loop() {
+    // Our bot repeatedly moves forward then corrects itself
+    forward();
+    linefollow();
+}
+
+void forward(){
+    // Moves the bot forward
+    MotorLeft.write(83);
+    MotorRight.write(95);
+    delay(100);
+}
+
+void linefollow(){
+    //Below 950 is white tape
+    //Above 950 is dark
+    LightDataC = analogRead(LightCenter);
+    LightDataL = analogRead(LightLeft);
+    LightDataR = analogRead(LightRight);
+    if (LightDataC <= 950 && LightDataL > 950 && LightDataR > 950){
+          // centered
+          return;
+    } else if (LightDataL <= 950 && LightDataR <= 950) {
+          // intersection
+          return;
+    } else if (LightDataC <= 950 && LightDataL <= 950){
+          // bot is veering right slightly, so we turn it left a bit
+          MotorRight.write(92);
+          MotorLeft.write(80);
+          delay(400);
+          return;
+    } else if (LightDataC <= 950 && LightDataR <= 950){
+          // bot is veering left slightly, so we turn it right a bit
+          MotorRight.write(100);
+          MotorLeft.write(88);
+          delay(400);
+          return;
+    } else if (LightDataL <= 950){
+          // bot is veering right a lot, so we turn it left more
+          MotorRight.write(92);
+          MotorLeft.write(80);
+          delay(400);
+          return;
+    } else if (LightDataR <= 950){
+          // bot is veering left a lot, so we turn it right more
+          MotorRight.write(100);
+          MotorLeft.write(88);
+          delay(400);
+          return;
+    } else {
+         // this case should never be reached!! if it does then y i k e s
+    }
+}
+                </code>
+              </pre>
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Figure 8</h4>
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/iWSI64gUKew?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-5" allowfullscreen></iframe>
-              <p class="mb-5 text-left">To accomplish a figure 8 we used our line following code to determine when we are at an intersection. Since all of our IR line sensors are in the front we then continued forward for an additional 350ms to ensure we would begin turning in the center of the intersection. Since we had to turn left and right in a complex pattern, we then referenced an array of integers using a global incrementing variable, if the array was a 1 at that point then we would turn left, if it was 0 we would turn right. To accomplish the turn, we spun around for approximately 500ms and then finished the turn using a while loop which uses our line following code to detect when we have aligned with the line. Once the turn completed we incremented our global variable and continued forward until the next intersection.</p>
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/iWSI64gUKew?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-3" allowfullscreen></iframe>
+              <p class="mb-0 text-left">To accomplish a figure 8 we used our line following code to determine when we are at an intersection. Since all of our IR line sensors are in the front we then continued forward for an additional 350ms to ensure that we would begin turning when the robot is in the center of the intersection. Since we had to turn left and right in a complex pattern, we then referenced an array of integers using a global incrementing variable as the index. If the array was a 1 at that point then we would turn left, if it was 0 we would turn right. To accomplish the turn, we spun around for approximately 500ms and then finished the turn using a while loop which uses our line following code to detect when we have aligned with the line. Once the turn completed we incremented our global variable and continued forward until the next intersection.<br />
+              <br />
+              At the top of our code, we initialized the following globals:
+              </p>
+              <pre class="mb-0 text-left">
+                <code>
+int turn[8] = {1,0,0,0,0,1,1,1};
+int i = 0;
+                </code>
+              </pre>
+              <p class="mb-0 text-left">
+                We added a push button on our robot so that it waits in setup() until we push the button:
+              </p>
+               <pre class="mb-0 text-left">
+                <code>
+// The following code is all in setup():
+pinMode(8, INPUT);
+...
+while(digitalRead(8) !=  HIGH);
+                </code>
+              </pre>
+              <p class="mb-0 text-left">
+                Our main loop moves the robot forward then corrects itself. While it's correcting itself, if it is at an intersection, it turns. We use turnRight() and turnLeft() as helper methods to turn the robot.
+              </p>
+               <pre class="mb-0 text-left">
+                <code>
+void loop() {
+    // put your main code here, to run repeatedly:
+    forward();
+    linefollow();
+    delay(20);
+}
+
+void turnRight(){
+    MotorLeft.write(80);
+    MotorRight.write(80);
+    delay(600);
+    while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
+      LightDataC = analogRead(LightCenter);
+      LightDataL = analogRead(LightLeft);
+      LightDataR = analogRead(LightRight);
+    }
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    delay(100);
+    return;
+}
+
+void turnLeft(){
+    MotorLeft.write(100);
+    MotorRight.write(100);
+    delay(600);
+      while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
+      LightDataC = analogRead(LightCenter);
+      LightDataL = analogRead(LightLeft);
+      LightDataR = analogRead(LightRight);
+    }
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    delay(100);
+    return;
+}
+
+void linefollow(){
+     //Below 775 is white tape
+     //Above 775 is dark
+     LightDataC = analogRead(LightCenter);
+     LightDataL = analogRead(LightLeft);
+     LightDataR = analogRead(LightRight);
+     Serial.println(LightDataC);
+     Serial.println(LightDataL);
+     Serial.println(LightDataR);
+     if (LightDataC <= 775 && LightDataL > 775 && LightDataR > 775){
+          // centered
+          Serial.println("Centered"); // debugging purposes
+          return;
+     } else if (LightDataL <= 775 && LightDataR <= 775) {
+          digitalWrite(LED_BUILTIN, HIGH);
+          forward();
+          delay(350);
+          if (turn[i] == 1){
+              turnRight();
+          }
+          else turnLeft();
+          if (i ==7){
+            i = 0;
+          }
+          else {
+               i = i + 1;
+          }
+          digitalWrite(LED_BUILTIN, LOW);
+            return;
+     } else if (LightDataC <= 775 && LightDataL <= 775){
+          // bot is veering right slightly, so we turn it left a bit
+          MotorRight.write(92);
+          MotorLeft.write(83);
+          Serial.println("Veering slightly right");
+          delay(100);
+          return;
+     } else if (LightDataC <= 775 && LightDataR <= 775){
+          // bot is veering left slightly, so we turn it right a bit
+          MotorRight.write(95);
+          MotorLeft.write(88);
+          Serial.println("Veering slightly left");
+          delay(100);
+          return;
+     } else if (LightDataL <= 775){
+          // bot is veering right a lot, so we turn it left more
+          MotorRight.write(92);
+          MotorLeft.write(80);
+          delay(100);
+          return;
+     } else if (LightDataR <= 775){
+          // bot is veering left a lot, so we turn it right more
+          MotorRight.write(100);
+          MotorLeft.write(88);
+          delay(100);
+          return;
+     } else {
+          // this case should never be reached!! if so then y i k e s
+     }
+}
+                </code>
+              </pre>
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Milestone1">View Milestone 1 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
