@@ -417,6 +417,10 @@ a:focus, a:hover, a:active {
   background-color: #6F42C1 !important;
 }
 
+.bg-red {
+  background-color: #d32 !important;
+}
+
 .text-primary {
   color: #18BC9C !important;
 }
