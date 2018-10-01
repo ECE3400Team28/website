@@ -1,8 +1,4 @@
-#define LOG_OUT 1 // use the log output function
-#define FFT_N 256 // set to 256 point fft
-
 #include <Servo.h>
-#include <FFT.h> // include the library
 
 Servo MotorLeft;
 Servo MotorRight;
@@ -18,10 +14,6 @@ int i = 0;
 
 void setup() {
   // put your setup code here, to run once:
-    Serial.begin(9600);
-    while(!readSignal() && digitalRead(8) !=  HIGH);
-    Serial.println("started");
-    
     int PWM1 = 3;
     int PWM2 = 5;
     pinMode(PWM1, OUTPUT);
@@ -35,7 +27,8 @@ void setup() {
     MotorRight.attach(PWM2);
     MotorLeft.write(90);
     MotorRight.write(90);
-    delay(1000);
+    while(digitalRead(8) !=  HIGH);
+    Serial.begin(9600);
 }
 
 void loop() {
@@ -43,32 +36,8 @@ void loop() {
     forward();
     linefollow();
     delay(20);
-
   // getValues();
 }
-
-boolean readSignal() {
-  cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    fft_input[i] = analogRead(A4); // put real data into even bins
-    fft_input[i+1] = 0; // set odd bins to 0
-  }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
-  sei();
-//  String out = "";
-//  for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-//    Serial.println(out + fft_log_out[i] + " " + i); //send out data
-//  }
-  if (fft_log_out[19] >= 50){
-    Serial.println("exiting now");
-    return true;
-  }
-  return false;
-}
-
 void forward(){
     MotorLeft.write(84);
     MotorRight.write(98);
