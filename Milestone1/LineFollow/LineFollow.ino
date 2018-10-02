@@ -19,28 +19,28 @@ int i = 0;
 void setup() {
   // put your setup code here, to run once:
     Serial.begin(9600);
-//    int PWM1 = 3;
-//    int PWM2 = 5;
-//    pinMode(PWM1, OUTPUT);
-//    pinMode(8, INPUT);
-//    pinMode(PWM2, OUTPUT);
-//    pinMode(LightCenter, INPUT);
-//    pinMode(LightRight, INPUT);
-//    pinMode(LightLeft, INPUT);
-//    pinMode(LED_BUILTIN, OUTPUT);
-//    MotorLeft.attach(PWM1); 
-//    MotorRight.attach(PWM2);
-//    MotorLeft.write(90);
-//    MotorRight.write(90);
-    while(!readSignal()); //|| digitalRead(8) !=  HIGH);
+    int PWM1 = 3;
+    int PWM2 = 5;
+    pinMode(PWM1, OUTPUT);
+    pinMode(8, INPUT);
+    pinMode(PWM2, OUTPUT);
+    pinMode(LightCenter, INPUT);
+    pinMode(LightRight, INPUT);
+    pinMode(LightLeft, INPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
+    MotorLeft.attach(PWM1); 
+    MotorRight.attach(PWM2);
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    while(!readSignal() && digitalRead(8) != HIGH);
     Serial.println("started");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-//    forward();
-//    linefollow();
-//    delay(20);
+    forward();
+    linefollow();
+    delay(20);
 
   // getValues();
 }
