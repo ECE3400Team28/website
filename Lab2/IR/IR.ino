@@ -1,138 +1,59 @@
-#include <Servo.h>
+/*
+fft_adc_serial.pde
+guest openmusiclabs.com 7.7.14
+example sketch for testing the fft library.
+it takes in data on ADC0 (Analog0) and processes them
+with the fft. the data is sent out over the serial
+port at 115.2kb.
+*/
 
-Servo MotorLeft;
-Servo MotorRight;
+#define LOG_OUT 1 // use the log output function
+#define FFT_N 256 // set to 256 point fft
 
-int LightDataC;
-int LightDataL;
-int LightDataR;
-int LightCenter = A2;
-int LightRight = A0;
-int LightLeft = A1;
+#include <FFT.h> // include the library
+
 void setup() {
-  // put your setup code here, to run once:
-    int PWM1 = 3;
-    int PWM2 = 5;
-    pinMode(PWM1, OUTPUT);
-    pinMode(PWM2, OUTPUT);
-    pinMode(LightCenter, INPUT);
-    pinMode(LightRight, INPUT);
-    pinMode(LightLeft, INPUT);
-    MotorLeft.attach(PWM1); 
-    MotorRight.attach(PWM2);
+  Serial.begin(115200); // use the serial port
+   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(A0, INPUT);
+  TIMSK0 = 0; // turn off timer0 for lower jitter
+  ADCSRA = 0xe5; // set the adc to free running mode
+  ADMUX = 0x40; // use adc0
+  DIDR0 = 0x01; // turn off the digital input for adc0
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  // linefollow(); if we want to have robot start before line
-  linefollow();
-  turnRight();
-  linefollow();
-  // forward(50); keep straight
-  linefollow();
-  turnLeft();
-  linefollow();
-  turnLeft();
-  linefollow();
-  turnLeft();
-  linefollow();
-  forward(50);
-  linefollow();
-  turnRight();
-  linefollow();
-  turnRight();
-}
-void forward(int timeDelay){
-    MotorLeft.write(83);
-    MotorRight.write(95);
-    delay(timeDelay);
-}
-void turnRight(){
-    MotorLeft.write(80);
-    MotorRight.write(80);
-    delay(600);
-    while (!isOnLine()) {
-      delay(10);
+  while(1) { // reduces jitter
+    cli();  // UDRE interrupt slows this way down on arduino1.0
+    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+      while(!(ADCSRA & 0x10)); // wait for adc to be ready
+      ADCSRA = 0xf5; // restart adc
+      byte m = ADCL; // fetch adc data
+      byte j = ADCH;
+      int k = (j << 8) | m; // form into an int
+      k -= 0x0200; // form into a signed int
+      k <<= 6; // form into a 16b signed int
+      fft_input[i] = k; // put real data into even bins
+      fft_input[i+1] = 0; // set odd bins to 0
     }
-    MotorLeft.write(90);
-    MotorRight.write(90);
-    delay(100);
-    return;
-}
-void turnleft(){
-    MotorLeft.write(100);
-    MotorRight.write(100);
-    delay(600);
-    while (!isOnLine()) {
-      delay(10);
+    fft_window(); // window the data for better frequency response
+    fft_reorder(); // reorder the data before doing the fft
+    fft_run(); // process the data in the fft
+    fft_mag_log(); // take the output of the fft
+    sei();
+    Serial.println("start");
+    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+      Serial.println(fft_log_out[i]); // send out the data
     }
-    MotorLeft.write(90);
-    MotorRight.write(90);
-    delay(100);
-    return;
-}
-
-bool isOnLine(){
-  return LightDataC <= 950 && LightDataL > 950 && LightDataR > 950;
-}
-
-void linefollow(){
-  while(1) {
-     forward(50);
-     //Below 950 is white tape
-     //Above 950 is dark
-     LightDataC = analogRead(LightCenter);
-     LightDataL = analogRead(LightLeft);
-     LightDataR = analogRead(LightRight);
-     if (LightDataC <= 950 && LightDataL > 950 && LightDataR > 950){
-           // centered
-           // return true;
-     } else if (LightDataC <= 950 && LightDataL <= 950 && LightDataR <= 950) {
-           forward(100);
-           break;
-     } else if (LightDataC <= 950 && LightDataL <= 950){
-           // bot is veering right slightly, so we turn it left a bit
-           MotorRight.write(92);
-           MotorLeft.write(80);
-           delay(400);
-           // return true;
-     } else if (LightDataC <= 950 && LightDataR <= 950){
-           // bot is veering left slightly, so we turn it right a bit
-           MotorRight.write(100);
-           MotorLeft.write(88);
-           delay(400);
-           // return true;
-     } else if (LightDataL <= 950){
-           // bot is veering right a lot, so we turn it left more
-           MotorRight.write(92);
-           MotorLeft.write(80);
-           delay(400);
-           // return true;
-     } else if (LightDataR <= 950){
-           // bot is veering left a lot, so we turn it right more
-           MotorRight.write(100);
-           MotorLeft.write(88);
-           delay(400);
-           // return true;
-     } else {
-          break;
-          // this is a case we did not foresee!! y i k e s
-     }
+   delay(1000);
+   for (int j = 38; j < 44; ++j) {
+    if (fft_log_out[j] >= 150){
+        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+        delay(1000);                       // wait for a second
+        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+        delay(1000);  
+      
+    }
+   }
   }
 }
- void motortest(){
-        MotorLeft.write(90);
-        MotorRight.write(90);
-        Serial.println("Enter a speed");
-        int MotorSpeed = Serial.parseInt();
-        MotorRight.write(MotorSpeed);
-        delay(2000);
- }
-  void motortestu(){
-        MotorLeft.write(90);
-        MotorRight.write(90);
-        Serial.println("Enter a speed");
-        float MotorSpeed = Serial.parseFloat();
-        MotorRight.writeMicroseconds(MotorSpeed); 
-        delay(2000);
- }
