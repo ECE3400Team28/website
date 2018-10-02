@@ -499,10 +499,148 @@ void turn(){
         <div class="container text-center">
           <div class="row">
             <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Lab 2</h2>
+              <h2 class="text-secondary text-uppercase mb-0">Lab 2: Analog Circuitry and FFTs</h2>
               <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/circus.png" alt="">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <h3 class="text-secondary mb-1">Acoustic Team</h3>
+              <h4 class="text-secondary mb-3">Liliet Sosa and Glenna Zhang</h4>
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                Create a microphone circuit that will detect a 660 Hz whistle blow signifying the beginning of our maze mapping.
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Prelab</h4>
+              <p class="mb-3 text-left">
+                We need at least a 660Hz x 2 = 1320Hz sampling rate based on the Nyquist sampling rate to avoid aliasing.<br />
+                Using the sketch found <a href="https://playground.arduino.cc/Main/ShowInfo">here</a>, these are the results of our speed test:
+              </p>
+              <img class="img-fluid mb-5" src="img/Lab 2 Photos/ShowInfoResult.png" alt="Serial Monitor result of ShowInfo"></img>
+              <p class="mb-3 text-left">
+                Based on this, <code>analogRead()</code> is sufficient (don’t need to use ADC) because its maximum rate is 111.987&#181s / sample = 1/111.987e-6 samples/s = 8930Hz, which is more than enough to detect the 660 Hz frequency.<br />
+                We used the following materials:
+              </p>
+              <ul class="mb-5 text-left">
+                <li><a href="https://www.mouser.com/datasheet/2/670/cma-4544pf-w-1309465.pdf">Electret microphone</a></li>
+                <li>One 6.8&#181F polarized capacitor</li>
+                <li>Resistors: 330&#8486, 3.8k&#8486, 380k&#8486, 10k&#8486 x2</li>
+                <li>LM358 Op-amp</li>
+                <li>Wires</li>
+              </ul>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Unit Tests</h4>
+              <p class="mb-3 text-left">
+                <i>Unit Test 1: Set up a signal generator to deliver a signal that matches what you expect to see from your sensor. This signal must be between 0-5V to not damage the Arduino. Test that the frequency output from your signal generator matches what you see on the serial monitor.
+                </i><br />
+                <br />
+                The following is an image of our signal generator (set to 660Hz, 2V<sub>pp</sub>, 1V offset)
+              </p>
+              <img class="img-fluid mb-3" src="img/Lab 2 Photos/SigGen.jpg" alt="photo of signal generator"></img>
+              <p class="mb-3 text-left">
+                We then coded a quick FFT analysis and output the results to the serial monitor:
+              </p>
+              <img class="img-fluid mb-3" src="img/Lab 2 Photos/SerialOutput.png" alt="photo of signal generator"></img>
+              <p class="mb-0 text-left">
+                For each line in the image above, the first number is the output of the FFT, and the second number is the index of the bin for readability. As you can see, we have a peak at 0 and at 19. Our bin size should be around 8930Hz / 256samples  = 34.883Hz/bin
+                So, our results make sense but are off by seemingly 1 bin.<br />
+                <br />
+                Our FFT code:
+              </p>
+              <pre class="mb-0 text-left"><code>
+#define LOG_OUT 1 // use the log output function
+#define FFT_N 256 // set to 256 point fft
+
+#include &ltFFT.h&gt // include the library
+
+void setup() {
+  Serial.begin(9600); // use the serial port
+}
+
+void loop() {
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    fft_input[i] = analogRead(A4); // put real data into even bins
+    fft_input[i+1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+  Serial.println("start");
+  String out = "";
+  for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+    Serial.println(out + fft_log_out[i] + " " + i); //send out data
+  }
+  while(1) {} // we inserted this so that it only prints one result
+}
+              </code></pre>
+              <p class="mb-3 text-left">
+                <i>Unit Test 2: Use the app you downloaded during the pre-lab to generate a 660Hz tone. Measure the output from the microphone with the oscilloscope, and try to get an idea of what you need to do to the signal to be able to detect it securely from the Arduino.
+                </i><br />
+                <br />
+                The following is the microphone circuit thus far, as taken from the lab handout:
+              </p>
+              <img class="img-fluid mb-2" src="img/Lab 2 Photos/MicrophoneCircuit_OG.png" alt="Original microphone circuit"></img>
+              <p class="mb-3 text-left">
+                After generating the tone, the microphone could not pick up the signal, but we knew the microphone was working because if we blew into the microphone the output would obviously change, as shown below:
+              </p>
+              <p class="mb-4"><b>Resting state of microphone</b></p>
+              <img class="img-fluid mb-4" src="img/Lab 2 Photos/Microphone_Resting.jpg" alt="Output of microphone resting"></img>
+              <p class="mb-4"><b>Microphone being blown on</b></p>
+              <img class="img-fluid mb-4" src="img/Lab 2 Photos/Microphone_Blowing.jpg" alt="Output of microphone resting"></img>
+              <p class="mb-3 text-left">
+                From this result, we decided to add an amplifier and a filter. After struggling to get our own design to work, we decided to use <a href="https://cei-lab.github.io/ECE3400-2017-teamAlpha/lab2.html">Team Alpha's design</a> that incorporates an inverting amplifier, has a voltage divider to center the output voltage around 2.5V, and has a gain of 100:
+              </p>
+              <img class="img-fluid mb-2" src="img/Lab 2 Photos/MicCircuit.png" alt="Output of microphone resting"></img>
+              <p class="mb-3 text-left">
+                <i>Unit Test: Check your circuitry before hooking it up to the Arduino.</i><br />
+                <br />
+                Below is the result of using the amplifier while playing a 660Hz tone, displayed on the oscilloscope:
+              </p>
+              <img class="img-fluid mb-3" src="img/Lab 2 Photos/Microphone_Signal.jpg" alt="Output of microphone resting"></img>
+              <p class="mb-3 text-left">
+                Clearly, this signal can be sent into the Arduino as its minimum voltage is 2.12V and its peak-to-peak voltage is 840mV, which is well within the 0-5V range. The frequency is also correct.<br />
+                The following is a picture of the physical circuit, where the purple wire is the output signal:
+              </p>
+              <img class="img-fluid mb-5" src="img/Lab 2 Photos/Circuit.jpg" alt="Output of microphone resting"></img>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Results</h4>
+              <p class="mb-3 text-left">
+                After connecting the circuit to our robot and changing the code that controls how the robot starts to incorporate waiting for the 660Hz signal, this is a video of our successful result:
+              </p>
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/aNj-LKDwgoE?rel=0" frameborder="0" allow="autoplay; encrypted-media" class="mb-3" allowfullscreen></iframe>
+              <p class="mb-0 text-left">
+                The following is our updated line following code to show that our robot waits for a signal before starting:
+              </p>
+              <pre class="mb-0 text-left"><code>
+// In set-up, we wait while the signal has not been heard and the button has not been pressed:
+while(!readSignal() && digitalRead(8) != HIGH);
+
+// The following is our readSignal() method that calculates the FFT and returns true or false based on if the signal has been heard. We are reading the analog signal from A4:
+boolean readSignal() {
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    fft_input[i] = analogRead(A4); // put real data into even bins
+    fft_input[i+1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+  if (fft_log_out[19] >= 50){ // check that bin 19 contains a significant value
+    return true;
+  }
+  return false;
+}
+              </code></pre>
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">Optical Team</h3>
+              <h4 class="text-secondary mb-3">Anthony Viego and Kevin Ying</h4>
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                lalala
+              </p>
+              <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab2">View Lab 2 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
                 Close Project</a>
@@ -556,50 +694,6 @@ void turn(){
       </div>
     </div>
     <!-- MILESTONES ------------------------------------------------------------------------------>
-    <!-- Portfolio Modal 6 -->
-    <div class="portfolio-modal mfp-hide" id="portfolio-modal-6">
-      <div class="portfolio-modal-dialog bg-white">
-        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
-          <i class="fa fa-3x fa-times"></i>
-        </a>
-        <div class="container text-center">
-          <div class="row">
-            <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Milestone 2</h2>
-              <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/safe.png" alt="">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-                <i class="fa fa-close"></i>
-                Close Project</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Portfolio Modal 7 -->
-    <div class="portfolio-modal mfp-hide" id="portfolio-modal-7">
-      <div class="portfolio-modal-dialog bg-white">
-        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
-          <i class="fa fa-3x fa-times"></i>
-        </a>
-        <div class="container text-center">
-          <div class="row">
-            <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Milestone 3</h2>
-              <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-                <i class="fa fa-close"></i>
-                Close Project</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Portfolio Modal 5 -->
     <div class="portfolio-modal mfp-hide" id="portfolio-modal-5">
       <div class="portfolio-modal-dialog bg-white">
@@ -824,6 +918,50 @@ void linefollow(){
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
                 Close Milestone 1</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio Modal 6 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-6">
+      <div class="portfolio-modal-dialog bg-white">
+        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h2 class="text-secondary text-uppercase mb-0">Milestone 2</h2>
+              <hr class="star-dark mb-5">
+              <img class="img-fluid mb-5" src="img/portfolio/safe.png" alt="">
+              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
+                <i class="fa fa-close"></i>
+                Close Project</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio Modal 7 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-7">
+      <div class="portfolio-modal-dialog bg-white">
+        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h2 class="text-secondary text-uppercase mb-0">Milestone 3</h2>
+              <hr class="star-dark mb-5">
+              <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
+              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
+                <i class="fa fa-close"></i>
+                Close Project</a>
             </div>
           </div>
         </div>
