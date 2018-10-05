@@ -13,6 +13,7 @@ port at 115.2kb.
 #include <FFT.h> // include the library
 
 void setup() {
+  pinMode(A4, INPUT);
   while(!readSignal() && digitalRead(8) !=  HIGH);
   Serial.begin(115200); // use the serial port
   pinMode(LED_BUILTIN, OUTPUT);
@@ -75,4 +76,3 @@ boolean readSignal() {
   }
   return false;
 }
-
