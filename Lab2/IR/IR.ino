@@ -13,8 +13,9 @@ port at 115.2kb.
 #include <FFT.h> // include the library
 
 void setup() {
+  while(!readSignal() && digitalRead(8) !=  HIGH);
   Serial.begin(115200); // use the serial port
-   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(A0, INPUT);
   TIMSK0 = 0; // turn off timer0 for lower jitter
   ADCSRA = 0xe5; // set the adc to free running mode
@@ -57,3 +58,21 @@ void loop() {
    }
   }
 }
+
+boolean readSignal() {
+  cli();  // UDRE interrupt slows this way down on arduino1.0
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    fft_input[i] = analogRead(A4); // put real data into even bins
+    fft_input[i+1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+  if (fft_log_out[19] >= 50){
+    return true;
+  }
+  return false;
+}
+
