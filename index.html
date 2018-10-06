@@ -663,7 +663,7 @@ boolean readSignal() {
               </p>
               <ul class="mb-5 text-left">
                 <li class="li-center">2x OP598A Phototransistor</li>
-                <li class="li-center">2x LM358 OP-Amp</li>
+                <li class="li-center">2x LM358 Dual OP-Amp</li>
                 <li class="li-center">1x 430 Ohm Resistor</li>
                 <li class="li-center">1x Solderless breadboard</li>
                 <li class="li-center">2x 1k Resistor</li>
@@ -673,8 +673,16 @@ boolean readSignal() {
                 <li class="li-center">1x 10nF Capacitor</li>
               </ul>
               <p class="mb-3 text-left">
-                Overall our circuit for detecting other robots can be broken down into 3 stages.
+                Overall our circuit for detecting other robots can be broken down into 3 stages. 
+                A picture of our completed IR circuit is below. You can see that one the top right
+                of the image, there exist two phototransistors in series. That then feeds into the
+                op-amp ICs, and the output commes out of the light blue wire which goes off-screen
+                to the left.
               </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/IR_circuit.jpg" alt="Completed IR Capture and Amplification Circuit"></img>
+                <figcaption>Figure: Completed IR Capture and Amplification Circuit</figcaption>
+              </figure>
               
               <h5 class="text-secondary text-left mb-3">Stage 1: IR Capture</h4>
               <p class="mb-3 text-left">
@@ -685,7 +693,18 @@ boolean readSignal() {
                 <figcaption>Figure: IR Capture Circuit</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                Once we implemented the output capture circuit, we probed the output of the first stage with an oscilloscope when holding a treasure close to the phototransistors. The treasures were tunable in frequency, so we were able to output both a 6.2kHz signal and a 18kHz signal, which approximate the frequencies emitted by the other robots and the decoy robots in the maze respectively. While there is a visible signal, its peak-to-peak voltage is very small, meaning that the Arduino would not easily be able to tell when the signal was present. In addition, in order to even get this clear of a signal, we needed to hold the IR source very close to the phototransistors, which would not be a viable solution for detecting robots from several inches away. We needed to add analog amplification.
+                Once we implemented the output capture circuit, we probed the output of 
+                the first stage with an oscilloscope when holding a treasure close to 
+                the phototransistors. The treasures were tunable in frequency, so we 
+                were able to output both a 6.2kHz signal and a 18kHz signal, which 
+                approximate the frequencies emitted by the other robots and the decoy 
+                robots in the maze respectively. While there is a visible signal, its 
+                peak-to-peak voltage is very small, meaning that the Arduino would not 
+                easily be able to tell when the signal was present. In addition, in 
+                order to even get this clear of a signal, we needed to hold the IR 
+                source very close to the phototransistors, which would not be a viable 
+                solution for detecting robots from several inches away. We needed to 
+                add analog amplification.
               </p>
               <figure>
                 <img class="img-fluid mb-3" src="img/Lab 2 Photos/scope_no_amp.png" alt="Oscilloscope Output of IR Signal Before Amplification"></img>
@@ -719,13 +738,13 @@ boolean readSignal() {
                 <figcaption>Figure: Comparator Circuit Diagram</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                  In order to further amplify our output, we fed the output of the amplification 
-                  circuit to a comparator circuit, which we hoped would further increase the 
-                  gain of our circuit and improve the signal quality. We first sent the input 
-                  through a unity gain voltage buffer which ensured that as we experimented 
-                  with different types of amplifiers and comparator circuits, the gain of each 
-                  would act independently. With our final design, we no longer need the unity 
-                  gain amplifier and may remove it to compact our circuit. 
+                In order to further amplify our output, we fed the output of the amplification 
+                circuit to a comparator circuit, which we hoped would further increase the 
+                gain of our circuit and improve the signal quality. We first sent the input 
+                through a unity gain voltage buffer which ensured that as we experimented 
+                with different types of amplifiers and comparator circuits, the gain of each 
+                would act independently. With our final design, we no longer need the unity 
+                gain amplifier and may remove it to compact our circuit. 
               </p>
               <p class="mb-3 text-left">
                 The second half uses a comparator with a voltage generated with a voltage divider. 
