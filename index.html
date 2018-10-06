@@ -638,15 +638,199 @@ boolean readSignal() {
               <h4 class="text-secondary mb-3">Anthony Viego and Kevin Ying</h4>
               <h4 class="text-secondary text-left mb-3">Goal</h4>
               <p class="mb-5 text-left">
-                lalala
+                Create a circuit which is able to detect a 6.08kHz IR signal signifying other robots which have to be avoided in the maze while discarding 18kHz decoy IR signals.
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Prelab</h4>
+              <p class="mb-3 text-left">
+                Unlike the microphone circuit, using AnalogRead will not be fast enough for IR purposes. 
+                We want to be able to detect 6kHz signals, which would require a sampling frequency of 
+                approximately 12kHz. However, the maximum with AnalogRead is approximately 8930Hz, 
+                as discussed above. Instead, we will have to read directly from the ADC pin result 
+                register to increase our sampling frequency. Since we will have to sample at such a high frequency, 
+                it will be difficult to do other processing simultaneously - we will have to carefully 
+                determine when to measure as to not miss other robots while were are making decisions 
+                about where to drive.
+              </p>
+              <p class="mb-3 text-left">
+                Thankfully, we don't have to worry as much about other sources of IR, which are unlikely to occur at the same frequency. For example, one common source of IR is fluorescent lights, but they emit approximately 30-60kHz signals. Testing in lab confirms that even in the presence of artificial lights and sunlike, the main source of noise for IR is 60Hz coming from the walls.
+              </p>
+
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Frequency Detection and Amplification Circuit</h4>
+              <p class="mb-3 text-left">
+                In order to build the amplification circuit, we needed the following materials in addition to our usual Arduino Uno setup:
+              </p>
+              <ul class="mb-5 text-left">
+                <li class="li-center">2x OP598A Phototransistor</li>
+                <li class="li-center">2x LM358 OP-Amp</li>
+                <li class="li-center">1x 430 Ohm Resistor</li>
+                <li class="li-center">1x Solderless breadboard</li>
+                <li class="li-center">2x 1k Resistor</li>
+                <li class="li-center">1x 10k Resistor</li>
+                <li class="li-center">1x 100k Resistor</li>
+                <li class="li-center">1x 24k Resistor</li>
+                <li class="li-center">1x 10nF Capacitor</li>
+              </ul>
+              <p class="mb-3 text-left">
+                Overall our circuit for detecting other robots can be broken down into 3 stages.
+              </p>
+              
+              <h5 class="text-secondary text-left mb-3">Stage 1: IR Capture</h4>
+              <p class="mb-3 text-left">
+                The first stage of our circuit is similar to the suggested circuit in the <a href="https://cei-lab.github.io/ece3400-2018/lab2.html">lab 2 handout</a>. However, rather we chose to use two resistors in parallel and two phototransistors in series to increase the amplitude of the produced signal. Figure 1 shows this stage of the circuit. As the output of our circuit ranged from 20mVpp to 100mVpp at very close distances, we decided to amplify the output of this stage to increase the distance we can detect other robots from. 
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/IR_capture_circuit.png" alt="IR Capture Circuit"></img>
+                <figcaption>Figure: IR Capture Circuit</figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                Once we implemented the output capture circuit, we probed the output of the first stage with an oscilloscope when holding a treasure close to the phototransistors. The treasures were tunable in frequency, so we were able to output both a 6.2kHz signal and a 18kHz signal, which approximate the frequencies emitted by the other robots and the decoy robots in the maze respectively. While there is a visible signal, its peak-to-peak voltage is very small, meaning that the Arduino would not easily be able to tell when the signal was present. In addition, in order to even get this clear of a signal, we needed to hold the IR source very close to the phototransistors, which would not be a viable solution for detecting robots from several inches away. We needed to add analog amplification.
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/scope_no_amp.png" alt="Oscilloscope Output of IR Signal Before Amplification"></img>
+                <figcaption>Figure: Output of IR Signal Before Amplification</figcaption>
+              </figure>
+
+              <h5 class="text-secondary text-left mb-3">Stage 2: Amplification</h4>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_amp_circuit.png" alt="Amplification Circuit Diagram"></img>
+                <figcaption>Figure: Amplification Circuit Diagram</figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                This stage is responsible for amplifying the output of our IR capture circuit. 
+                The circuit itself can be seen in figure 2 below. It should be noted that the 
+                output of the IR capture circuit has a DC bias of approximately 2.5V. Since we 
+                plan to have 20x gain, this would mean our signal would always hit the max voltage 
+                of 5V and would appear to be a constant high signal. Thus, to remove this bias 
+                we implemented a high pass RC filter using a 10k resistor and 10nF capacitor 
+                which has a cutoff frequency of roughly 1592Hz. 
+              </p>
+              <p class="mb-3 text-left">
+                We then fed the output of the low pass filter into a non-inverting amplifier. 
+                We used a 20k resistor and 1k resistor set up in a negative feedback loop to 
+                achieve a gain of roughly 20x. We found that this amplification level gave us 
+                the clearest results on our output.
+              </p>
+              
+              <h5 class="text-secondary text-left mb-3">Stage 3: Comparator</h4>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_comp_circuit.png" alt="Comparator Circuit Diagram"></img>
+                <figcaption>Figure: Comparator Circuit Diagram</figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                  In order to further amplify our output, we fed the output of the amplification 
+                  circuit to a comparator circuit, which we hoped would further increase the 
+                  gain of our circuit and improve the signal quality. We first sent the input 
+                  through a unity gain voltage buffer which ensured that as we experimented 
+                  with different types of amplifiers and comparator circuits, the gain of each 
+                  would act independently. With our final design, we no longer need the unity 
+                  gain amplifier and may remove it to compact our circuit. 
+              </p>
+              <p class="mb-3 text-left">
+                The second half uses a comparator with a voltage generated with a voltage divider. 
+                We first determined a voltage that we wanted to compare against by stepping 
+                through voltage levels on a DC power supply until the desired result was achieved. 
+                We found that we were able to get the clearest signal from the greatest range of 
+                distances for the IR treasure for a comparator reference voltage of 
+                approximately 23mV. The values of the resistors in the voltage divider were then 
+                determined to approximate that voltage, since 5V * (430/100000) = 21.5mV.
+              </p>
+              <p class="mb-3 text-left">
+                With the new amplifier and comparator, we were able to achieve the following output even when the IR emitter treasure was held 3-4 inches away from the phototransistors.
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_with_amp.png" alt="Oscilloscope Output of IR Signal With Amplification"></img>
+                <figcaption>Figure: Output of IR Signal With Amplification</figcaption>
+              </figure>
+
+              <h4 class="text-secondary text-left mb-3">FFT</h4>
+              <p class="mb-3 text-left">
+                Once we had a high signal-to-noise ratio and a clear signal, we now wanted to 
+                be able to read data into the Arduino and process the inputs to determine the 
+                frequencies coming in. To do this we connected the output of our comparator 
+                circuit to pin A0 of the arduino. We then used adc0 to read in the output of 
+                the comparator circuit from the ADCL and ADCH registers and converted these 
+                values into a single 16 bit integer. These values were then stored in the 
+                <code>fft_input</code> array which was then used by the fft library to calculate the 
+                magnitude of each bin. The graph below shows the result of this operation 
+                for a 6kHz and 18kHz signal. 
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_6k_18k_comparison.png" alt="Overlaid FFT Output for Amplified IR Sensor Signal"></img>
+                <figcaption>Figure: Overlaid FFT Output for Amplified IR Sensor Signal</figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                As can be seen, the peak magnitude of the 6kHz signal is around bin 40. This 
+                result is relatively accurate as our base clock for the arduino is 16MHz with 
+                an ADC clock prescaler of 32. As each ADC read takes 13 clock cycles this 
+                results in a sampling frequency of 38461.53. As we take 256 samples this 
+                means that each bin represents 150.24 Hz. If we divide 6.08kHz by 150.24Hz 
+                we find that the peak of our 6kHz single should be in bin 40 which is what 
+                we found. 
+              </p>
+              <p class="mb-3 text-left">
+                We then use this information to determine when a 6kHz signal is present by 
+                checking to see if the magnitude of bins 38 - 44 are above 150. We decided 
+                to use 150 as our threshold since general noise did not seem to create peaks 
+                above 75 and the 18kHz signal also does not generate peaks in that range 
+                above 100. By checking a range of bins we are able to determine if an 
+                approximate 6kHz signal is present while having some tolerance incase the 
+                frequency is not exact. The code, which is inside of a loop, is as follows:
+              </p>
+              <pre class="mb-0 text-left"><code>
+cli();  // UDRE interrupt slows this way down on arduino1.0 so we disable interrupts
+
+// save 256 samples
+for (int i = 0 ; i < 512 ; i += 2) {
+  while(!(ADCSRA & 0x10)); // wait for adc to be ready
+  ADCSRA = 0xf5; // restart adc
+  byte m = ADCL; // fetch adc data
+  byte j = ADCH;
+  int k = (j << 8) | m; // form into an int
+  k -= 0x0200; // form into a signed int
+  k <<= 6; // form into a 16b signed int
+  fft_input[i] = k; // put real data into even bins
+  fft_input[i+1] = 0; // set odd bins to 0
+}
+
+// process FFT data
+fft_window(); // window the data for better frequency response
+fft_reorder(); // reorder the data before doing the fft
+fft_run(); // process the data in the fft
+fft_mag_log(); // take the output of the fft
+
+sei(); // re-enable interrupts
+Serial.println("start");
+for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+  Serial.println(fft_log_out[i]); // send out the data for off-chip processing
+}
+delay(1000);
+for (int j = 38; j < 44; ++j) {
+  if (fft_log_out[j] >= 150){
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(1000);                       // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    delay(1000);
+  }
+}
+              </code></pre>
+              <p class="mb-3 text-left">
+                The results can be shown below.
               </p>
               <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/GuVrt4HzFvU?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+              <hr class="mb-5">
               <h3 class="text-secondary mb-1">The Final Integration</h3>
+              <p class="mb-3 text-left">
+                We then combined the results of the IR team and the acoustic team into one larger project!
+              </p>
               <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/RVqd22eCrKk?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab2">View Lab 2 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
-                Close Project</a>
+                Close Project
+              </a>
             </div>
           </div>
         </div>
