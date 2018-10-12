@@ -66,7 +66,7 @@ void forward(){
     MotorRight.write(98);
 }
 
-void turnRight(){
+void turnLeft(){
     MotorLeft.write(80);
     MotorRight.write(80);
     delay(400);
@@ -81,7 +81,7 @@ void turnRight(){
     return;
 }
 
-void turnLeft(){
+void turnRight(){
     MotorLeft.write(100);
     MotorRight.write(100);
     delay(400);
@@ -174,11 +174,11 @@ void wallfollow(){
       return;
   }
   if (wallRight <= SOMETHRESHOLD){  //nothing on the right, so we can turn right 
-      turnLeft();
+      turnRight();
       return;
   }
   while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){
-      turnRight();
+      turnLeft();
       wallRight = analogRead(A5);
       wallFront = analogRead(A4);
       if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
