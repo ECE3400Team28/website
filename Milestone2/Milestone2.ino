@@ -16,6 +16,8 @@ int LightLeft = A1;
 int wallRight;
 int wallFront;
 
+int rightWallLED = 13;
+int frontWallLED = 12;
 int SOMETHRESHOLD = 1;
 
 int i = 0;
@@ -23,19 +25,21 @@ int i = 0;
 void setup() {
   // put your setup code here, to run once:
     pinMode(A4, INPUT);           //second wall sensor
+    pinMode(8, INPUT);
     while(digitalRead(8) !=  HIGH);
     Serial.begin(115200); // use the serial port
     pinMode(A0, INPUT);           //ADC for other robot FFT detection
     int PWM1 = 3;
     int PWM2 = 5;
     pinMode(PWM1, OUTPUT); 
-    pinMode(8, INPUT);
     pinMode(PWM2, OUTPUT); 
     pinMode(LightCenter, INPUT);  //A2
     pinMode(LightRight, INPUT);   //A3, ******WAS A0, need to change wiring 
     pinMode(LightLeft, INPUT);    //A1
     pinMode(A5, INPUT);           //USED for IR distance sensor for walls 
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(rightWallLED, OUTPUT);
+    pinMode(frontWallLED, OUTPUT);
     MotorLeft.attach(PWM1); 
     MotorRight.attach(PWM2);
     MotorLeft.write(90);
@@ -141,6 +145,8 @@ void linefollow(){
 void wallfollow(){
   wallRight = analogRead(A5);
   wallFront = analogRead(A4);
+  if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+  if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
       //we can go straight
       return;
