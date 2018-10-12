@@ -13,7 +13,8 @@ int LightCenter = A2;
 int LightRight = A3;
 int LightLeft = A1;
 
-int wallData;
+int wallRight;
+int wallFront;
 
 int SOMETHRESHOLD = 1;
 
@@ -24,8 +25,8 @@ int detected = 0; //global variable used for detecting other robots
 
 void setup() {
   // put your setup code here, to run once:
-    pinMode(A4, INPUT);
-    while(!readSignal() && digitalRead(8) !=  HIGH);
+    pinMode(A4, INPUT);           //second wall sensor
+    while(digitalRead(8) !=  HIGH);
     Serial.begin(115200); // use the serial port
     pinMode(A0, INPUT);           //ADC for other robot FFT detection
     int PWM1 = 3;
@@ -141,16 +142,21 @@ void linefollow(){
 }
 
 void wallfollow(){
-  wallData = analogRead(A5);
-  if (wallData <= SOMETHRESHOLD){ //if greater than threshold there is a wall 
-    turnRight(); //open path to our right 
+  wallRight = analogRead(A5);
+  wallFront = analogRead(A4);
+  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
+    //we can go straight
     return;
   }
-  while (wallData >= SOMETHRESHOLD){
-      turnLeft();
-        wallData = analogRead(A5);
+  if (wallRight < SOMETHRESHOLD){  //nothing on the right, so we can turn right 
+      turnRight();
+      return;
   }
-  turnRight(); //turn back one so we can move forward 
+  while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){
+    turnLeft();
+    wallRight = analogRead(A5);
+    wallFront = analogRead(A4);
+  }
   return;
 }
 
