@@ -10,7 +10,7 @@ int LightDataC;
 int LightDataL;
 int LightDataR;
 int LightCenter = A2;
-int LightRight = A3;
+int LightRight = A0;
 int LightLeft = A1;
 
 int wallRight;
@@ -34,7 +34,7 @@ void setup() {
     pinMode(PWM1, OUTPUT); 
     pinMode(PWM2, OUTPUT); 
     pinMode(LightCenter, INPUT);  //A2
-    pinMode(LightRight, INPUT);   //A3, ******WAS A0, need to change wiring 
+    pinMode(LightRight, INPUT);   //A0
     pinMode(LightLeft, INPUT);    //A1
     pinMode(A5, INPUT);           //USED for IR distance sensor for walls 
     pinMode(LED_BUILTIN, OUTPUT);
