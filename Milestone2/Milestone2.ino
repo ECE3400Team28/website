@@ -18,10 +18,7 @@ int wallFront;
 
 int SOMETHRESHOLD = 1;
 
-int turn[8] = {1,0,0,0,0,1,1,1};
 int i = 0;
-
-int detected = 0; //global variable used for detecting other robots 
 
 void setup() {
   // put your setup code here, to run once:
@@ -37,7 +34,7 @@ void setup() {
     pinMode(LightCenter, INPUT);  //A2
     pinMode(LightRight, INPUT);   //A3, ******WAS A0, need to change wiring 
     pinMode(LightLeft, INPUT);    //A1
-  pinMode(A5, INPUT);           //USED for IR distance sensor for walls 
+    pinMode(A5, INPUT);           //USED for IR distance sensor for walls 
     pinMode(LED_BUILTIN, OUTPUT);
     MotorLeft.attach(PWM1); 
     MotorRight.attach(PWM2);
@@ -50,15 +47,15 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-    if (!detected){
+    // put your main code here, to run repeatedly:
+    if (!detect()){
         forward();
         linefollow();
-  }
-  detect();
+    }
     delay(20);
-  // getValues();
+    // getValues();
 }
+
 void forward(){
     MotorLeft.write(84);
     MotorRight.write(98);
@@ -69,9 +66,9 @@ void turnRight(){
     MotorRight.write(80);
     delay(600);
     while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
-     LightDataC = analogRead(LightCenter);
-     LightDataL = analogRead(LightLeft);
-     LightDataR = analogRead(LightRight);
+       LightDataC = analogRead(LightCenter);
+       LightDataL = analogRead(LightLeft);
+       LightDataR = analogRead(LightRight);
     }
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -83,10 +80,10 @@ void turnLeft(){
     MotorLeft.write(100);
     MotorRight.write(100);
     delay(600);
-     while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
-     LightDataC = analogRead(LightCenter);
-     LightDataL = analogRead(LightLeft);
-     LightDataR = analogRead(LightRight);
+    while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
+       LightDataC = analogRead(LightCenter);
+       LightDataL = analogRead(LightLeft);
+       LightDataR = analogRead(LightRight);
     }
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -145,33 +142,33 @@ void wallfollow(){
   wallRight = analogRead(A5);
   wallFront = analogRead(A4);
   if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
-    //we can go straight
-    return;
+      //we can go straight
+      return;
   }
   if (wallRight < SOMETHRESHOLD){  //nothing on the right, so we can turn right 
       turnRight();
       return;
   }
   while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){
-    turnLeft();
-    wallRight = analogRead(A5);
-    wallFront = analogRead(A4);
+      turnLeft();
+      wallRight = analogRead(A5);
+      wallFront = analogRead(A4);
   }
   return;
 }
 
-void detect() {
+boolean detect() {
     cli();  // UDRE interrupt slows this way down on arduino1.0
     for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-      while(!(ADCSRA & 0x10)); // wait for adc to be ready
-      ADCSRA = 0xf5; // restart adc
-      byte m = ADCL; // fetch adc data
-      byte j = ADCH;
-      int k = (j << 8) | m; // form into an int
-      k -= 0x0200; // form into a signed int
-      k <<= 6; // form into a 16b signed int
-      fft_input[i] = k; // put real data into even bins
-      fft_input[i+1] = 0; // set odd bins to 0
+        while(!(ADCSRA & 0x10)); // wait for adc to be ready
+        ADCSRA = 0xf5; // restart adc
+        byte m = ADCL; // fetch adc data
+        byte j = ADCH;
+        int k = (j << 8) | m; // form into an int
+        k -= 0x0200; // form into a signed int
+        k <<= 6; // form into a 16b signed int
+        fft_input[i] = k; // put real data into even bins
+        fft_input[i+1] = 0; // set odd bins to 0
     }
     fft_window(); // window the data for better frequency response
     fft_reorder(); // reorder the data before doing the fft
@@ -186,18 +183,18 @@ void detect() {
   */
    //delay(1000);  ***** do we need this 
    for (int j = 38; j < 44; ++j) {
-    if (fft_log_out[j] >= 150){
-    MotorRight.write(90);
-    MotorLeft.write(90);
-    detected = 1;                 //We have detected another robot
-        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-        delay(1000);                       // wait for a second
-        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-        delay(1000); 
-        return;   
-    }
+      if (fft_log_out[j] >= 150){
+          //We have detected another robot
+          MotorRight.write(90);
+          MotorLeft.write(90);
+          digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+          delay(1000);                       // wait for a second
+          digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+          delay(1000); 
+          return true;
+      }
    }
-   detected = 0;        //Other robots not detected 
+   return false;        //Other robots not detected 
 }
 
 boolean readSignal() {
