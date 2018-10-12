@@ -16,10 +16,10 @@ int LightLeft = A1;
 int wallRight;
 int wallFront;
 
-int rightWallLED = 13;
+int rightWallLED = 11;
 int frontWallLED = 12;
-int SOMETHRESHOLD = 1;
-
+int SOMETHRESHOLD = 170;
+int LIGHTTHRESHOLD = 500;
 int i = 0;
 
 void setup() {
@@ -28,7 +28,7 @@ void setup() {
     pinMode(8, INPUT);
     while(digitalRead(8) !=  HIGH);
     Serial.begin(115200); // use the serial port
-    pinMode(A0, INPUT);           //ADC for other robot FFT detection
+    //pinMode(A0, INPUT);           //ADC for other robot FFT detection
     int PWM1 = 3;
     int PWM2 = 5;
     pinMode(PWM1, OUTPUT); 
@@ -44,18 +44,19 @@ void setup() {
     MotorRight.attach(PWM2);
     MotorLeft.write(90);
     MotorRight.write(90);
-    TIMSK0 = 0; // turn off timer0 for lower jitter
-    ADCSRA = 0xe5; // set the adc to free running mode
-    ADMUX = 0x40; // use adc0
-    DIDR0 = 0x01; // turn off the digital input for adc0
+    delay(2000);
+//    TIMSK0 = 0; // turn off timer0 for lower jitter
+//    ADCSRA = 0xe5; // set the adc to free running mode
+//    ADMUX = 0x40; // use adc0
+//    DIDR0 = 0x01; // turn off the digital input for adc0
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
-    if (!detect()){
-        forward();
-        linefollow();
-    }
+    //if (!detect()){
+    forward();
+    linefollow();
+    //}
     delay(20);
     // getValues();
 }
@@ -68,8 +69,8 @@ void forward(){
 void turnRight(){
     MotorLeft.write(80);
     MotorRight.write(80);
-    delay(600);
-    while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
+    delay(400);
+    while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
        LightDataR = analogRead(LightRight);
@@ -83,8 +84,8 @@ void turnRight(){
 void turnLeft(){
     MotorLeft.write(100);
     MotorRight.write(100);
-    delay(600);
-    while(!(LightDataC <= 775 && LightDataL > 775 && LightDataR > 775)){
+    delay(400);
+    while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
        LightDataR = analogRead(LightRight);
@@ -96,45 +97,64 @@ void turnLeft(){
 }
 
 void linefollow(){
-     //Below 775 is white tape
-     //Above 775 is dark
+     //Below LIGHTTHRESHOLD is white tape
+     //Above LIGHTTHRESHOLD is dark
      LightDataC = analogRead(LightCenter);
      LightDataL = analogRead(LightLeft);
      LightDataR = analogRead(LightRight);
-     Serial.println(LightDataC);
-     Serial.println(LightDataL);
-     Serial.println(LightDataR);
-     if (LightDataC <= 775 && LightDataL > 775 && LightDataR > 775){
+
+     bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
+     bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
+     bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
+     
+//     Serial.println(LightDataC);
+//     Serial.println(LightDataL);
+//     Serial.println(LightDataR);
+     //if (LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD){
+     if (centerOnLine && !leftOnLine && !rightOnLine) {
            // centered
            Serial.println("Centered");
            return;
-     } else if (LightDataL <= 775 && LightDataR <= 775) { //intersection code
+     //} else if (LightDataL <= LIGHTTHRESHOLD && LightDataR <= LIGHTTHRESHOLD) { //intersection code
+     } else if (leftOnLine && rightOnLine) {
+           forward();
+           delay(650);
            wallfollow();
+           Serial.println("intersection");
            return;
-     } else if (LightDataC <= 775 && LightDataL <= 775){
+     //} else if (LightDataC <= LIGHTTHRESHOLD && LightDataL <= LIGHTTHRESHOLD){
+     } else if (centerOnLine && leftOnLine) {
            // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
            MotorLeft.write(83);
            Serial.println("Veering slightly right");
            delay(100);
            return;
-     } else if (LightDataC <= 775 && LightDataR <= 775){
+     //} else if (LightDataC <= LIGHTTHRESHOLD && LightDataR <= LIGHTTHRESHOLD){
+     } else if (centerOnLine && rightOnLine) {
            // bot is veering left slightly, so we turn it right a bit
+           //MotorRight.write(95);
            MotorRight.write(95);
-           MotorLeft.write(88);
+           MotorLeft.write(80);
+           //MotorLeft.write(88);
            Serial.println("Veering slightly left");
            delay(100);
            return;
-     } else if (LightDataL <= 775){
+     //} else if (LightDataL <= LIGHTTHRESHOLD){
+     } else if (leftOnLine) {
            // bot is veering right a lot, so we turn it left more
+           Serial.println("A lot right");
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(100);
            return;
-     } else if (LightDataR <= 775){
+     //} else if (LightDataR <= LIGHTTHRESHOLD){
+     } else if (rightOnLine) {
            // bot is veering left a lot, so we turn it right more
+           Serial.println("A lot left");
+           //MotorRight.write(92);
+           MotorLeft.write(90);
            MotorRight.write(100);
-           MotorLeft.write(88);
            delay(100);
            return;
      } else {
@@ -145,20 +165,24 @@ void linefollow(){
 void wallfollow(){
   wallRight = analogRead(A5);
   wallFront = analogRead(A4);
+  Serial.println(wallRight);
+  Serial.println(wallFront);
   if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
   if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
-  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
+  if (wallFront <= SOMETHRESHOLD){ // && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
       //we can go straight
       return;
   }
-  if (wallRight < SOMETHRESHOLD){  //nothing on the right, so we can turn right 
-      turnRight();
+  if (wallRight <= SOMETHRESHOLD){  //nothing on the right, so we can turn right 
+      turnLeft();
       return;
   }
   while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){
-      turnLeft();
+      turnRight();
       wallRight = analogRead(A5);
       wallFront = analogRead(A4);
+      if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+      if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
   return;
 }
