@@ -26,16 +26,19 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  outputWall();
-  //outputLine();
+  //outputWall();
+  outputLine();
 }
 
 void outputLine(){
   int LightDataC = analogRead(LightCenter);
   int LightDataL = analogRead(LightLeft);
   int LightDataR = analogRead(LightRight);
+  Serial.println("Center");
   Serial.println(LightDataC);
+  Serial.println("Left");
   Serial.println(LightDataL);
+  Serial.println("Right");
   Serial.println(LightDataR);
   delay(100);
 }

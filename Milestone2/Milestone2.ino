@@ -19,9 +19,10 @@ int wallFront;
 int rightWallLED = 11;
 int frontWallLED = 12;
 int SOMETHRESHOLD = 170;
-int LIGHTTHRESHOLD = 500;
+int LIGHTTHRESHOLD = 500; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 int i = 0;
 
+// *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
   // put your setup code here, to run once:
     pinMode(A4, INPUT);           //second wall sensor
@@ -69,30 +70,40 @@ void forward(){
 void turnLeft(){
     MotorLeft.write(80);
     MotorRight.write(80);
-    delay(400);
+    delay(600); // move away from current line
+    // added the following check for current status:
+    LightDataC = analogRead(LightCenter); 
+    LightDataL = analogRead(LightLeft);
+    LightDataR = analogRead(LightRight);
+    // end check;
     while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
+       // keep checking
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
        LightDataR = analogRead(LightRight);
     }
     MotorLeft.write(90);
     MotorRight.write(90);
-    delay(100);
     return;
 }
 
 void turnRight(){
     MotorLeft.write(100);
     MotorRight.write(100);
-    delay(400);
+    delay(600); // move away from current line
+    // added the following check for current status:
+    LightDataC = analogRead(LightCenter);
+    LightDataL = analogRead(LightLeft);
+    LightDataR = analogRead(LightRight);
+    // end check
     while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
+       // keep checking
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
        LightDataR = analogRead(LightRight);
     }
     MotorLeft.write(90);
     MotorRight.write(90);
-    delay(100);
     return;
 }
 
@@ -107,22 +118,16 @@ void linefollow(){
      bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
      bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
      
-//     Serial.println(LightDataC);
-//     Serial.println(LightDataL);
-//     Serial.println(LightDataR);
-     //if (LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD){
      if (centerOnLine && !leftOnLine && !rightOnLine) {
            // centered
            Serial.println("Centered");
            return;
-     //} else if (LightDataL <= LIGHTTHRESHOLD && LightDataR <= LIGHTTHRESHOLD) { //intersection code
      } else if (leftOnLine && rightOnLine) {
            forward();
            delay(650);
            wallfollow();
            Serial.println("intersection");
            return;
-     //} else if (LightDataC <= LIGHTTHRESHOLD && LightDataL <= LIGHTTHRESHOLD){
      } else if (centerOnLine && leftOnLine) {
            // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
@@ -130,7 +135,6 @@ void linefollow(){
            Serial.println("Veering slightly right");
            delay(100);
            return;
-     //} else if (LightDataC <= LIGHTTHRESHOLD && LightDataR <= LIGHTTHRESHOLD){
      } else if (centerOnLine && rightOnLine) {
            // bot is veering left slightly, so we turn it right a bit
            //MotorRight.write(95);
@@ -140,7 +144,6 @@ void linefollow(){
            Serial.println("Veering slightly left");
            delay(100);
            return;
-     //} else if (LightDataL <= LIGHTTHRESHOLD){
      } else if (leftOnLine) {
            // bot is veering right a lot, so we turn it left more
            Serial.println("A lot right");
@@ -148,7 +151,6 @@ void linefollow(){
            MotorLeft.write(80);
            delay(100);
            return;
-     //} else if (LightDataR <= LIGHTTHRESHOLD){
      } else if (rightOnLine) {
            // bot is veering left a lot, so we turn it right more
            Serial.println("A lot left");
@@ -157,28 +159,29 @@ void linefollow(){
            MotorRight.write(100);
            delay(100);
            return;
-     } else {
-          // this is a case we did not foresee!! y i k e s
      }
 }
 
 void wallfollow(){
   wallRight = analogRead(A5);
+  wallRight = analogRead(A5);
   wallFront = analogRead(A4);
-  Serial.println(wallRight);
-  Serial.println(wallFront);
+  wallFront = analogRead(A4);
+  //Serial.println(wallRight);
+  //Serial.println(wallFront);
   if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
   if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
-  if (wallFront <= SOMETHRESHOLD){ // && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
-      //we can go straight
+  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { //if greater than threshold there is a wall 
+      //following the wall: we can go straight
       return;
   }
   if (wallRight <= SOMETHRESHOLD){  //nothing on the right, so we can turn right 
       turnRight();
       return;
   }
-  while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){
+  while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ // blocked on both front and right
       turnLeft();
+      //delay(1000);
       wallRight = analogRead(A5);
       wallFront = analogRead(A4);
       if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
