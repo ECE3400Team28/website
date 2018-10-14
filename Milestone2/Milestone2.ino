@@ -164,18 +164,16 @@ void linefollow(){
 
 void wallfollow(){
   wallRight = analogRead(A5);
-  wallRight = analogRead(A5);
-  wallFront = analogRead(A4);
   wallFront = analogRead(A4);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
   if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
   if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { //if greater than threshold there is a wall 
-      //following the wall: we can go straight
+      // following the wall: we can go straight
       return;
   }
-  if (wallRight <= SOMETHRESHOLD){  //nothing on the right, so we can turn right 
+  if (wallRight <= SOMETHRESHOLD){  // nothing on the right, so we can turn right 
       turnRight();
       return;
   }

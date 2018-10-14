@@ -1150,6 +1150,62 @@ void linefollow(){
               <p class="mb-5 text-left">As shown in the video below, the red LED turns on when the robot senses a wall in front of it, and the green LED turns on when it senses a wall to the right. These LEDs only change at an intersection in the grid, because we only check for walls at these intersections. We determined a threshold value for the distance sensors by holding a wall a certain distance away from the robot so that we don't detect a wall too early or too late. Our right-hand wall-following logic is determined through a series of if-statements.
               </p>
               <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/R7MomRgZwi8?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <p class="mb-0 text-left">The following is commented code on how we implemented this:</p>
+              <pre class="mb-0 text-left">
+                <code>
+// this is some code from our linefollow() method from Milestone 1 that we changed for this milestone
+void linefollow(){
+    //Below LIGHTTHRESHOLD is white tape
+    //Above LIGHTTHRESHOLD is dark
+    LightDataC = analogRead(LightCenter);
+    LightDataL = analogRead(LightLeft);
+    LightDataR = analogRead(LightRight);
+
+    bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
+    bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
+    bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
+     
+    if (centerOnLine && !leftOnLine && !rightOnLine) {
+        // centered
+        Serial.println("Centered");
+        return;
+    } else if (leftOnLine && rightOnLine) {
+        forward();
+        delay(650); // this allows the robot to be centered on top of the intersection before turning
+        wallfollow(); // new method!
+        Serial.println("intersection");
+        return;
+    }
+    ... // other cases
+}
+
+// our wall-following code
+void wallfollow(){
+  wallRight = analogRead(A5);
+  wallFront = analogRead(A4);
+  if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the right wall LED on
+  if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the front wall LED on
+  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { // if greater than threshold there is a wall 
+      // following the right wall: we can go straight
+      return;
+  }
+  if (wallRight <= SOMETHRESHOLD){  // nothing on the right, so we can turn right 
+      turnRight(); // turns right until the center line sensor hits a line
+      return;
+  }
+  while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ // blocked on both front and right- keep turning until we aren't blocked
+      turnLeft(); // turns left until the center line sensor hits a line
+      wallRight = analogRead(A5);
+      wallFront = analogRead(A4);
+      // signal our findings with LED
+      if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);
+      if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);
+  }
+  return;
+}
+                </code>
+              </pre>
+              <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Avoiding other robots</h4>
               <p class="mb-5 text-left">blah blah
               </p>
