@@ -7,7 +7,7 @@ int frontWallLED = 12;
 int SOMETHRESHOLD = 1;
 
 int LightCenter = A2;
-int LightRight = A0;
+int LightRight = A3;
 int LightLeft = A1;
 
 void setup() {

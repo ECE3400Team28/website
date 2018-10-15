@@ -9,35 +9,35 @@ Servo MotorRight;
 int LightDataC;
 int LightDataL;
 int LightDataR;
-int LightCenter = A2;
-int LightRight = A0;
-int LightLeft = A1;
+const int LightCenter = A2;
+const int LightRight = A3;
+const int LightLeft = A1;
 
 int wallRight;
 int wallFront;
 
-int rightWallLED = 11;
-int frontWallLED = 12;
-int SOMETHRESHOLD = 170;
+const int rightWallLED = 11;
+const int frontWallLED = 12;
+const int SOMETHRESHOLD = 170;
 int LIGHTTHRESHOLD = 500; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 int i = 0;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
   // put your setup code here, to run once:
-    pinMode(A4, INPUT);           //second wall sensor
     pinMode(8, INPUT);
     while(digitalRead(8) !=  HIGH);
     Serial.begin(115200); // use the serial port
-    //pinMode(A0, INPUT);           //ADC for other robot FFT detection
+    pinMode(A0, INPUT);           //ADC for other robot FFT detection
     int PWM1 = 3;
     int PWM2 = 5;
     pinMode(PWM1, OUTPUT); 
     pinMode(PWM2, OUTPUT); 
     pinMode(LightCenter, INPUT);  //A2
-    pinMode(LightRight, INPUT);   //A0
+    pinMode(LightRight, INPUT);   //A3
     pinMode(LightLeft, INPUT);    //A1
-    pinMode(A5, INPUT);           //USED for IR distance sensor for walls 
+    pinMode(A4, INPUT);           //USED for wall distance sensor for walls 
+    pinMode(A5, INPUT);           //USED for wall distance sensor for walls 
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(rightWallLED, OUTPUT);
     pinMode(frontWallLED, OUTPUT);
@@ -46,25 +46,43 @@ void setup() {
     MotorLeft.write(90);
     MotorRight.write(90);
     delay(2000);
-//    TIMSK0 = 0; // turn off timer0 for lower jitter
-//    ADCSRA = 0xe5; // set the adc to free running mode
-//    ADMUX = 0x40; // use adc0
-//    DIDR0 = 0x01; // turn off the digital input for adc0
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
     //if (!detect()){
+//    while(1){
+//      Serial.println("test");
+//      digitalWrite(LED_BUILTIN, HIGH);
+//      delay(1000);
+//      digitalWrite(LED_BUILTIN, LOW);
+//      delay(1000);
+//    }
+//    while(1){
+//      Serial.println("test");
+//      detect();
+//    }
+//    if (detect()){
+//      turnLeft();
+//    }
+    Serial.println("test1");
     forward();
     linefollow();
+    Serial.println("test4");
     //}
     delay(20);
-    // getValues();
+
+    if (detect()){
+      turnLeft();
+      turnLeft();
+    }
+    Serial.println("test");
 }
 
 void forward(){
     MotorLeft.write(84);
     MotorRight.write(98);
+    Serial.println("test2");
 }
 
 void turnLeft(){
@@ -110,55 +128,65 @@ void turnRight(){
 void linefollow(){
      //Below LIGHTTHRESHOLD is white tape
      //Above LIGHTTHRESHOLD is dark
+     Serial.println(F("test3"));
+     Serial.println(TIMSK0);
+     Serial.println(ADCSRA);
+     Serial.println(ADMUX);
+     Serial.println(DIDR0);
+
      LightDataC = analogRead(LightCenter);
+     Serial.println(F("test5"));
      LightDataL = analogRead(LightLeft);
+     Serial.println(F("test6"));
      LightDataR = analogRead(LightRight);
+     Serial.println(F("test7"));
 
      bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
      bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
      bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
+
+     
      
      if (centerOnLine && !leftOnLine && !rightOnLine) {
            // centered
-           Serial.println("Centered");
+           Serial.println(F("Centered"));
            return;
      } else if (leftOnLine && rightOnLine) {
            forward();
            delay(650);
            wallfollow();
-           Serial.println("intersection");
+           Serial.println(F("intersection"));
            return;
      } else if (centerOnLine && leftOnLine) {
            // bot is veering right slightly, so we turn it left a bit
            MotorRight.write(92);
            MotorLeft.write(83);
-           Serial.println("Veering slightly right");
+           Serial.println(F("Veering slightly right"));
            delay(100);
            return;
      } else if (centerOnLine && rightOnLine) {
            // bot is veering left slightly, so we turn it right a bit
-           //MotorRight.write(95);
            MotorRight.write(95);
            MotorLeft.write(80);
-           //MotorLeft.write(88);
-           Serial.println("Veering slightly left");
+           Serial.println(F("Veering slightly left"));
            delay(100);
            return;
      } else if (leftOnLine) {
            // bot is veering right a lot, so we turn it left more
-           Serial.println("A lot right");
+           Serial.println(F("A lot right"));
            MotorRight.write(92);
            MotorLeft.write(80);
            delay(100);
            return;
      } else if (rightOnLine) {
            // bot is veering left a lot, so we turn it right more
-           Serial.println("A lot left");
-           //MotorRight.write(92);
+           Serial.println(F("A lot left"));
            MotorLeft.write(90);
            MotorRight.write(100);
            delay(100);
            return;
+     } else {
+      Serial.println(F("other"));
      }
 }
 
@@ -190,6 +218,18 @@ void wallfollow(){
 
 boolean detect() {
     cli();  // UDRE interrupt slows this way down on arduino1.0
+
+    int tempTIM = TIMSK0;
+    int tempSRA = ADCSRA;
+    int tempMUX = ADMUX;
+    int tempDID = DIDR0;
+    
+    TIMSK0 = 0; // turn off timer0 for lower jitter
+    ADCSRA = 0xe5; // set the adc to free running mode
+    ADMUX = 0x40; // use adc3
+    DIDR0 = 0x01; // turn off the digital input for adc3
+
+//    int startTime=millis();
     for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
         while(!(ADCSRA & 0x10)); // wait for adc to be ready
         ADCSRA = 0xf5; // restart adc
@@ -206,25 +246,58 @@ boolean detect() {
     fft_run(); // process the data in the fft
     fft_mag_log(); // take the output of the fft
     sei();
-  /*
-    Serial.println("start");
-    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-      Serial.println(fft_log_out[i]); // send out the data
-    }
-  */
+  
+//    Serial.println("start");
+//    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+//      Serial.println(fft_log_out[i]); // send out the data
+//    }
+  
+   digitalWrite(LED_BUILTIN, LOW);
+//   Serial.println(millis()-startTime);
    //delay(1000);  ***** do we need this 
    for (int j = 38; j < 44; ++j) {
       if (fft_log_out[j] >= 150){
+          
           //We have detected another robot
-          MotorRight.write(90);
-          MotorLeft.write(90);
+          //MotorRight.write(90);
+          //MotorLeft.write(90);
           digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-          delay(1000);                       // wait for a second
-          digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-          delay(1000); 
+          //delay(1000);                       // wait for a second
+          //digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+          //delay(1000);
+
+//          Serial.println(tempTIM);
+//          Serial.println(tempSRA);
+//          Serial.println(tempMUX);
+//          Serial.println(tempDID);
+
+          Serial.println(TIMSK0);
+          Serial.println(ADCSRA);
+          Serial.println(ADMUX);
+          Serial.println(DIDR0);
+
+          // return settings to original
+          TIMSK0 = tempTIM;
+          ADCSRA = tempSRA;
+          ADMUX = tempMUX;
+          DIDR0 = tempDID;
+//          Serial.println(millis()-startTime);
+
+          Serial.println(TIMSK0);
+          Serial.println(ADCSRA);
+          Serial.println(ADMUX);
+          Serial.println(DIDR0);
+
+          Serial.println(F("ayy"));
+          
           return true;
       }
    }
+   Serial.println(F("dang"));
+   TIMSK0 = tempTIM;
+   ADCSRA = tempSRA;
+   ADMUX = tempMUX;
+   DIDR0 = tempDID;
    return false;        //Other robots not detected 
 }
 
