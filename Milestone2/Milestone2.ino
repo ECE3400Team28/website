@@ -65,24 +65,37 @@ void loop() {
 //    if (detect()){
 //      turnLeft();
 //    }
-    Serial.println("test1");
+    //Serial.println("test1");
     forward();
     linefollow();
-    Serial.println("test4");
+    //Serial.println("test4");
     //}
     delay(20);
 
+    int numDetect;
     if (detect()){
-      turnLeft();
-      turnLeft();
+      // wait for three consecutive IR detections for better accuracy
+      if (numDetect == 3) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        turnLeft();
+        //turnLeft();
+        numDetect = 0;
+      }
+      else
+        numDetect++;
     }
-    Serial.println("test");
+    else {
+      // no IR detection, so decrease the number of IR detections by 1 if >0
+      digitalWrite(LED_BUILTIN, LOW);
+      numDetect = numDetect ? numDetect-- : 0;
+    }
+    //Serial.println("test");
 }
 
 void forward(){
     MotorLeft.write(84);
     MotorRight.write(98);
-    Serial.println("test2");
+    //Serial.println("test2");
 }
 
 void turnLeft(){
@@ -128,18 +141,18 @@ void turnRight(){
 void linefollow(){
      //Below LIGHTTHRESHOLD is white tape
      //Above LIGHTTHRESHOLD is dark
-     Serial.println(F("test3"));
-     Serial.println(TIMSK0);
-     Serial.println(ADCSRA);
-     Serial.println(ADMUX);
-     Serial.println(DIDR0);
+     //Serial.println(F("test3"));
+     //Serial.println(TIMSK0);
+     //Serial.println(ADCSRA);
+     //Serial.println(ADMUX);
+     //Serial.println(DIDR0);
 
      LightDataC = analogRead(LightCenter);
-     Serial.println(F("test5"));
+     //Serial.println(F("test5"));
      LightDataL = analogRead(LightLeft);
-     Serial.println(F("test6"));
+     //Serial.println(F("test6"));
      LightDataR = analogRead(LightRight);
-     Serial.println(F("test7"));
+     //Serial.println(F("test7"));
 
      bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
      bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
@@ -252,7 +265,7 @@ boolean detect() {
 //      Serial.println(fft_log_out[i]); // send out the data
 //    }
   
-   digitalWrite(LED_BUILTIN, LOW);
+   //digitalWrite(LED_BUILTIN, LOW);
 //   Serial.println(millis()-startTime);
    //delay(1000);  ***** do we need this 
    for (int j = 38; j < 44; ++j) {
@@ -261,7 +274,7 @@ boolean detect() {
           //We have detected another robot
           //MotorRight.write(90);
           //MotorLeft.write(90);
-          digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+          //digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
           //delay(1000);                       // wait for a second
           //digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
           //delay(1000);
@@ -271,10 +284,10 @@ boolean detect() {
 //          Serial.println(tempMUX);
 //          Serial.println(tempDID);
 
-          Serial.println(TIMSK0);
-          Serial.println(ADCSRA);
-          Serial.println(ADMUX);
-          Serial.println(DIDR0);
+          //Serial.println(TIMSK0);
+          //Serial.println(ADCSRA);
+          //Serial.println(ADMUX);
+          //Serial.println(DIDR0);
 
           // return settings to original
           TIMSK0 = tempTIM;
@@ -283,17 +296,17 @@ boolean detect() {
           DIDR0 = tempDID;
 //          Serial.println(millis()-startTime);
 
-          Serial.println(TIMSK0);
-          Serial.println(ADCSRA);
-          Serial.println(ADMUX);
-          Serial.println(DIDR0);
+          //Serial.println(TIMSK0);
+          //Serial.println(ADCSRA);
+          //Serial.println(ADMUX);
+          //Serial.println(DIDR0);
 
-          Serial.println(F("ayy"));
+          //Serial.println(F("ayy"));
           
           return true;
       }
    }
-   Serial.println(F("dang"));
+   //Serial.println(F("dang"));
    TIMSK0 = tempTIM;
    ADCSRA = tempSRA;
    ADMUX = tempMUX;
