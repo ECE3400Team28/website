@@ -1221,7 +1221,7 @@ void wallfollow(){
               </p>
               <figure>
                 <img class="img-fluid mb-3" src="img/Milestone 2 Photos/Noise_5V.jpg" alt="Noise on Arduino 5V"></img>
-                <figcaption>Figure 2: Output of IR Signal With Amplification</figcaption>
+                <figcaption>Figure 2: Noise Out of 5V Pin</figcaption>
               </figure>
               <p class="mb-5 text-left">
                 We also found in our testing that our robot was failing to reliably detect walls once powered off of the Arduino's 5V line, due to coupling with other components or the operations within the Arduino. This meant that a single reading from the IR FFT code was not sufficient to ascertain that a robot was present, but the sensing was also not reliable enough that we could count on every single reading returning that there was a robot present. Therefore, we needed to have some way of keeping track of how often we thought there was a robot present. We required that several readings detect the presence of a 6kHz IR source in quick succession by having count of the number of readings that increases when the FFT says there is a 6kHz peak, and otherwise slowly decays. Then, we only tried to avoid robots when the reading count was high enough. This essentially allows us to filter through the noise.
