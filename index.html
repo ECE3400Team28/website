@@ -1143,11 +1143,20 @@ void linefollow(){
               <hr class="star-dark mb-5">
               <h4 class="text-secondary text-left mb-3">Goal</h4>
               <p class="mb-5 text-left">
-                The goal of Milestone 2 was to add right-hand wall-following and robot-detecting functionality to the robot while maintaining previously built line-tracking capabilities. To detect walls, we used analog distance sensors, one on the front and one on the right. We also added additional LEDs in order to signal what the robot is thinking as it progress through the maze.
+                The goal of Milestone 2 was to add right-hand wall-following and robot-detecting functionality to the robot while maintaining previously built line-tracking capabilities. To detect walls, we used IR distance sensors, one on the front of the robot and one on the right. We also added additional LEDs (in series with 330ohm resistors) in order to signal what the robot is thinking as it progress through the maze.
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Robot Redesign</h4>
+              <p class="mb-5 text-left">
+                Many parts of our circuitry from previous labs and milestones were scattered across multiple breadboards and had to be powered by external power sources. Therefore, in order to have a contained drivable robot we needed to compactify our circuits and transfer them onto the main robot body. No major changes were made to either the IR detection or microphone circuit, although many of the specific pins we read have changed. We will continue to compact our circuit and make the connections more permanent/reliable throughout the rest of the lab sections. Note that for this milestone, we disconnect the microphone circuit entirely in order to make use of as many analog input pins as possible. In the future, we intend to free up analog inputs by replacing their usage with muxing or digital triggering circuits.
               </p>
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Circling a set of walls through right-hand wall-following</h4>
-              <p class="mb-5 text-left">As shown in the video below, the red LED turns on when the robot senses a wall in front of it, and the green LED turns on when it senses a wall to the right. These LEDs only change at an intersection in the grid, because we only check for walls at these intersections. We determined a threshold value for the distance sensors by holding a wall a certain distance away from the robot so that we don't detect a wall too early or too late. Our right-hand wall-following logic is determined through a series of if-statements.
+              <p class="mb-5 text-left">
+                  As shown in the video below, the red LED turns on when the robot senses a wall in front of it, and the green LED turns on when it senses a wall to the right. These LEDs only change at an intersection in the grid, because we only check for walls at these intersections. We determined a threshold value for the distance sensors by holding a wall a certain distance away from the robot so that we don't detect a wall too early or too late. Our right-hand wall-following logic is determined through a series of if-statements.
+              </p>
+              <p class="mb-5 text-left">
+                Firstly, in order to follow the wall to the right, we always want to turn right if there is no wall. Otherwise, if there is a wall to the right and no wall in front, we follow the wall forwards. Finally, if there are walls both the front and right, then we try to find a direction which does not have a wall in front by turning left. Each turn rotates the vehicle 90 degrees, so that once we know that there is no longer a wall both to the front and to the right, then there should be no wall to the front and we can continue driving forward. This allows us to reliably follow walls regardless of the configuration.
               </p>
               <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/R7MomRgZwi8?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <p class="mb-0 text-left">The following is commented code on how we implemented this:</p>
@@ -1206,12 +1215,21 @@ void wallfollow(){
                 </code>
               </pre>
               <hr class="mb-5">
-              <h4 class="text-secondary text-left mb-3">Avoiding other robots</h4>
-              <p class="mb-5 text-left">blah blah
+              <h4 class="text-secondary text-left mb-3">Circling a set of walls through right-hand wall-following</h4>
+              <p class="mb-5 text-left">
+                In order to be able to detect and avoid other robots, we needed to integrate the IR FFT detection with the other analog input reading that our Arduino does. However, we quickly found that the FFT detection code from Lab 2 changed some of the serial communication registers and timers, which results in servos behaving strangely or not moving at all. In order to get around this obstacle, we stored the state of the required registers and then restore them once the FFT is processed and we return: TIMSK0, ADCSRA, ADMUX, and DIDR0. 
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Milestone 2 Photos/Noise_5V.jpg" alt="Noise on Arduino 5V"></img>
+                <figcaption>Figure 2: Output of IR Signal With Amplification</figcaption>
+              </figure>
+              <p class="mb-5 text-left">
+                We also found in our testing that our robot was failing to reliably detect walls once powered off of the Arduino's 5V line, due to coupling with other components or the operations within the Arduino. This meant that a single reading from the IR FFT code was not sufficient to ascertain that a robot was present, but the sensing was also not reliable enough that we could count on every single reading returning that there was a robot present. Therefore, we needed to have some way of keeping track of how often we thought there was a robot present. We required that several readings detect the presence of a 6kHz IR source in quick succession by having count of the number of readings that increases when the FFT says there is a 6kHz peak, and otherwise slowly decays. Then, we only tried to avoid robots when the reading count was high enough. This essentially allows us to filter through the noise.
               </p>
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Line-tracking & avoiding robots and walls</h4>
-              <p class="mb-5 text-left">blah blah
+              <p class="mb-5 text-left">
+                We then were able to reliably do line tracking, wall avoidance, and robot avoidance together.
               </p>
               <hr class="mb-5">
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Milestone2">View Milestone 2 Code on GitHub</a>
