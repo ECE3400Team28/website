@@ -75,19 +75,21 @@ void loop() {
     int numDetect;
     if (detect()){
       // wait for three consecutive IR detections for better accuracy
-      if (numDetect == 3) {
+      if (numDetect >= 15) {
         digitalWrite(LED_BUILTIN, HIGH);
         turnLeft();
         //turnLeft();
         numDetect = 0;
       }
       else
-        numDetect++;
+        numDetect+=5;
     }
     else {
       // no IR detection, so decrease the number of IR detections by 1 if >0
       digitalWrite(LED_BUILTIN, LOW);
-      numDetect = numDetect ? numDetect-- : 0;
+      num--;
+      if (num < 0)
+        num = 0;
     }
     //Serial.println("test");
 }
