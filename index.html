@@ -1215,7 +1215,7 @@ void wallfollow(){
                 </code>
               </pre>
               <hr class="mb-5">
-              <h4 class="text-secondary text-left mb-3">Circling a set of walls through right-hand wall-following</h4>
+              <h4 class="text-secondary text-left mb-3">Avoiding other robots</h4>
               <p class="mb-5 text-left">
                 In order to be able to detect and avoid other robots, we needed to integrate the IR FFT detection with the other analog input reading that our Arduino does. However, we quickly found that the FFT detection code from Lab 2 changed some of the serial communication registers and timers, which results in servos behaving strangely or not moving at all. In order to get around this obstacle, we stored the state of the required registers and then restore them once the FFT is processed and we return: TIMSK0, ADCSRA, ADMUX, and DIDR0. 
               </p>
