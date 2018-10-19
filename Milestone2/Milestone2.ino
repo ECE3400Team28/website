@@ -87,9 +87,9 @@ void loop() {
     else {
       // no IR detection, so decrease the number of IR detections by 1 if >0
       digitalWrite(LED_BUILTIN, LOW);
-      num--;
-      if (num < 0)
-        num = 0;
+      numDetect--;
+      if (numDetect < 0)
+        numDetect = 0;
     }
     //Serial.println("test");
 }
