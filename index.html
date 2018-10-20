@@ -865,13 +865,286 @@ for (int j = 38; j < 44; ++j) {
         <div class="container text-center">
           <div class="row">
             <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Lab 3</h2>
+              <h2 class="text-secondary text-uppercase mb-0">Lab 3: System Integration and Radio Communication</h2>
               <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/circus.png" alt="">
-              <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+              <h3 class="text-secondary mb-1">Radio Team</h3>
+              <h4 class="text-secondary mb-3">Kevin Ying and Glenna Zhang</h4>
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                In this lab we established a communication protocol between one Arduino, which will be on our robot, and another, which will remain at a base station and need to interface with a GUI to display the progress of our robot. This interface will also come in handy for debugging because we will be able to determine the progress of our robot and what it has discovered.<br />
+                <br />
+                In order to communicate wirelessly, we used a pair of Nordic nRF24L01+ transceivers, as well as the relevant libraries. (can be found <a href="https://cei-lab.github.io/ece3400-2018/lab3.html">here</a>)
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Data Scheme & Protocol</h4>
+              <p class="mb-3 text-left">
+                We use the following two variables to store the current location of our robot:<br />
+                <code>uint8_t x = 0; // stores the x index/coordinate</code><br />
+                <code>uint8_t y = 0; // stores the y index/coordinate</code><br />
+                We use the following 2-D array to store what we discover about each tile of the maze:<br />
+                <code>uint8_t maze[9][9] = {...};</code>
+                <br />
+                We have also defined a set of macros that help us easily construct the correct bit sequence that describes what our robot sees, based on our protocol:
+              </p>
+              <pre class="mb-0 text-left">
+                <code>
+// walls 
+#define bm_wall       15 << 0
+#define bm_wall_east  1 << 1
+#define bm_wall_north 1 << 3
+#define bm_wall_west  1 << 0
+#define bm_wall_south 1 << 2
+
+// treasure
+#define treasure_shift 4
+#define bm_treasure_none     0 << 4
+#define bm_treasure_b_sq     1 << 4
+#define bm_treasure_r_sq     2 << 4
+#define bm_treasure_b_ci     3 << 4
+#define bm_treasure_r_ci     4 << 4
+#define bm_treasure_b_tr     5 << 4
+#define bm_treasure_r_tr     6 << 4
+
+// whether square explored
+#define bm_explored     0 << 7
+#define bm_not_explored 1 << 7
+#define explored_shift  7
+
+// presence of other robot
+#define bm_robot    0 << 1
+#define bm_no_robot 1 << 1
+#define robot_shift 1
+                </code>
+              </pre>
+              <p class="mb-3 text-left">
+                We learned that the maximum package the Nordic Radio module can send is 32 bytes, but we realized we only need to send 2 bytes of data to fully describe each tile, which means we were able to use a single transmission/packet per tile/cell. The following image describes the structure of our protocol:
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 3 Photos/Protocol.png" alt="Protocol of our communication method"></img>
+                <figcaption>Figure 1: Communication protocol</figcaption>
+              </figure>
+              <p class="mb-5 text-left">
+                We believe that this protocol provides sufficient information about the state of the board. It includes the x and y coordinates of the current tile, which has just been explored. The explored bit is mainly for the robot itself to know if it has explored a tile. The treasure bits represent one of seven options: no treasure, blue square, red square, blue circle, red circle, blue triangle, and red triangle. Lastly, the for the bits representing each wall (north, south, east, west), a 1 represents that the wall is present in this tile and a 0 means it isn’t there.
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Sending maze information wirelessly between Arduinos</h4>
+              <p class="mb-3 text-left">
+                We wrote a program to make a virtual robot explore a 9x9 maze with preset walls and treasures in order to test our radio communication and our protocol. We hard-coded the robot’s sequence of exploration for ease- it just snakes around the maze, as there is only one path anyway. We set the role of the virtual robot to “role_ping_out”, a.k.a. the transmitter, and we set the other Arduino to “role_pong_back”, or the receiver.<br />
+                <br />
+                The following is our setup code, which is very similar to the setup found in the GettingStarted sketch in the RF24 Arduino library:
+              </p>
+              <pre class="mb-0 text-left">
+                <code>
+void setup(void) {
+  // Print preamble
+  Serial.begin(9600);
+  printf_begin();
+  printf("\n\rRF24/examples/GettingStarted/\n\r");
+  printf("ROLE: %s\n\r",role_friendly_name[role]);
+  printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
+
+  // Setup and configure rf radio
+  radio.begin();
+  // optionally, increase the delay between retries & # of retries
+  radio.setRetries(15,15);
+  radio.setAutoAck(true);
+  // set the channel
+  radio.setChannel(0x50);
+  // set the power
+  // *****REAL: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, and RF24_PA_MAX*****
+  // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+  radio.setPALevel(RF24_PA_HIGH);
+  //RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+  radio.setDataRate(RF24_250KBPS);
+
+  // optionally, reduce the payload size.  seems to
+  // improve reliability
+  radio.setPayloadSize(2); // we only need 2 bytes
+
+  // Open pipes to other nodes for communication
+  // This simple sketch opens two pipes for these two nodes to communicate
+  // back and forth.
+  // Open 'our' pipe for writing
+  // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
+  radio.openWritingPipe(pipes[0]);
+  radio.openReadingPipe(1,pipes[1]);
+  
+  // Start listening
+  radio.startListening();
+
+  // Dump the configuration of the rf unit for debugging
+  radio.printDetails();
+}
+                </code>
+              </pre>
+              <p class="mb-0 text-left">
+                Then, in the loop, we first develop the message that we are trying to send using the current cell information and the current location. We also print the message in binary for debugging:
+              </p>
+              <pre class="mb-0 text-left">
+                <code>
+uint8_t cell = maze[x][y]; // information about the current location, which our robot will use its sensors to determine
+uint16_t coordinate = x << 4 | y; // generate the left byte of information (coordinates)
+uint16_t message = coordinate << 8 | cell; // generate the whole message
+Serial.println(message, BIN);
+                </code>
+              </pre>
+              <p class="mb-0 text-left">
+                The rest of the communication code is the same as in the GettingStarted sketch, but we changed what happens when the response is received- if a good response is received, we then let the robot move to the next tile, but if no response is received (timeout), then the robot stays put and tries again in the next iteration. This way no information is lost. The code is below:
+              </p>
+              <pre class="mb-0 text-left"><code>
+// First, stop listening so we can talk.
+radio.stopListening();
+
+printf("Now sending %lu...",message);
+bool ok = radio.write( &message, sizeof(uint16_t) );
+if (ok)
+  printf("ok...");
+else
+  printf("failed.\n\r");
+
+// Now, continue listening
+radio.startListening();
+
+// Wait here until we get a response, or timeout (250ms)
+unsigned long started_waiting_at = millis();
+bool timeout = false;
+while ( ! radio.available() && ! timeout )
+  if (millis() - started_waiting_at > 200 )
+    timeout = true;
+
+// Describe the results
+if ( timeout )
+{
+  printf("Failed, response timed out.\n\r");
+}
+else
+{
+  // Grab the response, compare, and send to debugging spew
+  unsigned long got_time;
+  radio.read( &got_time, sizeof(unsigned long) );
+
+  // Spew it
+  printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+    
+  if (x == 8 && y == 8) {
+      x = 0;
+      y = 0;
+  }
+  else if (x%2 == 0){
+      if (y == 8) x++;
+      else y++;
+  }
+  else{
+      if (y == 0) x++;
+      else y--;
+  }
+}
+
+ // Try again 1s later
+delay(1000);
+              </code></pre>
+              <p class="mb-0 text-left">
+                We wrote another program to be the receiver of the messages and to update the GUI. The setup is largely the same as the transmitter program, so we will only show the looping code. It receives a packet and then proceeds to decode it using bitwise operators and our macros, and then sends the information in the correct format to the GUI (location, walls, and treasures, then a new line). Lastly, it resumes listening for a new packet.
+              </p>
+              <pre class="mb-0 text-left"><code>
+// if there is data ready
+if ( radio.available() )
+{
+  // Dump the payloads until we've gotten everything
+  uint16_t message;
+  unsigned char coord;
+  unsigned char walls;
+  bool done = false;
+  while (!done)
+  {
+    // Fetch the payload, and see if this was the last one.
+    // spew out payloads
+    done = radio.read( &message, sizeof(uint16_t) );
+
+    int x = (message & (15 << xcoord_shift)) >> xcoord_shift;
+    int y = (message & (15 << ycoord_shift)) >> ycoord_shift;
+    bool north = message & bm_wall_north;
+    bool south = message & bm_wall_south;
+    bool east = message & bm_wall_east;
+    bool west = message & bm_wall_west;
+    uint8_t treasure = (message & bm_treasure);
+    char buff[30];
+    sprintf(buff, "%d,%d", x, y);
+    Serial.print(buff);
+    if (north) {
+      Serial.print(",north=true");
+    }
+    if (south) {
+      Serial.print(",south=true");
+    }
+    if (east) {
+      Serial.print(",east=true");
+    }
+    if (west) {
+      Serial.print(",west=true");
+    }
+    switch (treasure) {
+      case bm_treasure_none:
+        break;
+      case bm_treasure_b_sq:
+        Serial.print(",tshape=Square,tcolor=Blue");
+        break;
+      case bm_treasure_r_sq:
+        Serial.print(",tshape=Square,tcolor=Red");
+        break;
+      case bm_treasure_b_ci:
+        Serial.print(",tshape=Circle,tcolor=Blue");
+        break;
+      case bm_treasure_r_ci:
+        Serial.print(",tshape=Circle,tcolor=Red");
+        break;
+      case bm_treasure_b_tr:
+        Serial.print(",tshape=Triangle,tcolor=Blue");
+        break;
+      case bm_treasure_r_tr:
+        Serial.print(",tshape=Triangle,tcolor=Red");
+        break;
+      default:
+        break;
+    }
+    Serial.print("\n");
+
+    // Delay just a little bit to let the other unit
+    // make the transition to receiver
+    delay(20);
+
+  }
+
+  // First, stop listening so we can talk
+  radio.stopListening();
+
+  // Send the final one back.
+  radio.write( &coord, sizeof(unsigned long) );
+  //printf("Sent response.\n\r");
+
+  // Now, resume listening so we catch the next packets.
+  radio.startListening();
+}
+              </code></pre>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Updating the GUI</h4>
+              <p class="mb-3 text-left">
+                This is the final result of using our virtual robot to wirelessly update the GUI!
+              </p>
+              <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/oeo-r_0Xa80?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">Robot Team</h3>
+              <h4 class="text-secondary mb-3">Liliet Sosa and Anthony Viego</h4>
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                lalaa
+              </p>
+              <hr class="mb-5">
+              <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab3">View Lab 3 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
-                Close Project</a>
+                Close Project
+              </a>
             </div>
           </div>
         </div>
