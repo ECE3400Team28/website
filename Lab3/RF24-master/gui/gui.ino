@@ -74,7 +74,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   printf_begin();
   //printf("\n\rRF24/examples/GettingStarted/\n\r");
   //printf("ROLE: %s\n\r",role_friendly_name[role]);
@@ -99,7 +99,7 @@ void setup(void)
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  //radio.setPayloadSize(8);
+  radio.setPayloadSize(2); // we only need 2 bytes
 
   //
   // Open pipes to other nodes for communication

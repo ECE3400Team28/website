@@ -34,7 +34,7 @@ RF24 radio(9,10);
 //
 
 // Protocol: 16 bits (2 bytes): (4 bits) x, (4 bits) y, [(1 bit) explored, (3 bits) treasures, (walls) 1111 NSEW] <- blocked bits are stored as a maze cell
-// maze byte 1
+
 // walls 
 #define bm_wall       15 << 0
 #define bm_wall_east  1 << 1
@@ -52,12 +52,11 @@ RF24 radio(9,10);
 #define bm_treasure_b_tr     5 << 4
 #define bm_treasure_r_tr     6 << 4
 
-// maze byte 2
 // whether square explored
-// allows us to say if byte > 0
 #define bm_explored     0 << 7
 #define bm_not_explored 1 << 7
 #define explored_shift  7
+
 // presence of other robot
 #define bm_robot    0 << 1
 #define bm_no_robot 1 << 1
@@ -97,22 +96,15 @@ role_e role = role_ping_out;
 
 void setup(void)
 {
-  //
   // Print preamble
-  //
-
   Serial.begin(9600);
   printf_begin();
   printf("\n\rRF24/examples/GettingStarted/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
   printf("*** PRESS 'T' to begin transmitting to the other node\n\r");
 
-  //
   // Setup and configure rf radio
-  //
-
   radio.begin();
-
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
   radio.setAutoAck(true);
@@ -127,38 +119,20 @@ void setup(void)
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  //radio.setPayloadSize(8);
+  radio.setPayloadSize(2); // we only need 2 bytes
 
-  //
   // Open pipes to other nodes for communication
-  //
-
   // This simple sketch opens two pipes for these two nodes to communicate
   // back and forth.
   // Open 'our' pipe for writing
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
-
-  if ( role == role_ping_out )
-  {
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
-  }
-  else
-  {
-    radio.openWritingPipe(pipes[1]);
-    radio.openReadingPipe(1,pipes[0]);
-  }
-
-  //
+  radio.openWritingPipe(pipes[0]);
+  radio.openReadingPipe(1,pipes[1]);
+  
   // Start listening
-  //
-
   radio.startListening();
 
-  //
   // Dump the configuration of the rf unit for debugging
-  //
-
   radio.printDetails();
 }
 
