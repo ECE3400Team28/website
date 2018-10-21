@@ -153,24 +153,6 @@ void setup() {
 }
 
 void loop() {
-    // put your main code here, to run repeatedly:
-    //if (!detect()){
-//    while(1){
-//      Serial.println("test");
-//      digitalWrite(LED_BUILTIN, HIGH);
-//      delay(1000);
-//      digitalWrite(LED_BUILTIN, LOW);
-//      delay(1000);
-//    }
-//    while(1){
-//      Serial.println("test");
-//      detect();
-//    }
-//    if (detect()){
-//      turnLeft();
-//    }
-    //Serial.println("test1");
-    
     forward();
     linefollow();
 //    //Serial.println("test4");
@@ -311,8 +293,10 @@ void linefollow(){
 }
 
 void wallfollow(){
+  digitalWrite(mux, HIGH); //when high we read from the right wall
   wallRight = analogRead(A5);
-  wallFront = analogRead(A4);
+  digitalWrite(mux, LOW); //when low we read from teh front wall 
+  wallFront = analogRead(A5);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
   switch (current_dir) {
@@ -375,8 +359,10 @@ void wallfollow(){
   while (wallFront >= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD){ // blocked on both front and right
       turnLeft();
       //delay(1000);
-      wallRight = analogRead(A5);
-      wallFront = analogRead(A4);
+  digitalWrite(mux, HIGH); //when high we read from the right wall
+  wallRight = analogRead(A5);
+  digitalWrite(mux, LOW); //when low we read from teh front wall 
+  wallFront = analogRead(A5);
       if (wallRight >= RIGHTTHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
       if (wallFront >= FRONTTHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
