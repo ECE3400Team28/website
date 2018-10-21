@@ -24,8 +24,8 @@ const int detectRobotLED = 6;
 const int rightWallLED = 4;
 const int frontWallLED = 2;
 const int SOMETHRESHOLD = 170;
-int LIGHTTHRESHOLD = 500; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-int i = 0;
+const int LIGHTTHRESHOLD = 500; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+//int i = 0;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -54,12 +54,12 @@ RF24 radio(9,10);
 // whether square explored
 #define bm_explored     0 << 7
 #define bm_not_explored 1 << 7
-#define explored_shift  7
+//#define explored_shift  7
 
-// presence of other robot
-#define bm_robot    0 << 1
-#define bm_no_robot 1 << 1
-#define robot_shift 1
+//// presence of other robot
+//#define bm_robot    0 << 1
+//#define bm_no_robot 1 << 1
+//#define robot_shift 1
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
@@ -102,7 +102,8 @@ void setup() {
   // put your setup code here, to run once:
 //    pinMode(0, INPUT); // button
 //    //while(digitalRead(0) !=  HIGH);// && !readSignal());
-      Serial.begin(115200); // use the serial port
+      Serial.begin(9600); // use the serial port
+      printf_begin();
 //    //Serial.println(F("START"));
 //    pinMode(A0, INPUT);           //ADC for other robot FFT detection
 //    int PWM1 = 3;
@@ -153,8 +154,9 @@ void setup() {
   
     // Dump the configuration of the rf unit for debugging
     radio.printDetails();
-    Serial.println("DONE SETUP");
-    delay(2000);
+
+    printf("SETUP");
+    //delay(2000);
 }
 
 void loop() {
@@ -447,7 +449,7 @@ void broadcast() {
   uint8_t cell = maze[x][y];
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
-  Serial.println(message, BIN);
+  //Serial.println(message, BIN);
   
   //
   // Ping out role.  Repeatedly send the current time
@@ -460,9 +462,9 @@ void broadcast() {
   bool ok = radio.write( &message, sizeof(uint16_t) );
 
   if (ok)
-    printf("ok...");
+    printf("ok...\n");
   else
-    printf("failed.\n\r");
+    //Serial.println(F("failed.\n\r"));
 
   // Now, continue listening
   radio.startListening();
@@ -477,7 +479,7 @@ void broadcast() {
   // Describe the results
   if ( timeout )
   {
-    printf("Failed, response timed out.\n\r");
+    //Serial.println("Failed, response timed out.\n\r");
   }
   else
   {
@@ -486,7 +488,7 @@ void broadcast() {
     radio.read( &got_time, sizeof(unsigned long) );
 
     // Spew it
-    printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+    //Serial.println(F("Got response"));
     
     if (x == 8 && y == 8) {
       x = 0;
