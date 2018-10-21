@@ -21,10 +21,14 @@ int wallRight;
 int wallFront;
 
 const int detectRobotLED = 6;
+const int mux = 7;
 const int rightWallLED = 4;
 const int frontWallLED = 2;
-const int SOMETHRESHOLD = 170;
-const int LIGHTTHRESHOLD = 500; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int FRONTTHRESHOLD = 270;
+const int RIGHTTHRESHOLD = 200;
+int LIGHT_CENTER_THRESHOLD = 480; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+int LIGHT_RIGHT_THRESHOLD = 540;
+int LIGHT_LEFT_THRESHOLD = 620;
 //int i = 0;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
@@ -65,98 +69,87 @@ RF24 radio(9,10);
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const uint8_t maze[9][9] = {
- {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
- {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
- {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
- {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
- {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
- {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
- {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
- {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
- {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
-};
-
 //uint8_t maze[9][9] = {
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
-// {bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored, bm_not_explored},
+// {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
 //};
 
-//
-// Role management
-//
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.
-//
+uint8_t maze[2][3] = {
+ {bm_not_explored, bm_not_explored, bm_not_explored},
+ {bm_not_explored, bm_not_explored, bm_not_explored}
+};
+
+typedef enum { N, S, E, W } facing_direction;
+
+// The role of the current running sketch
+facing_direction current_dir = S;
 
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
   // put your setup code here, to run once:
-//    pinMode(0, INPUT); // button
-//    //while(digitalRead(0) !=  HIGH);// && !readSignal());
-      Serial.begin(9600); // use the serial port
-      printf_begin();
-//    //Serial.println(F("START"));
-//    pinMode(A0, INPUT);           //ADC for other robot FFT detection
-//    int PWM1 = 3;
-//    int PWM2 = 5;
-//    pinMode(PWM1, OUTPUT); 
-//    pinMode(PWM2, OUTPUT); 
-//    pinMode(LightCenter, INPUT);  //A2
-//    pinMode(LightRight, INPUT);   //A3
-//    pinMode(LightLeft, INPUT);    //A1
-//    pinMode(A4, INPUT);           //USED for wall distance sensor for walls 
-//    pinMode(A5, INPUT);           //USED for wall distance sensor for walls 
-//    pinMode(detectRobotLED, OUTPUT);
-//    pinMode(rightWallLED, OUTPUT);
-//    pinMode(frontWallLED, OUTPUT);
-    //MotorLeft.attach(PWM1); 
-    //MotorRight.attach(PWM2);
-    //MotorLeft.write(90);
-    //MotorRight.write(90);
+  //pinMode(8, INPUT);
+  Serial.begin(115200); // use the serial port
+  //while(!readSignal());
+  pinMode(A0, INPUT);           //ADC for other robot FFT detection
+  int PWM1 = 5;
+  int PWM2 = 3;
+  pinMode(PWM1, OUTPUT); 
+  pinMode(PWM2, OUTPUT); 
+  pinMode(LightCenter, INPUT);  //A2
+  pinMode(LightRight, INPUT);   //A3
+  pinMode(LightLeft, INPUT);    //A1
+  pinMode(A4, INPUT);           //USED for wall distance sensor for walls 
+  pinMode(A5, INPUT);           //USED for wall distance sensor for walls 
+  pinMode(detectRobotLED, OUTPUT);
+  pinMode(rightWallLED, OUTPUT);
+  pinMode(frontWallLED, OUTPUT);
+  pinMode(mux, OUTPUT);
+  MotorLeft.attach(PWM1); 
+  MotorRight.attach(PWM2);
+  MotorLeft.write(90);
+  MotorRight.write(90);
     
-    // Setup and configure rf radio
-    radio.begin();
-    // optionally, increase the delay between retries & # of retries
-    radio.setRetries(15,15);
-    radio.setAutoAck(true);
-    // set the channel
-    radio.setChannel(0x50);
-    // set the power
-    // *****REAL: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, and RF24_PA_MAX*****
-    // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
-    radio.setPALevel(RF24_PA_HIGH);
-    //RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
-    radio.setDataRate(RF24_250KBPS);
-  
-    // optionally, reduce the payload size.  seems to
-    // improve reliability
-    radio.setPayloadSize(2); // we only need 2 bytes
-  
-    // Open pipes to other nodes for communication
-    // This simple sketch opens two pipes for these two nodes to communicate
-    // back and forth.
-    // Open 'our' pipe for writing
-    // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
-    
-    // Start listening
-    radio.startListening();
-  
-    // Dump the configuration of the rf unit for debugging
-    radio.printDetails();
+  // Setup and configure rf radio
+  radio.begin();
+  // optionally, increase the delay between retries & # of retries
+  radio.setRetries(15,15);
+  radio.setAutoAck(true);
+  // set the channel
+  radio.setChannel(0x50);
+  // set the power
+  // *****REAL: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, and RF24_PA_MAX*****
+  // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
+  radio.setPALevel(RF24_PA_HIGH);
+  //RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
+  radio.setDataRate(RF24_250KBPS);
 
-    printf("SETUP");
-    //delay(2000);
+  // optionally, reduce the payload size.  seems to
+  // improve reliability
+  radio.setPayloadSize(2); // we only need 2 bytes
+
+  // Open pipes to other nodes for communication
+  // This simple sketch opens two pipes for these two nodes to communicate
+  // back and forth.
+  // Open 'our' pipe for writing
+  // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
+  radio.openWritingPipe(pipes[0]);
+  radio.openReadingPipe(1,pipes[1]);
+  
+  // Start listening
+  radio.startListening();
+
+  // Dump the configuration of the rf unit for debugging
+  radio.printDetails();
+  
+  delay(2000);
 }
 
 void loop() {
@@ -177,12 +170,12 @@ void loop() {
 //      turnLeft();
 //    }
     //Serial.println("test1");
-    broadcast();
-//    forward();
-//    linefollow();
+    
+    forward();
+    linefollow();
 //    //Serial.println("test4");
 //    //}
-//    delay(20);
+    delay(20);
 //
 //    int numDetect;
 //    if (detect()){
@@ -221,7 +214,7 @@ void turnLeft(){
     LightDataL = analogRead(LightLeft);
     LightDataR = analogRead(LightRight);
     // end check;
-    while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
+    while(!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)){
        // keep checking
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
@@ -241,7 +234,7 @@ void turnRight(){
     LightDataL = analogRead(LightLeft);
     LightDataR = analogRead(LightRight);
     // end check
-    while(!(LightDataC <= LIGHTTHRESHOLD && LightDataL > LIGHTTHRESHOLD && LightDataR > LIGHTTHRESHOLD)){
+    while(!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)){
        // keep checking
        LightDataC = analogRead(LightCenter);
        LightDataL = analogRead(LightLeft);
@@ -268,9 +261,9 @@ void linefollow(){
      LightDataR = analogRead(LightRight);
      //Serial.println(F("test7"));
 
-     bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
-     bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
-     bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
+     bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
+     bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
+     bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
 
      
      
@@ -322,23 +315,70 @@ void wallfollow(){
   wallFront = analogRead(A4);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
-  if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
-  if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
-  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { //if greater than threshold there is a wall 
+  switch (current_dir) {
+    case N:
+      x--;
+      break;
+    case S:
+      x++;
+      break;
+    case E:
+      y++;
+      break;
+    case W:
+      y--;
+      break;
+  }
+  
+  if (wallRight >= RIGHTTHRESHOLD) {
+    digitalWrite(rightWallLED, HIGH);
+    if (current_dir == N) {
+      maze[x][y] |= bm_wall_east;
+    } else if (current_dir == E) {
+      maze[x][y] |= bm_wall_south;
+    } else if (current_dir == S) {
+      maze[x][y] |= bm_wall_west;
+    } else if (current_dir == W) {
+      maze[x][y] |= bm_wall_north;
+    }
+  } else {
+    digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+  }
+  
+  if (wallFront >= FRONTTHRESHOLD) {
+    digitalWrite(frontWallLED, HIGH);
+    if (current_dir == N) {
+      maze[x][y] |= bm_wall_north;
+    } else if (current_dir == E) {
+      maze[x][y] |= bm_wall_east;
+    } else if (current_dir == S) {
+      maze[x][y] |= bm_wall_south;
+    } else if (current_dir == W) {
+      maze[x][y] |= bm_wall_west;
+    }
+  } else {
+    digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+  }
+  
+//  if (maze[x][y] & bm_not_explored > 0)
+    while(!broadcast());
+//  else maze[x][y] |= bm_explored;
+  
+  if (wallFront <= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { //if greater than threshold there is a wall 
       // following the wall: we can go straight
       return;
   }
-  if (wallRight <= SOMETHRESHOLD){  // nothing on the right, so we can turn right 
+  if (wallRight <= RIGHTTHRESHOLD){  // nothing on the right, so we can turn right 
       turnRight();
       return;
   }
-  while (wallFront >= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ // blocked on both front and right
+  while (wallFront >= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD){ // blocked on both front and right
       turnLeft();
       //delay(1000);
       wallRight = analogRead(A5);
       wallFront = analogRead(A4);
-      if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
-      if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+      if (wallRight >= RIGHTTHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+      if (wallFront >= FRONTTHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
   return;
 }
@@ -445,7 +485,7 @@ boolean readSignal() {
   return false;
 }
 
-void broadcast() {
+boolean broadcast() {
   uint8_t cell = maze[x][y];
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
@@ -464,7 +504,7 @@ void broadcast() {
   if (ok)
     printf("ok...\n");
   else
-    //Serial.println(F("failed.\n\r"));
+    printf("failed.\n\r");
 
   // Now, continue listening
   radio.startListening();
@@ -479,7 +519,10 @@ void broadcast() {
   // Describe the results
   if ( timeout )
   {
-    //Serial.println("Failed, response timed out.\n\r");
+    printf("Failed, response timed out.\n\r");
+    // Try again 1s later
+    delay(1000);
+    return false;
   }
   else
   {
@@ -488,22 +531,7 @@ void broadcast() {
     radio.read( &got_time, sizeof(unsigned long) );
 
     // Spew it
-    //Serial.println(F("Got response"));
-    
-    if (x == 8 && y == 8) {
-      x = 0;
-      y = 0;
-    }
-    else if (x%2 == 0){
-      if (y == 8) x++;
-      else y++;
-    }
-    else{
-      if (y == 0) x++;
-      else y--;
-    }
+    printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+    return true;
   }
-
-  // Try again 1s later
-  delay(1000);
 }
