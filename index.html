@@ -1136,8 +1136,17 @@ if ( radio.available() )
               <h3 class="text-secondary mb-1">Robot Team</h3>
               <h4 class="text-secondary mb-3">Liliet Sosa and Anthony Viego</h4>
               <h4 class="text-secondary text-left mb-3">Goal</h4>
-              <p class="mb-5 text-left">
+              <p class="mb-3 text-left">
                 The goal for this part of the lab was to integrate all of our robot’s sensing components, including recognizing the start signal of 660Hz with a microphone, line following, right-hand wall following, and detecting other robots while ignoring decoys. All of these features have been successfully built in previous labs/milestones, and so now we’ve integrated all of these features to prove that they can work together without interfering with each other.
+              </p>
+              <p class="mb-3 text-left">
+                In order to integrate all of our current analog input signals, we needed to be able to read in more analog inputs than we had analog input pins on the Arduino Uno. To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. Therefore, before reading either the front or right sensor, we switch the state of a digital output pin to choose which sensor we read from. 
+              </p>
+              <p class="mb-3 text-left">
+                We also moved to having two half-breadboards on the top level of our robot, with the Arduino mounted on the lower level. This allowed us to better access the many connections on the breadboard, since most connections to the Arduino were rarely changed. We also were able to comfortably move the IR circuit onto the two half breadboards, decreasing the precariousness of our robot.
+              </p>
+              <p class="mb-5 text-left">
+                In order to integrate the maze GUI code with the robot maneuvering, we needed to keep track of the current orientation of the robot (which would get updated whenever we turn left/right), as well as update the internal maze state whenever we reach an intersection, at which point we are able to detect walls. 
               </p>
               <hr class="mb-5">
               <h3 class="text-secondary mb-1">Final Integration</h3>
