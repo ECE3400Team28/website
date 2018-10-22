@@ -1137,8 +1137,13 @@ if ( radio.available() )
               <h4 class="text-secondary mb-3">Liliet Sosa and Anthony Viego</h4>
               <h4 class="text-secondary text-left mb-3">Goal</h4>
               <p class="mb-5 text-left">
-                lalaa
+                The goal for this part of the lab was to integrate all of our robot’s sensing components, including recognizing the start signal of 660Hz with a microphone, line following, right-hand wall following, and detecting other robots while ignoring decoys. All of these features have been successfully built in previous labs/milestones, and so now we’ve integrated all of these features to prove that they can work together without interfering with each other.
               </p>
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">Final Integration</h3>
+              <p class="mb-3 text-left">First, we incorporated radio communication into our overall program, as shown in the video below. As you can see in the video, the robot now pauses for a bit at every intersection. We do this because this is when the robot broadcasts to the base station, and if the broadcast is unsuccessful, it stays put and keeps trying. The coordinates received in the base station are correct at every intersection, based on the starting coordinate of the robot being set to (0, 0). We did not show the actual GUI updating in this video, because it was inconvenient at the time of recording and we've already shown above that it works.</p>
+              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/N0hEJD_Hcbo?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <p class="mb-5 text-left">Finally, the following video shows everything incorporated into our robot (line following, wall following, radio communication, GUI, starting on 660Hz, responding to other robots, and ignoring decoys):</p>
               <hr class="mb-5">
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab3">View Lab 3 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
