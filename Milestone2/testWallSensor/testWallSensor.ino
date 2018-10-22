@@ -9,6 +9,7 @@ int SOMETHRESHOLD = 1;
 int LightCenter = A2;
 int LightRight = A3;
 int LightLeft = A1;
+const int mux = 7;
 
 void setup() {
   // put your setup code here, to run once:
@@ -19,15 +20,16 @@ void setup() {
     pinMode(LightCenter, INPUT);  //A2
     pinMode(LightRight, INPUT);   //A0
     pinMode(LightLeft, INPUT);    //A1
-    
+
+    pinMode(mux, OUTPUT);
     
     Serial.begin(9600);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //outputWall();
-  outputLine();
+  outputWall();
+  //outputLine();
 }
 
 void outputLine(){
@@ -44,8 +46,12 @@ void outputLine(){
 }
 
 void outputWall(){
+  digitalWrite(mux, HIGH); //when high we read from the right wall
+  delay(100);
   wallRight = analogRead(A5);
-  wallFront = analogRead(A4);
+  digitalWrite(mux, LOW); //when low we read from teh front wall 
+  delay(100);
+  wallFront = analogRead(A5);
   Serial.println("Right");
   Serial.println(wallRight);
   Serial.println("Front");

@@ -24,11 +24,11 @@ const int detectRobotLED = 6;
 const int mux = 7;
 const int rightWallLED = 4;
 const int frontWallLED = 2;
-const int FRONTTHRESHOLD = 270;
-const int RIGHTTHRESHOLD = 200;
-int LIGHT_CENTER_THRESHOLD = 480; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-int LIGHT_RIGHT_THRESHOLD = 540;
-int LIGHT_LEFT_THRESHOLD = 620;
+const int FRONTTHRESHOLD = 200;
+const int RIGHTTHRESHOLD = 140;
+int LIGHT_CENTER_THRESHOLD = 800;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+int LIGHT_RIGHT_THRESHOLD = 800;//540;
+int LIGHT_LEFT_THRESHOLD = 800;//620;
 //int i = 0;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
@@ -86,7 +86,7 @@ uint8_t maze[2][3] = {
  {bm_not_explored, bm_not_explored, bm_not_explored}
 };
 
-typedef enum { N, S, E, W } facing_direction;
+typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
 
 // The role of the current running sketch
 facing_direction current_dir = S;
@@ -293,6 +293,8 @@ void linefollow(){
 }
 
 void wallfollow(){
+  MotorLeft.write(90);
+  MotorRight.write(90);
   digitalWrite(mux, HIGH); //when high we read from the right wall
   wallRight = analogRead(A5);
   digitalWrite(mux, LOW); //when low we read from teh front wall 
@@ -345,7 +347,7 @@ void wallfollow(){
   }
   
 //  if (maze[x][y] & bm_not_explored > 0)
-    while(!broadcast());
+  broadcast();
 //  else maze[x][y] |= bm_explored;
   
   if (wallFront <= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { //if greater than threshold there is a wall 
@@ -354,17 +356,50 @@ void wallfollow(){
   }
   if (wallRight <= RIGHTTHRESHOLD){  // nothing on the right, so we can turn right 
       turnRight();
+      current_dir = (facing_direction) ((current_dir + 1) % 4);
       return;
   }
   while (wallFront >= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD){ // blocked on both front and right
       turnLeft();
+      if (current_dir-1 < 0) current_dir = (facing_direction) 3;
+      else current_dir = (facing_direction) (current_dir - 1);
+      
       //delay(1000);
-  digitalWrite(mux, HIGH); //when high we read from the right wall
-  wallRight = analogRead(A5);
-  digitalWrite(mux, LOW); //when low we read from teh front wall 
-  wallFront = analogRead(A5);
-      if (wallRight >= RIGHTTHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
-      if (wallFront >= FRONTTHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+      digitalWrite(mux, HIGH); //when high we read from the right wall
+      wallRight = analogRead(A5);
+      digitalWrite(mux, LOW); //when low we read from teh front wall 
+      wallFront = analogRead(A5);
+      
+      if (wallRight >= RIGHTTHRESHOLD) {
+        digitalWrite(rightWallLED, HIGH);
+        if (current_dir == N) {
+          maze[x][y] |= bm_wall_east;
+        } else if (current_dir == E) {
+          maze[x][y] |= bm_wall_south;
+        } else if (current_dir == S) {
+          maze[x][y] |= bm_wall_west;
+        } else if (current_dir == W) {
+          maze[x][y] |= bm_wall_north;
+        }
+      } else {
+        digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+      }
+      
+      if (wallFront >= FRONTTHRESHOLD) {
+        digitalWrite(frontWallLED, HIGH);
+        if (current_dir == N) {
+          maze[x][y] |= bm_wall_north;
+        } else if (current_dir == E) {
+          maze[x][y] |= bm_wall_east;
+        } else if (current_dir == S) {
+          maze[x][y] |= bm_wall_south;
+        } else if (current_dir == W) {
+          maze[x][y] |= bm_wall_west;
+        }
+      } else {
+        digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+      }
+      broadcast();
   }
   return;
 }
@@ -475,7 +510,7 @@ boolean broadcast() {
   uint8_t cell = maze[x][y];
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
-  //Serial.println(message, BIN);
+  Serial.println(message, BIN);
   
   //
   // Ping out role.  Repeatedly send the current time
