@@ -336,9 +336,11 @@ void wallfollow(){
     digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
   
-//  if (maze[x][y] & bm_not_explored > 0)
-  broadcast();
-//  else maze[x][y] |= bm_explored;
+  if (maze[x][y] & bm_explored == 0) {
+    // have not explored yet
+    while(!broadcast()); // keep broadcasting until successful
+    maze[x][y] |= bm_explored;
+  }
   
   if (wallFront <= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { //if greater than threshold there is a wall 
       // following the wall: we can go straight
