@@ -24,6 +24,8 @@ const int detectRobotLED = 6;
 const int mux = 7;
 const int rightWallLED = 4;
 const int frontWallLED = 2;
+#define pin_PowerMux 0
+#define pin_Button   8
 const int FRONTTHRESHOLD = 200;
 const int RIGHTTHRESHOLD = 140;
 int LIGHT_CENTER_THRESHOLD = 800;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
@@ -56,13 +58,13 @@ RF24 radio(9,10);
 #define bm_treasure_r_tr     6 << 4
 
 // whether square explored
-#define bm_explored     0 << 7
-#define bm_not_explored 1 << 7
+#define bm_explored     1 << 7
+#define bm_not_explored 0 << 7
 //#define explored_shift  7
 
 //// presence of other robot
-//#define bm_robot    0 << 1
-//#define bm_no_robot 1 << 1
+//#define bm_robot    1 << 1
+//#define bm_no_robot 0 << 1
 //#define robot_shift 1
 
 // Radio pipe addresses for the 2 nodes to communicate.
@@ -82,8 +84,8 @@ uint8_t y = 0;
 //};
 
 uint8_t maze[2][3] = {
- {bm_not_explored, bm_not_explored, bm_not_explored},
- {bm_not_explored, bm_not_explored, bm_not_explored}
+ {0, 0, 0},
+ {0, 0, 0}
 };
 
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -95,9 +97,15 @@ facing_direction current_dir = S;
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
   // put your setup code here, to run once:
-  //pinMode(8, INPUT);
+  pinMode(pin_Button, INPUT);
   Serial.begin(115200); // use the serial port
-  //while(!readSignal());
+
+  // remove wall sensors from 5v line to prevent weird interference
+  pinMode(pin_PowerMux, OUTPUT);
+  digitalWrite(pin_PowerMux, HIGH);
+
+  // wait for either microphone 660Hz or button input
+  while(!readSignal() && digitalRead(pin_Button) !=  HIGH);
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
   int PWM2 = 3;
@@ -112,6 +120,7 @@ void setup() {
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux, OUTPUT);
+  pinMode(pin_PowerMux, INPUT);
   MotorLeft.attach(PWM1); 
   MotorRight.attach(PWM2);
   MotorLeft.write(90);
@@ -131,15 +140,11 @@ void setup() {
   //RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
   radio.setDataRate(RF24_250KBPS);
 
-  // optionally, reduce the payload size.  seems to
-  // improve reliability
-  radio.setPayloadSize(2); // we only need 2 bytes
+  // Set message size since we only need 2 bytes
+  radio.setPayloadSize(2); 
 
   // Open pipes to other nodes for communication
-  // This simple sketch opens two pipes for these two nodes to communicate
-  // back and forth.
-  // Open 'our' pipe for writing
-  // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
+  // Open 'our' pipe for writing, the 'other' pipe for reading
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
   
@@ -155,36 +160,20 @@ void setup() {
 void loop() {
     forward();
     linefollow();
-//    //Serial.println("test4");
-//    //}
     delay(20);
-//
-//    int numDetect;
+
+    // IR
 //    if (detect()){
-//      // wait for three consecutive IR detections for better accuracy
-//      if (numDetect >= 15) {
-//        digitalWrite(detectRobotLED, HIGH);
-//        turnLeft();
-//        //turnLeft();
-//        numDetect = 0;
-//      }
-//      else
-//        numDetect+=5;
-//    }
-//    else {
-//      // no IR detection, so decrease the number of IR detections by 1 if >0
+//      turnLeft();
+//      digitalWrite(detectRobotLED, HIGH);
+//    } else {
 //      digitalWrite(detectRobotLED, LOW);
-//      numDetect--;
-//      if (numDetect < 0)
-//        numDetect = 0;
 //    }
-//    //Serial.println("test");
 }
 
 void forward(){
     MotorLeft.write(84);
     MotorRight.write(98);
-    //Serial.println("test2");
 }
 
 void turnLeft(){
@@ -230,18 +219,10 @@ void turnRight(){
 void linefollow(){
      //Below LIGHTTHRESHOLD is white tape
      //Above LIGHTTHRESHOLD is dark
-     //Serial.println(F("test3"));
-     //Serial.println(TIMSK0);
-     //Serial.println(ADCSRA);
-     //Serial.println(ADMUX);
-     //Serial.println(DIDR0);
 
      LightDataC = analogRead(LightCenter);
-     //Serial.println(F("test5"));
      LightDataL = analogRead(LightLeft);
-     //Serial.println(F("test6"));
      LightDataR = analogRead(LightRight);
-     //Serial.println(F("test7"));
 
      bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
      bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
@@ -295,10 +276,13 @@ void linefollow(){
 void wallfollow(){
   MotorLeft.write(90);
   MotorRight.write(90);
+  pinMode(pin_PowerMux, OUTPUT);
+  digitalWrite(pin_PowerMux, LOW);
   digitalWrite(mux, HIGH); //when high we read from the right wall
   wallRight = analogRead(A5);
-  digitalWrite(mux, LOW); //when low we read from teh front wall 
+  digitalWrite(mux, LOW);  //when low we read from the front wall 
   wallFront = analogRead(A5);
+  pinMode(pin_PowerMux, INPUT);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
   switch (current_dir) {
@@ -365,10 +349,14 @@ void wallfollow(){
       else current_dir = (facing_direction) (current_dir - 1);
       
       //delay(1000);
+
+      pinMode(pin_PowerMux, OUTPUT);
+      digitalWrite(pin_PowerMux, LOW);
       digitalWrite(mux, HIGH); //when high we read from the right wall
       wallRight = analogRead(A5);
-      digitalWrite(mux, LOW); //when low we read from teh front wall 
+      digitalWrite(mux, LOW);  //when low we read from the front wall 
       wallFront = analogRead(A5);
+      pinMode(pin_PowerMux, INPUT);
       
       if (wallRight >= RIGHTTHRESHOLD) {
         digitalWrite(rightWallLED, HIGH);
@@ -405,88 +393,57 @@ void wallfollow(){
 }
 
 boolean detect() {
-    cli();  // UDRE interrupt slows this way down on arduino1.0
+  pinMode(pin_PowerMux, OUTPUT);
+  digitalWrite(pin_PowerMux, HIGH);
 
-    int tempTIM = TIMSK0;
-    int tempSRA = ADCSRA;
-    int tempMUX = ADMUX;
-    int tempDID = DIDR0;
-    
-    TIMSK0 = 0; // turn off timer0 for lower jitter
-    ADCSRA = 0xe5; // set the adc to free running mode
-    ADMUX = 0x40; // use adc3
-    DIDR0 = 0x01; // turn off the digital input for adc3
+  cli();  // UDRE interrupt slows this way down on arduino1.0
 
-//    int startTime=millis();
-    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-        while(!(ADCSRA & 0x10)); // wait for adc to be ready
-        ADCSRA = 0xf5; // restart adc
-        byte m = ADCL; // fetch adc data
-        byte j = ADCH;
-        int k = (j << 8) | m; // form into an int
-        k -= 0x0200; // form into a signed int
-        k <<= 6; // form into a 16b signed int
-        fft_input[i] = k; // put real data into even bins
-        fft_input[i+1] = 0; // set odd bins to 0
+  int tempTIM = TIMSK0;
+  int tempSRA = ADCSRA;
+  int tempMUX = ADMUX;
+  int tempDID = DIDR0;
+  
+  TIMSK0 = 0; // turn off timer0 for lower jitter
+  ADCSRA = 0xe5; // set the adc to free running mode
+  ADMUX = 0x40; // use adc3
+  DIDR0 = 0x01; // turn off the digital input for adc3
+
+  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    while(!(ADCSRA & 0x10)); // wait for adc to be ready
+    ADCSRA = 0xf5; // restart adc
+    byte m = ADCL; // fetch adc data
+    byte j = ADCH;
+    int k = (j << 8) | m; // form into an int
+    k -= 0x0200; // form into a signed int
+    k <<= 6; // form into a 16b signed int
+    fft_input[i] = k; // put real data into even bins
+    fft_input[i+1] = 0; // set odd bins to 0
+  }
+  fft_window(); // window the data for better frequency response
+  fft_reorder(); // reorder the data before doing the fft
+  fft_run(); // process the data in the fft
+  fft_mag_log(); // take the output of the fft
+  sei();
+
+//  Serial.println("start");
+//  for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+//    Serial.println(fft_log_out[i]); // send out the data
+//  }
+  bool detected = false;
+  for (int j = 38; j < 44; ++j) {
+    if (fft_log_out[j] >= 150){
+      //We have detected another robot
+      // return settings to original
+      detected = true;
+      break;
     }
-    fft_window(); // window the data for better frequency response
-    fft_reorder(); // reorder the data before doing the fft
-    fft_run(); // process the data in the fft
-    fft_mag_log(); // take the output of the fft
-    sei();
-  
-//    Serial.println("start");
-//    for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-//      Serial.println(fft_log_out[i]); // send out the data
-//    }
-  
-   //digitalWrite(LED_BUILTIN, LOW);
-//   Serial.println(millis()-startTime);
-   //delay(1000);  ***** do we need this 
-   for (int j = 38; j < 44; ++j) {
-      if (fft_log_out[j] >= 150){
-          
-          //We have detected another robot
-          //MotorRight.write(90);
-          //MotorLeft.write(90);
-          //digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-          //delay(1000);                       // wait for a second
-          //digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-          //delay(1000);
-
-//          Serial.println(tempTIM);
-//          Serial.println(tempSRA);
-//          Serial.println(tempMUX);
-//          Serial.println(tempDID);
-
-          //Serial.println(TIMSK0);
-          //Serial.println(ADCSRA);
-          //Serial.println(ADMUX);
-          //Serial.println(DIDR0);
-
-          // return settings to original
-          TIMSK0 = tempTIM;
-          ADCSRA = tempSRA;
-          ADMUX = tempMUX;
-          DIDR0 = tempDID;
-//          Serial.println(millis()-startTime);
-
-          //Serial.println(TIMSK0);
-          //Serial.println(ADCSRA);
-          //Serial.println(ADMUX);
-          //Serial.println(DIDR0);
-
-          //Serial.println(F("ayy"));
-          
-          return true;
-      }
-   }
-   //Serial.println(F("dang"));
-   TIMSK0 = tempTIM;
-   ADCSRA = tempSRA;
-   ADMUX = tempMUX;
-   DIDR0 = tempDID;
-   return false;        //Other robots not detected 
+  }
+  TIMSK0 = tempTIM;
+  ADCSRA = tempSRA;
+  ADMUX = tempMUX;
+  DIDR0 = tempDID;
+  pinMode(pin_PowerMux, INPUT);
+  return detected;        //Other robots not detected 
 }
 
 boolean readSignal() {
