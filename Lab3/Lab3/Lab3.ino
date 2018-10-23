@@ -98,6 +98,7 @@ facing_direction current_dir = S;
 void setup() {
   // put your setup code here, to run once:
   pinMode(pin_Button, INPUT);
+  pinMode(A4, INPUT);           //USED for microphone input
   Serial.begin(115200); // use the serial port
 
   // remove wall sensors from 5v line to prevent weird interference
@@ -105,7 +106,10 @@ void setup() {
   digitalWrite(pin_PowerMux, HIGH);
 
   // wait for either microphone 660Hz or button input
-  while(!readSignal() && digitalRead(pin_Button) !=  HIGH);
+  while(!readSignal() && digitalRead(pin_Button) !=  HIGH) {
+    Serial.println(F("no input"));
+    delay(10);
+  }
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
   int PWM2 = 3;
@@ -114,7 +118,6 @@ void setup() {
   pinMode(LightCenter, INPUT);  //A2
   pinMode(LightRight, INPUT);   //A3
   pinMode(LightLeft, INPUT);    //A1
-  pinMode(A4, INPUT);           //USED for wall distance sensor for walls 
   pinMode(A5, INPUT);           //USED for wall distance sensor for walls 
   pinMode(detectRobotLED, OUTPUT);
   pinMode(rightWallLED, OUTPUT);
@@ -150,14 +153,17 @@ void setup() {
   
   // Start listening
   radio.startListening();
+  
+  Serial.println(F("done!"));
 
   // Dump the configuration of the rf unit for debugging
-  radio.printDetails();
+  //radio.printDetails();
   
   delay(2000);
 }
 
 void loop() {
+    Serial.println(F("start loop"));
     forward();
     linefollow();
     delay(20);
