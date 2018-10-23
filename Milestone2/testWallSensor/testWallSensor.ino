@@ -6,6 +6,8 @@ int rightWallLED = 13;
 int frontWallLED = 12;
 int SOMETHRESHOLD = 1;
 
+#define pin_PowerMux 1
+
 int LightCenter = A2;
 int LightRight = A3;
 int LightLeft = A1;
@@ -22,6 +24,7 @@ void setup() {
     pinMode(LightLeft, INPUT);    //A1
 
     pinMode(mux, OUTPUT);
+    pinMode(pin_PowerMux, INPUT);
     
     Serial.begin(9600);
 }
@@ -46,12 +49,20 @@ void outputLine(){
 }
 
 void outputWall(){
+  pinMode(pin_PowerMux, OUTPUT);
+  digitalWrite(pin_PowerMux, LOW);
+  delay(100);
+  digitalWrite(pin_PowerMux, HIGH);
+  delay(100);
+  digitalWrite(pin_PowerMux, LOW);
+  delay(100);
   digitalWrite(mux, HIGH); //when high we read from the right wall
   delay(100);
   wallRight = analogRead(A5);
   digitalWrite(mux, LOW); //when low we read from teh front wall 
   delay(100);
   wallFront = analogRead(A5);
+  pinMode(pin_PowerMux, INPUT);
   Serial.println("Right");
   Serial.println(wallRight);
   Serial.println("Front");

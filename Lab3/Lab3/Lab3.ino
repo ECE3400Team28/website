@@ -154,7 +154,7 @@ void setup() {
   // Start listening
   radio.startListening();
   
-  Serial.println(F("done!"));
+  Serial.println(F("setup done!"));
 
   // Dump the configuration of the rf unit for debugging
   //radio.printDetails();
@@ -169,12 +169,12 @@ void loop() {
     delay(20);
 
     // IR
-//    if (detect()){
-//      turnLeft();
-//      digitalWrite(detectRobotLED, HIGH);
-//    } else {
-//      digitalWrite(detectRobotLED, LOW);
-//    }
+    if (detect()){
+      turnLeft();
+      digitalWrite(detectRobotLED, HIGH);
+    } else {
+      digitalWrite(detectRobotLED, LOW);
+    }
 }
 
 void forward(){
