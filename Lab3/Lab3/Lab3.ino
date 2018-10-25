@@ -23,14 +23,14 @@ int wallFront;
 const int detectRobotLED = 6;
 const int mux = 7;
 const int rightWallLED = 4;
-const int frontWallLED = 2;
-#define pin_PowerMux 0
+const int frontWallLED = 6;
+#define pin_PowerMux 2
 #define pin_Button   8
-const int FRONTTHRESHOLD = 200;
-const int RIGHTTHRESHOLD = 140;
-int LIGHT_CENTER_THRESHOLD = 800;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-int LIGHT_RIGHT_THRESHOLD = 800;//540;
-int LIGHT_LEFT_THRESHOLD = 800;//620;
+const int FRONTTHRESHOLD = 250;
+const int RIGHTTHRESHOLD = 200;
+int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+int LIGHT_RIGHT_THRESHOLD = 600;//540;
+int LIGHT_LEFT_THRESHOLD = 600;//620;
 //int i = 0;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
@@ -106,7 +106,7 @@ void setup() {
   digitalWrite(pin_PowerMux, HIGH);
 
   // wait for either microphone 660Hz or button input
-  while(!readSignal() && digitalRead(pin_Button) !=  HIGH) {
+  while(!readSignal() && !digitalRead(pin_Button) == HIGH) {
     Serial.println(F("no input"));
     delay(10);
   }
@@ -123,7 +123,6 @@ void setup() {
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux, OUTPUT);
-  pinMode(pin_PowerMux, INPUT);
   MotorLeft.attach(PWM1); 
   MotorRight.attach(PWM2);
   MotorLeft.write(90);
@@ -169,6 +168,7 @@ void loop() {
     delay(20);
 
     // IR
+    
     if (detect()){
       turnLeft();
       digitalWrite(detectRobotLED, HIGH);
@@ -188,8 +188,11 @@ void turnLeft(){
     delay(600); // move away from current line
     // added the following check for current status:
     LightDataC = analogRead(LightCenter); 
+    delay(1);
     LightDataL = analogRead(LightLeft);
+    delay(1);
     LightDataR = analogRead(LightRight);
+    delay(1);
     // end check;
     while(!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)){
        // keep checking
@@ -282,13 +285,15 @@ void linefollow(){
 void wallfollow(){
   MotorLeft.write(90);
   MotorRight.write(90);
-  pinMode(pin_PowerMux, OUTPUT);
   digitalWrite(pin_PowerMux, LOW);
   digitalWrite(mux, HIGH); //when high we read from the right wall
+  delay(20);
   wallRight = analogRead(A5);
   digitalWrite(mux, LOW);  //when low we read from the front wall 
+  delay(20);
   wallFront = analogRead(A5);
-  pinMode(pin_PowerMux, INPUT);
+  Serial.println(wallFront);
+  digitalWrite(pin_PowerMux, HIGH);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
   switch (current_dir) {
@@ -358,13 +363,14 @@ void wallfollow(){
       
       //delay(1000);
 
-      pinMode(pin_PowerMux, OUTPUT);
       digitalWrite(pin_PowerMux, LOW);
       digitalWrite(mux, HIGH); //when high we read from the right wall
+      delay(20);
       wallRight = analogRead(A5);
       digitalWrite(mux, LOW);  //when low we read from the front wall 
+      delay(20);
       wallFront = analogRead(A5);
-      pinMode(pin_PowerMux, INPUT);
+      digitalWrite(pin_PowerMux, HIGH);
       
       if (wallRight >= RIGHTTHRESHOLD) {
         digitalWrite(rightWallLED, HIGH);
@@ -395,13 +401,12 @@ void wallfollow(){
       } else {
         digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
       }
-      broadcast();
+     broadcast();
   }
   return;
 }
 
 boolean detect() {
-  pinMode(pin_PowerMux, OUTPUT);
   digitalWrite(pin_PowerMux, HIGH);
 
   cli();  // UDRE interrupt slows this way down on arduino1.0
@@ -450,11 +455,11 @@ boolean detect() {
   ADCSRA = tempSRA;
   ADMUX = tempMUX;
   DIDR0 = tempDID;
-  pinMode(pin_PowerMux, INPUT);
   return detected;        //Other robots not detected 
 }
 
 boolean readSignal() {
+  delay(10);
   cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
     fft_input[i] = analogRead(A4); // put real data into even bins
@@ -465,8 +470,13 @@ boolean readSignal() {
   fft_run(); // process the data in the fft
   fft_mag_log(); // take the output of the fft
   sei();
-  if (fft_log_out[19] >= 50){
-    return true;
+  Serial.println(fft_log_out[19]);
+  for (int j = 17; j < 23; ++j) {
+    if (fft_log_out[j] >= 80){
+      //We have detected another robot
+      // return settings to original
+      return true;
+    }
   }
   return false;
 }
