@@ -1145,13 +1145,13 @@ if ( radio.available() )
               <p class="mb-3 text-left">
                 Cleaning up, we moved all of our circuitry to two half-breadboards which we mounted on the top level of our robot, with our arduino now being mounted on the lower level. This gave us better access to all of our circuitry as well as it helped to reduce the nest of wires making our robot easier to debug and cleaner looking as well. However, as we re-wired out inputs and outputs from our arduino we ran into the problem that we had more analog inputs than the arduino could handle. 
               </p>
-              <p class="mb-5 text-left">
+              <p class="mb-3 text-left">
                 To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. As we currently only needed to mux between two inputs we grounded the S1 and S2 selection inputs and connected digital pin 7 of our arduino to S0 of the mux. We then connected the output channel of the mux to analog input pin A5. 
               </p>
-              <p class="mb-5 text-left">
+              <p class="mb-3 text-left">
                 A rather unanticipated issue that arose from using the mux was that both of our sensors appeared to be changing based off of the values from the right one. At first we believed that one of the sensors was simply broken since the mux had been functioning originally. However, we discovered that the mux does not sit properly in the breadboard, causing some of the pins to not be fully connected. This resulted in only one of the wall sensors ever being read. To fix this problem we needed to bend several of the pins in order to better fit the breadboard.
               </p>
-              <p class="mb-5 text-left">
+              <p class="mb-3 text-left">
                 Another unanticipated problem we faced was the noise on our 5V rails caused by the wall sensors. Due to this noise our IR and microphone circuits ceased to function correctly. Our initial solution to this problem was to add as many decoupling capacitors as possible but we found that this simply didn’t work well enough. Instead, we decided to use the provided 5-to-3.3 voltage regulator, in order to have a separate power line dedicated to the sensitive IR circuit.
               </p>
               <p class="mb-5 text-left">
