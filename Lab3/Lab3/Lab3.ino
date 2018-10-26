@@ -24,14 +24,12 @@ const int detectRobotLED = 6;
 const int mux = 7;
 const int rightWallLED = 4;
 const int frontWallLED = 6;
-#define pin_PowerMux 2
 #define pin_Button   8
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
 int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 int LIGHT_RIGHT_THRESHOLD = 600;//540;
 int LIGHT_LEFT_THRESHOLD = 600;//620;
-//int i = 0;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -41,25 +39,26 @@ RF24 radio(9,10);
 // Protocol: 16 bits (2 bytes): (4 bits) x, (4 bits) y, [(1 bit) explored, (3 bits) treasures, (walls) 1111 NSEW] <- blocked bits are stored as a maze cell
 
 // walls 
-#define bm_wall       15 << 0
-#define bm_wall_east  1 << 1
-#define bm_wall_north 1 << 3
-#define bm_wall_west  1 << 0
-#define bm_wall_south 1 << 2
+const uint8_t bm_wall    =   15;
+const uint8_t bm_wall_east = 2  ;
+const uint8_t bm_wall_north=8;
+const uint8_t bm_wall_west  =1;
+const uint8_t bm_wall_south =4;
 
 // treasure
 #define treasure_shift 4
-#define bm_treasure_none     0 << 4
-#define bm_treasure_b_sq     1 << 4
-#define bm_treasure_r_sq     2 << 4
-#define bm_treasure_b_ci     3 << 4
-#define bm_treasure_r_ci     4 << 4
-#define bm_treasure_b_tr     5 << 4
-#define bm_treasure_r_tr     6 << 4
+const uint8_t bm_treasure      = 112 ;// 7 << 4
+const uint8_t bm_treasure_none = 0  ; // 0 << 4
+const uint8_t bm_treasure_b_sq = 16 ; // 1 << 4
+const uint8_t bm_treasure_r_sq = 32 ; // 2 << 4
+const uint8_t bm_treasure_b_ci = 48 ; // 3 << 4
+const uint8_t bm_treasure_r_co = 64 ; // 4 << 4
+const uint8_t bm_treasure_b_tr = 80 ; // 5 << 4
+const uint8_t bm_treasure_r_tr = 96 ; // 6 << 4
 
 // whether square explored
-#define bm_explored     1 << 7
-#define bm_not_explored 0 << 7
+const uint8_t bm_explored    = 128;
+const uint8_t bm_not_explored= 0;
 //#define explored_shift  7
 
 //// presence of other robot
@@ -102,8 +101,6 @@ void setup() {
   Serial.begin(115200); // use the serial port
 
   // remove wall sensors from 5v line to prevent weird interference
-  pinMode(pin_PowerMux, OUTPUT);
-  digitalWrite(pin_PowerMux, HIGH);
 
   // wait for either microphone 660Hz or button input
   while(!readSignal() && !digitalRead(pin_Button) == HIGH) {
@@ -165,7 +162,6 @@ void loop() {
     Serial.println(F("start loop"));
     forward();
     linefollow();
-    delay(20);
 
     // IR
     
@@ -179,7 +175,7 @@ void loop() {
 
 void forward(){
     MotorLeft.write(84);
-    MotorRight.write(98);
+    MotorRight.write(99);
 }
 
 void turnLeft(){
@@ -251,7 +247,7 @@ void linefollow(){
            return;
      } else if (centerOnLine && leftOnLine) {
            // bot is veering right slightly, so we turn it left a bit
-           MotorRight.write(92);
+           MotorRight.write(93);
            MotorLeft.write(83);
            Serial.println(F("Veering slightly right"));
            delay(100);
@@ -285,7 +281,6 @@ void linefollow(){
 void wallfollow(){
   MotorLeft.write(90);
   MotorRight.write(90);
-  digitalWrite(pin_PowerMux, LOW);
   digitalWrite(mux, HIGH); //when high we read from the right wall
   delay(20);
   wallRight = analogRead(A5);
@@ -293,7 +288,6 @@ void wallfollow(){
   delay(20);
   wallFront = analogRead(A5);
   Serial.println(wallFront);
-  digitalWrite(pin_PowerMux, HIGH);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
   switch (current_dir) {
@@ -310,7 +304,8 @@ void wallfollow(){
       y--;
       break;
   }
-  
+ x %= 16;
+ y %= 16;
   if (wallRight >= RIGHTTHRESHOLD) {
     digitalWrite(rightWallLED, HIGH);
     if (current_dir == N) {
@@ -341,10 +336,10 @@ void wallfollow(){
     digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
   
-  if (maze[x][y] & bm_explored == 0) {
+  if (maze[x][y] >= 0) {
     // have not explored yet
-    while(!broadcast()); // keep broadcasting until successful
     maze[x][y] |= bm_explored;
+    broadcast(); // keep broadcasting until successful
   }
   
   if (wallFront <= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { //if greater than threshold there is a wall 
@@ -363,14 +358,12 @@ void wallfollow(){
       
       //delay(1000);
 
-      digitalWrite(pin_PowerMux, LOW);
       digitalWrite(mux, HIGH); //when high we read from the right wall
       delay(20);
       wallRight = analogRead(A5);
       digitalWrite(mux, LOW);  //when low we read from the front wall 
       delay(20);
       wallFront = analogRead(A5);
-      digitalWrite(pin_PowerMux, HIGH);
       
       if (wallRight >= RIGHTTHRESHOLD) {
         digitalWrite(rightWallLED, HIGH);
@@ -401,13 +394,12 @@ void wallfollow(){
       } else {
         digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
       }
-     broadcast();
+    // broadcast();
   }
   return;
 }
 
 boolean detect() {
-  digitalWrite(pin_PowerMux, HIGH);
 
   cli();  // UDRE interrupt slows this way down on arduino1.0
 
@@ -472,7 +464,7 @@ boolean readSignal() {
   sei();
   Serial.println(fft_log_out[19]);
   for (int j = 17; j < 23; ++j) {
-    if (fft_log_out[j] >= 80){
+    if (fft_log_out[j] >= 60){
       //We have detected another robot
       // return settings to original
       return true;
@@ -517,17 +509,11 @@ boolean broadcast() {
   {
     printf("Failed, response timed out.\n\r");
     // Try again 1s later
-    delay(1000);
     return false;
   }
   else
   {
     // Grab the response, compare, and send to debugging spew
-    unsigned long got_time;
-    radio.read( &got_time, sizeof(unsigned long) );
-
-    // Spew it
-    printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
     return true;
   }
 }
