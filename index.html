@@ -906,13 +906,13 @@ for (int j = 38; j < 44; ++j) {
 #define bm_treasure_r_tr     6 << 4
 
 // whether square explored
-#define bm_explored     0 << 7
-#define bm_not_explored 1 << 7
+#define bm_explored     1 << 7
+#define bm_not_explored 0 << 7
 #define explored_shift  7
 
 // presence of other robot
-#define bm_robot    0 << 1
-#define bm_no_robot 1 << 1
+#define bm_robot    1 << 1
+#define bm_no_robot 0 << 1
 #define robot_shift 1
                 </code>
               </pre>
@@ -1140,19 +1140,29 @@ if ( radio.available() )
                 The goal for this part of the lab was to integrate all of our robot’s sensing components, including recognizing the start signal of 660Hz with a microphone, line following, right-hand wall following, and detecting other robots while ignoring decoys. All of these features have been successfully built in previous labs/milestones, and so now we’ve integrated all of these features to prove that they can work together without interfering with each other.
               </p>
               <p class="mb-3 text-left">
-                In order to integrate all of our current analog input signals, we needed to be able to read in more analog inputs than we had analog input pins on the Arduino Uno. To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. Therefore, before reading either the front or right sensor, we switch the state of a digital output pin to choose which sensor we read from. 
+                Integrating all of our separate circuits and systems in order to complete lab 3 turned out to be more of a challenge than initially anticipated. For starters, our IR detection circuit, microphone circuit, sensor inputs, and servo controls all existed either on different breadboards or very far away from the arduino. This created a large mess of wires that made modifying and debugging our circuits difficult as every modification almost always resulted in accidently removing another wire. 
               </p>
               <p class="mb-3 text-left">
-                We also moved to having two half-breadboards on the top level of our robot, with the Arduino mounted on the lower level. This allowed us to better access the many connections on the breadboard, since most connections to the Arduino were rarely changed. We also were able to comfortably move the IR circuit onto the two half breadboards, decreasing the precariousness of our robot.
+                Cleaning up, we moved all of our circuitry to two half-breadboards which we mounted on the top level of our robot, with our arduino now being mounted on the lower level. This gave us better access to all of our circuitry as well as it helped to reduce the nest of wires making our robot easier to debug and cleaner looking as well. However, as we re-wired out inputs and outputs from our arduino we ran into the problem that we had more analog inputs than the arduino could handle. 
+              </p>
+              <p class="mb-3 text-left">
+                To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. As we currently only needed to mux between two inputs we grounded the S1 and S2 selection inputs and connected digital pin 7 of our arduino to S0 of the mux. We then connected the output channel of the mux to analog input pin A5. 
+              </p>
+              <p class="mb-3 text-left">
+                A rather unanticipated issue that arose from using the mux was that both of our sensors appeared to be changing based off of the values from the right one. At first we believed that one of the sensors was simply broken since the mux had been functioning originally. However, we discovered that the mux does not sit properly in the breadboard, causing some of the pins to not be fully connected. This resulted in only one of the wall sensors ever being read. To fix this problem we needed to bend several of the pins in order to better fit the breadboard.
+              </p>
+              <p class="mb-3 text-left">
+                Another unanticipated problem we faced was the noise on our 5V rails caused by the wall sensors. Due to this noise our IR and microphone circuits ceased to function correctly. Our initial solution to this problem was to add as many decoupling capacitors as possible but we found that this simply didn’t work well enough. Instead, we decided to use the provided 5-to-3.3 voltage regulator, in order to have a separate power line dedicated to the sensitive IR circuit.
               </p>
               <p class="mb-5 text-left">
-                In order to integrate the maze GUI code with the robot maneuvering, we needed to keep track of the current orientation of the robot (which would get updated whenever we turn left/right), as well as update the internal maze state whenever we reach an intersection, at which point we are able to detect walls. 
+                Finally, in order to integrate the maze GUI code with the robot maneuvering, we needed to keep track of the current orientation of the robot (which would get updated whenever we turn left/right), as well as update the internal maze state whenever we reach an intersection, at which point we are able to detect walls. Note that since we only broadcast the maze state one time, before it has been explored, some of the walls do not appear. This will be fixed once add a third wall sensor on the left side of the robot, so that we will be able to detect all of the walls at the same time.
               </p>
               <hr class="mb-5">
               <h3 class="text-secondary mb-1">Final Integration</h3>
               <p class="mb-3 text-left">First, we incorporated radio communication into our overall program, as shown in the video below. As you can see in the video, the robot now pauses for a bit at every intersection. We do this because this is when the robot broadcasts to the base station, and if the broadcast is unsuccessful, it stays put and keeps trying. The coordinates received in the base station are correct at every intersection, based on the starting coordinate of the robot being set to (0, 0). We did not show the actual GUI updating in this video, because it was inconvenient at the time of recording and we've already shown above that it works.</p>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/N0hEJD_Hcbo?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <p class="mb-5 text-left">Finally, the following video shows everything incorporated into our robot (line following, wall following, radio communication, GUI, starting on 660Hz, responding to other robots, and ignoring decoys):</p>
+              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/Ex6m2g_6p3g" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <hr class="mb-5">
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab3">View Lab 3 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
