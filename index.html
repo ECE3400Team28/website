@@ -1071,42 +1071,13 @@ if ( radio.available() )
     char buff[30];
     sprintf(buff, "%d,%d", x, y);
     Serial.print(buff);
-    if (north) {
-      Serial.print(",north=true");
-    }
-    if (south) {
-      Serial.print(",south=true");
-    }
-    if (east) {
-      Serial.print(",east=true");
-    }
-    if (west) {
-      Serial.print(",west=true");
-    }
-    switch (treasure) {
-      case bm_treasure_none:
-        break;
-      case bm_treasure_b_sq:
-        Serial.print(",tshape=Square,tcolor=Blue");
-        break;
-      case bm_treasure_r_sq:
-        Serial.print(",tshape=Square,tcolor=Red");
-        break;
-      case bm_treasure_b_ci:
-        Serial.print(",tshape=Circle,tcolor=Blue");
-        break;
-      case bm_treasure_r_ci:
-        Serial.print(",tshape=Circle,tcolor=Red");
-        break;
-      case bm_treasure_b_tr:
-        Serial.print(",tshape=Triangle,tcolor=Blue");
-        break;
-      case bm_treasure_r_tr:
-        Serial.print(",tshape=Triangle,tcolor=Red");
-        break;
-      default:
-        break;
-    }
+
+    /*
+     * Code for checking the message with each wall/treasure bitmask goes here
+     * If a match is found, more is printed to Serial
+     */
+
+    // Ends printed message to GUI
     Serial.print("\n");
 
     // Delay just a little bit to let the other unit
@@ -1163,6 +1134,8 @@ if ( radio.available() )
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/N0hEJD_Hcbo?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <p class="mb-5 text-left">Finally, the following video shows everything incorporated into our robot (line following, wall following, radio communication, GUI, starting on 660Hz, responding to other robots, and ignoring decoys):</p>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/Ex6m2g_6p3g" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <p class="mb-5 text-left">This last video shows the same robot (running the same code) detecting the IR hat from a farther distance. </p>
+              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/sQ3DKX8HY3o" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <hr class="mb-5">
               <a class="btn btn-secondary btn-lg rounded-pill" href="https://github.com/ECE3400Team28/website/tree/master/Lab3">View Lab 3 Code on GitHub</a>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
