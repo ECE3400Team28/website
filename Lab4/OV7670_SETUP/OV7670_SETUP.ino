@@ -1,15 +1,22 @@
 #include <Wire.h>
+//#include "help.h"
 
-#define OV7670_I2C_ADDRESS 0x42 /*TODO: write this in hex (eg. 0xAB) */
+#define OV7670_I2C_ADDRESS 0x21 /*TODO: write this in hex (eg. 0xAB) */
 
 uint8_t regs[16][16];
 
 ///////// Main Program //////////////
 void setup() {
+
   Wire.begin();
   Serial.begin(9600);
   
   // TODO: READ KEY REGISTERS
+  Serial.println("Start");
+  
+  //while(Wire.available()<1);
+  delay(100);
+  
   read_key_registers();
   
   // useful registers:
@@ -23,9 +30,23 @@ void setup() {
   
   // TODO: WRITE KEY REGISTERS
 
-  regs[7][0] |= (1 << 7);
-  regs[7][1] |= (1 << 7);
+// values at start: 0x70 was 0xX0111010
+// 0x71 was 10110101
+regs[7][0] = B10111010;
+regs[7][1] = B10110101;
+//  regs[7][0] |= (1 << 7);
+//  regs[7][0] &= ~(1 << 5);
+//  regs[7][1] |= (1 << 7);
+//  regs[7][1] &= ~(1 << 5);
+  
+  Serial.print("Writing back ");
+  Serial.print(regs[7][0], BIN);
+  Serial.println(" into register 0x70");
 
+  Serial.print("Writing back ");
+  Serial.print(regs[7][1], BIN);
+  Serial.println(" into register 0x71");
+  
   OV7670_write_register(0x70, regs[7][0]);
   OV7670_write_register(0x71, regs[7][1]);
   
@@ -43,33 +64,34 @@ void loop(){
 void read_key_registers(){
   /*TODO: DEFINE THIS FUNCTION*/
   Serial.print("Reg 0x00: ");
-  Serial.println(read_register_value(0x00), BIN);
+  //Serial.println(read_register_value(0x00), BIN);
   regs[0][0] = read_register_value(0x00);
   Serial.println(regs[0][0], BIN);
   Serial.print("Reg 0x01: ");
   regs[0][1] = read_register_value(0x01);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[0][1], BIN);
   Serial.print("Reg 0x02: ");
   regs[0][2] = read_register_value(0x02);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[0][2], BIN);
   Serial.print("Reg 0x04: ");
   regs[0][4] = read_register_value(0x04);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[0][4], BIN);
   Serial.print("Reg 0x07: ");
   regs[0][7] = read_register_value(0x07);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[0][7], BIN);
   Serial.print("Reg 0x10: ");
   regs[1][0] = read_register_value(0x10);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[1][0], BIN);
   Serial.print("Reg 0x11: ");
   regs[1][1] = read_register_value(0x11);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[1][1], BIN);
   Serial.print("Reg 0x70: ");
   regs[7][0] = read_register_value(0x70);
-  Serial.println(regs[0][0], BIN);
+  //Serial.println(regs[7][0]);
+  Serial.println(regs[7][0], BIN);
   Serial.print("Reg 0x71: ");
   regs[7][1] = read_register_value(0x71);
-  Serial.println(regs[0][0], BIN);
+  Serial.println(regs[7][1], BIN);
 }
 
 byte read_register_value(int register_address){

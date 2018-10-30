@@ -1,0 +1,38 @@
+module fake_treasures(
+	CLK,
+	OUTPUT
+);
+
+reg [31:0] cnt1;
+reg [31:0] cnt2;
+reg [31:0] cnt3;
+
+always (@posedge CLK) begin
+	cnt1 = cnt1 + 1;
+	OUTPUT = 1'b0;
+	if (cnt1 == 32'd10000) begin
+		cnt2 = cnt2 + 1;
+		cnt1 = 32'b0;
+		if (cnt2 == 32'd100) begin
+			cnt3 = cnt3 + 1;
+			cnt2 = 32'b0;
+			if (cnt3 == 32'd3) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd6) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd6) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd100) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd103) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd106) begin
+				OUTPUT = 1'b1;
+			end else if (cnt3 == 32'd200) begin
+				cnt3 = 32'b0;
+			end
+		end
+	end
+end
+
+endmodule				
