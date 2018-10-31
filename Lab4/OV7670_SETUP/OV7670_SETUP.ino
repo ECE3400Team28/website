@@ -2,6 +2,7 @@
 //#include "help.h"
 
 #define OV7670_I2C_ADDRESS 0x21 /*TODO: write this in hex (eg. 0xAB) */
+#define FPGA_PIN           5
 
 uint8_t regs[16][16];
 
@@ -54,10 +55,36 @@ regs[7][1] = B10110101;
   read_key_registers();
 
   set_color_matrix();
+  
+  pinMode(FPGA_PIN, INPUT);
 }
 
 void loop(){
- }
+  delay(80);
+  uint16_t msg_resp=read_12_bits();
+  Serial.print("Received: ");
+  Serial.println(msg_resp, BIN);
+}
+
+uint16_t read_12_bits(){
+  uint16_t msg = 0;
+  for (int i = 0; i < 12; i++) {
+    msg = msg << 1;
+    msg |= digitalRead(FPGA_PIN);
+    delayMicroseconds(100);
+  }
+  return msg;
+}
+
+uint16_t read_after_pinhigh(){
+  uint16_t msg_start = read_12_bits();
+  if (__builtin_popcount(msg_start) > 11)
+    return 0;
+  //if (msg_start[11:0]
+  while(!digitalRead(FPGA_PIN))
+    delayMicroseconds(100);
+  return read_12_bits();
+}
 
 
 ///////// Function Definition //////////////
