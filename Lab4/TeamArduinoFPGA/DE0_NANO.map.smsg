@@ -1,0 +1,1 @@
+Warning (10268): Verilog HDL information at DE0_NANO.v(132): always construct contains both blocking and non-blocking assignments File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 132

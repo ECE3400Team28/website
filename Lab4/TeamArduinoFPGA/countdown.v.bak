@@ -1,0 +1,20 @@
+module countdown {
+	input 			CLK,
+	input				RESET,
+	input				LOAD,
+	input	[9:0]		DATA,
+	output			DONE
+);
+
+	reg [9:0] count;
+	
+	always @ (posedge CLK) begin
+		if (RESET)
+			count <= 10'b0;
+		else if (LOAD)
+			count <= DATA;
+		else
+			count <= count - 10'b1;
+	end
+	
+	assign DONE = count == 10'd0;
