@@ -15,8 +15,8 @@ reg [15:0] cnt3;
 reg CLK9600;
 
 wire DONE;
-wire LOAD;
-wire LOADSHIFT;
+//wire LOAD;
+//wire LOADSHIFT;
 
 always @ (posedge CLK) begin
 	cnt1 = cnt1 + 1;
@@ -42,36 +42,46 @@ end
 
 always @(*) begin
 	case (cnt3)
-		16'd0:
-			treasure_color = 2'b00;
-			treasure_shape = 2'b01;
-		16'd1:
-			treasure_color = 2'b11;
-			treasure_shape = 2'b00;
-		16'd2:
-			treasure_color = 2'b11;
-			treasure_shape = 2'b01;
-		16'd3:
-			treasure_color = 2'b11;
-			treasure_shape = 2'b10;
-		16'd4:
-			treasure_color = 2'b11;
-			treasure_shape = 2'b11;
-		16'd6:
-			treasure_color = 2'b10;
-			treasure_shape = 2'b01;
-		16'd7:
-			treasure_color = 2'b10;
-			treasure_shape = 2'b10;
-		16'd8:
-			treasure_color = 2'b10;
-			treasure_shape = 2'b11;
-		16'd9:
-			treasure_color = 2'b01;
-			treasure_shape = 2'b11;
-		default:
-			treasure_color = 2'b00;
-			treasure_shape = 2'b00;
+		16'd0: begin
+			treasure_color <= 2'b00;
+			treasure_shape <= 2'b01;
+			end
+		16'd1: begin
+			treasure_color <= 2'b11;
+			treasure_shape <= 2'b00;
+			end
+		16'd2: begin
+			treasure_color <= 2'b11;
+			treasure_shape <= 2'b01;
+			end
+		16'd3: begin
+			treasure_color <= 2'b11;
+			treasure_shape <= 2'b10;
+			end
+		16'd4: begin
+			treasure_color <= 2'b11;
+			treasure_shape <= 2'b11;
+			end
+		16'd6: begin
+			treasure_color <= 2'b10;
+			treasure_shape <= 2'b01;
+			end
+		16'd7: begin
+			treasure_color <= 2'b10;
+			treasure_shape <= 2'b10;
+			end
+		16'd8: begin
+			treasure_color <= 2'b10;
+			treasure_shape <= 2'b11;
+			end
+		16'd9: begin
+			treasure_color <= 2'b01;
+			treasure_shape <= 2'b11;
+			end
+		default: begin
+			treasure_color <= 2'b00;
+			treasure_shape <= 2'b00;
+			end
 	endcase
 end
 
@@ -85,41 +95,46 @@ end
 
 reg Scurr;
 reg Snext;
+reg LOAD;
+reg LOADSHIFT;
 
 parameter 	Send  = 1'b0;
-			Count = 1'b1;
+parameter   Count = 1'b1;
 			
 reg [11:0] ShiftData;
 reg  [3:0] ShiftCount;
-reg [11:0] Nessage;
+reg [11:0] Message;
 
 wire ShiftDone;
-wire SHIFTOUT;
+reg SHIFTOUT;
 
 always @ (*) begin
 	case (Scurr)
 		Send:
 			// if treasure color and shape signify that they are valid
-			Snext <= (treasure_color[1] && (|treasure_shape) && ShiftDone) ? Count : Init;
+			Snext <= (treasure_color[1] && (|treasure_shape) && ShiftDone) ? Count : Send;
 		Count:
-			Snext <= DONE ? Send : Init;
+			Snext <= DONE ? Send : Count;
 	endcase
 end
 
 always @ (Scurr) begin
-	case (scurr)
-		Send:
+	case (Scurr)
+		Send: begin
 			LOAD = 1'b1;
 			LOADSHIFT = 1'b0;
 			OUTPUT = SHIFTOUT;
-		Count:
+			end
+		Count: begin
 			LOAD = 1'b0;
 			LOADSHIFT = 1'b1;
 			OUTPUT = 1'b0;
-		default:
+			end
+		default: begin
 			LOAD = 1'b1;
 			LOADSHIFT = 1'b0;
 			OUTPUT = 1'b1;
+			end
 	endcase
 end
 			
@@ -138,6 +153,7 @@ always @ (*) begin
 			// No color
 			Message <= 12'b1111_1111_1111;
 		2'b10:
+		begin
 			// Red
 			case (treasure_shape)
 				2'b00:
@@ -156,7 +172,9 @@ always @ (*) begin
 					// No shape
 					Message <= 12'b1111_1111_1111;
 			endcase
+		end
 		2'b11:
+		begin
 			// Blue
 			case (treasure_shape)
 				2'b00:
@@ -175,6 +193,7 @@ always @ (*) begin
 					// No shape
 					Message <= 12'b1111_1111_1111;
 			endcase
+		end
 	endcase
 end
 
@@ -182,13 +201,17 @@ end
 
 always @ (posedge CLK9600) begin
 	if (LOADSHIFT)
+	begin
 		ShiftCount <= 4'd12;
 		ShiftData <= Message;
 		SHIFTOUT <= 1'b1;
+	end
 	else
+	begin
 		ShiftCount <= ShiftCount - 4'b1;
 		SHIFTOUT <= ShiftData[11];
 		ShiftData <= {ShiftData[10:0], 1'b1};
+	end
 end
 
 assign ShiftDone = (ShiftCount == 4'b0);

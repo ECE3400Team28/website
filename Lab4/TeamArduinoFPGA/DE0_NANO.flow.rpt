@@ -1,5 +1,5 @@
 Flow report for DE0_NANO
-Tue Oct 30 17:34:30 2018
+Fri Nov 02 14:07:25 2018
 Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 
 
@@ -41,17 +41,17 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Flow Summary                                                                     ;
 +------------------------------------+---------------------------------------------+
-; Flow Status                        ; Successful - Tue Oct 30 17:34:12 2018       ;
+; Flow Status                        ; Successful - Fri Nov 02 14:07:04 2018       ;
 ; Quartus Prime Version              ; 17.0.0 Build 595 04/25/2017 SJ Lite Edition ;
 ; Revision Name                      ; DE0_NANO                                    ;
 ; Top-level Entity Name              ; DE0_NANO                                    ;
 ; Family                             ; Cyclone IV E                                ;
 ; Device                             ; EP4CE22F17C6                                ;
 ; Timing Models                      ; Final                                       ;
-; Total logic elements               ; 294 / 22,320 ( 1 % )                        ;
-;     Total combinational functions  ; 294 / 22,320 ( 1 % )                        ;
-;     Dedicated logic registers      ; 102 / 22,320 ( < 1 % )                      ;
-; Total registers                    ; 102                                         ;
+; Total logic elements               ; 321 / 22,320 ( 1 % )                        ;
+;     Total combinational functions  ; 320 / 22,320 ( 1 % )                        ;
+;     Dedicated logic registers      ; 145 / 22,320 ( < 1 % )                      ;
+; Total registers                    ; 145                                         ;
 ; Total pins                         ; 51 / 154 ( 33 % )                           ;
 ; Total virtual pins                 ; 0                                           ;
 ; Total memory bits                  ; 76,032 / 608,256 ( 13 % )                   ;
@@ -65,7 +65,7 @@ agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 10/30/2018 17:33:33 ;
+; Start date & time ; 11/02/2018 14:06:26 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; DE0_NANO            ;
 +-------------------+---------------------+
@@ -76,7 +76,7 @@ agreement for further details.
 +-------------------------------------+----------------------------------------+---------------+-------------+------------+
 ; Assignment Name                     ; Value                                  ; Default Value ; Entity Name ; Section Id ;
 +-------------------------------------+----------------------------------------+---------------+-------------+------------+
-; COMPILER_SIGNATURE_ID               ; 268891670445130.154093521305628        ; --            ; --          ; --         ;
+; COMPILER_SIGNATURE_ID               ; 268891670462828.154118198608396        ; --            ; --          ; --         ;
 ; MAX_CORE_JUNCTION_TEMP              ; 85                                     ; --            ; --          ; --         ;
 ; MIN_CORE_JUNCTION_TEMP              ; 0                                      ; --            ; --          ; --         ;
 ; MISC_FILE                           ; thePLL_inst.v                          ; --            ; --          ; --         ;
@@ -95,11 +95,11 @@ agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:00:14     ; 1.0                     ; 694 MB              ; 00:00:25                           ;
-; Fitter                    ; 00:00:11     ; 1.0                     ; 1417 MB             ; 00:00:08                           ;
-; Assembler                 ; 00:00:02     ; 1.0                     ; 563 MB              ; 00:00:01                           ;
-; TimeQuest Timing Analyzer ; 00:00:13     ; 1.0                     ; 671 MB              ; 00:00:02                           ;
-; Total                     ; 00:00:40     ; --                      ; --                  ; 00:00:36                           ;
+; Analysis & Synthesis      ; 00:00:14     ; 1.0                     ; 672 MB              ; 00:00:25                           ;
+; Fitter                    ; 00:00:10     ; 1.0                     ; 1416 MB             ; 00:00:08                           ;
+; Assembler                 ; 00:00:02     ; 1.0                     ; 564 MB              ; 00:00:01                           ;
+; TimeQuest Timing Analyzer ; 00:00:17     ; 1.0                     ; 667 MB              ; 00:00:02                           ;
+; Total                     ; 00:00:43     ; --                      ; --                  ; 00:00:36                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -108,10 +108,10 @@ agreement for further details.
 +---------------------------+------------------+------------+------------+----------------+
 ; Module Name               ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
 +---------------------------+------------------+------------+------------+----------------+
-; Analysis & Synthesis      ; en-ec-ph427-05   ; Windows 10 ; 10.0       ; x86_64         ;
-; Fitter                    ; en-ec-ph427-05   ; Windows 10 ; 10.0       ; x86_64         ;
-; Assembler                 ; en-ec-ph427-05   ; Windows 10 ; 10.0       ; x86_64         ;
-; TimeQuest Timing Analyzer ; en-ec-ph427-05   ; Windows 10 ; 10.0       ; x86_64         ;
+; Analysis & Synthesis      ; en-ec-ph427-09   ; Windows 10 ; 10.0       ; x86_64         ;
+; Fitter                    ; en-ec-ph427-09   ; Windows 10 ; 10.0       ; x86_64         ;
+; Assembler                 ; en-ec-ph427-09   ; Windows 10 ; 10.0       ; x86_64         ;
+; TimeQuest Timing Analyzer ; en-ec-ph427-09   ; Windows 10 ; 10.0       ; x86_64         ;
 +---------------------------+------------------+------------+------------+----------------+
 
 

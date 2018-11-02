@@ -1,5 +1,5 @@
 Analysis & Synthesis report for DE0_NANO
-Tue Oct 30 17:33:49 2018
+Fri Nov 02 14:06:41 2018
 Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 
 
@@ -21,18 +21,20 @@ Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
  13. Registers Packed Into Inferred Megafunctions
  14. Multiplexer Restructuring Statistics (Restructuring Performed)
  15. Source assignments for Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_95f1:auto_generated
- 16. Parameter Settings for User Entity Instance: thePLL:thePLL_inst|altpll:altpll_component
- 17. Parameter Settings for Inferred Entity Instance: Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0
- 18. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult0
- 19. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult1
- 20. altpll Parameter Settings by Entity Instance
- 21. altsyncram Parameter Settings by Entity Instance
- 22. lpm_mult Parameter Settings by Entity Instance
- 23. Port Connectivity Checks: "IMAGE_PROCESSOR:proc"
- 24. Post-Synthesis Netlist Statistics for Top Partition
- 25. Elapsed Time Per Partition
- 26. Analysis & Synthesis Messages
- 27. Analysis & Synthesis Suppressed Messages
+ 16. Parameter Settings for User Entity Instance: fake_treasures:fkt
+ 17. Parameter Settings for User Entity Instance: thePLL:thePLL_inst|altpll:altpll_component
+ 18. Parameter Settings for Inferred Entity Instance: Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0
+ 19. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult0
+ 20. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult1
+ 21. altpll Parameter Settings by Entity Instance
+ 22. altsyncram Parameter Settings by Entity Instance
+ 23. lpm_mult Parameter Settings by Entity Instance
+ 24. Port Connectivity Checks: "IMAGE_PROCESSOR:proc"
+ 25. Port Connectivity Checks: "fake_treasures:fkt|countdown:cd"
+ 26. Post-Synthesis Netlist Statistics for Top Partition
+ 27. Elapsed Time Per Partition
+ 28. Analysis & Synthesis Messages
+ 29. Analysis & Synthesis Suppressed Messages
 
 
 
@@ -59,15 +61,15 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +------------------------------------+---------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Tue Oct 30 17:33:49 2018       ;
+; Analysis & Synthesis Status        ; Successful - Fri Nov 02 14:06:41 2018       ;
 ; Quartus Prime Version              ; 17.0.0 Build 595 04/25/2017 SJ Lite Edition ;
 ; Revision Name                      ; DE0_NANO                                    ;
 ; Top-level Entity Name              ; DE0_NANO                                    ;
 ; Family                             ; Cyclone IV E                                ;
-; Total logic elements               ; 294                                         ;
-;     Total combinational functions  ; 294                                         ;
-;     Dedicated logic registers      ; 102                                         ;
-; Total registers                    ; 102                                         ;
+; Total logic elements               ; 320                                         ;
+;     Total combinational functions  ; 320                                         ;
+;     Dedicated logic registers      ; 145                                         ;
+; Total registers                    ; 145                                         ;
 ; Total pins                         ; 51                                          ;
 ; Total virtual pins                 ; 0                                           ;
 ; Total memory bits                  ; 76,032                                      ;
@@ -175,8 +177,7 @@ agreement for further details.
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
 ;     Processor 1            ; 100.0%      ;
-;     Processor 2            ;   0.0%      ;
-;     Processors 3-4         ;   0.0%      ;
+;     Processors 2-4         ;   0.0%      ;
 +----------------------------+-------------+
 
 
@@ -191,6 +192,7 @@ agreement for further details.
 ; IMAGE_PROCESSOR.v                ; yes             ; User Verilog HDL File        ; G:/ECE3400/Lab4_FPGA_Template/IMAGE_PROCESSOR.v                                ;         ;
 ; thePLL.v                         ; yes             ; User Wizard-Generated File   ; G:/ECE3400/Lab4_FPGA_Template/thePLL.v                                         ;         ;
 ; fake_treasures.v                 ; yes             ; User Verilog HDL File        ; G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v                                 ;         ;
+; countdown.v                      ; yes             ; User Verilog HDL File        ; G:/ECE3400/Lab4_FPGA_Template/countdown.v                                      ;         ;
 ; altpll.tdf                       ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altpll.tdf              ;         ;
 ; aglobal170.inc                   ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/aglobal170.inc          ;         ;
 ; stratix_pll.inc                  ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/stratix_pll.inc         ;         ;
@@ -239,20 +241,20 @@ agreement for further details.
 +---------------------------------------------+------------------------------------------------------------------------------------------+
 ; Resource                                    ; Usage                                                                                    ;
 +---------------------------------------------+------------------------------------------------------------------------------------------+
-; Estimated Total logic elements              ; 294                                                                                      ;
+; Estimated Total logic elements              ; 320                                                                                      ;
 ;                                             ;                                                                                          ;
-; Total combinational functions               ; 294                                                                                      ;
+; Total combinational functions               ; 320                                                                                      ;
 ; Logic element usage by number of LUT inputs ;                                                                                          ;
-;     -- 4 input functions                    ; 86                                                                                       ;
-;     -- 3 input functions                    ; 77                                                                                       ;
-;     -- <=2 input functions                  ; 131                                                                                      ;
+;     -- 4 input functions                    ; 84                                                                                       ;
+;     -- 3 input functions                    ; 59                                                                                       ;
+;     -- <=2 input functions                  ; 177                                                                                      ;
 ;                                             ;                                                                                          ;
 ; Logic elements by mode                      ;                                                                                          ;
-;     -- normal mode                          ; 167                                                                                      ;
-;     -- arithmetic mode                      ; 127                                                                                      ;
+;     -- normal mode                          ; 169                                                                                      ;
+;     -- arithmetic mode                      ; 151                                                                                      ;
 ;                                             ;                                                                                          ;
-; Total registers                             ; 102                                                                                      ;
-;     -- Dedicated logic registers            ; 102                                                                                      ;
+; Total registers                             ; 145                                                                                      ;
+;     -- Dedicated logic registers            ; 145                                                                                      ;
 ;     -- I/O registers                        ; 0                                                                                        ;
 ;                                             ;                                                                                          ;
 ; I/O pins                                    ; 51                                                                                       ;
@@ -264,9 +266,9 @@ agreement for further details.
 ;     -- PLLs                                 ; 1                                                                                        ;
 ;                                             ;                                                                                          ;
 ; Maximum fan-out node                        ; thePLL:thePLL_inst|altpll:altpll_component|thePLL_altpll:auto_generated|wire_pll1_clk[0] ;
-; Maximum fan-out                             ; 116                                                                                      ;
-; Total fan-out                               ; 1495                                                                                     ;
-; Average fan-out                             ; 2.93                                                                                     ;
+; Maximum fan-out                             ; 132                                                                                      ;
+; Total fan-out                               ; 1673                                                                                     ;
+; Average fan-out                             ; 2.88                                                                                     ;
 +---------------------------------------------+------------------------------------------------------------------------------------------+
 
 
@@ -275,14 +277,15 @@ agreement for further details.
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
 ; Compilation Hierarchy Node                     ; Combinational ALUTs ; Dedicated Logic Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                              ; Entity Name       ; Library Name ;
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
-; |DE0_NANO                                      ; 294 (65)            ; 102 (31)                  ; 76032       ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
+; |DE0_NANO                                      ; 320 (66)            ; 145 (31)                  ; 76032       ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
 ;    |Dual_Port_RAM_M9K:mem|                     ; 8 (0)               ; 2 (0)                     ; 76032       ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem                                                                                                  ; Dual_Port_RAM_M9K ; work         ;
 ;       |altsyncram:mem_rtl_0|                   ; 8 (0)               ; 2 (0)                     ; 76032       ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0                                                                             ; altsyncram        ; work         ;
 ;          |altsyncram_95f1:auto_generated|      ; 8 (0)               ; 2 (2)                     ; 76032       ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_95f1:auto_generated                                              ; altsyncram_95f1   ; work         ;
 ;             |decode_f8a:rden_decode_b|         ; 4 (4)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_95f1:auto_generated|decode_f8a:rden_decode_b                     ; decode_f8a        ; work         ;
 ;             |decode_msa:decode2|               ; 4 (4)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_95f1:auto_generated|decode_msa:decode2                           ; decode_msa        ; work         ;
-;    |VGA_DRIVER:driver|                         ; 46 (46)             ; 20 (20)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|VGA_DRIVER:driver                                                                                                      ; VGA_DRIVER        ; work         ;
-;    |fake_treasures:fkt|                        ; 125 (125)           ; 49 (49)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|fake_treasures:fkt                                                                                                     ; fake_treasures    ; work         ;
+;    |VGA_DRIVER:driver|                         ; 45 (45)             ; 20 (20)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|VGA_DRIVER:driver                                                                                                      ; VGA_DRIVER        ; work         ;
+;    |fake_treasures:fkt|                        ; 150 (138)           ; 92 (82)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|fake_treasures:fkt                                                                                                     ; fake_treasures    ; work         ;
+;       |countdown:cd|                           ; 12 (12)             ; 10 (10)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|fake_treasures:fkt|countdown:cd                                                                                        ; countdown         ; work         ;
 ;    |lpm_mult:Mult0|                            ; 25 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0                                                                                                         ; lpm_mult          ; work         ;
 ;       |multcore:mult_core|                     ; 25 (15)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core                                                                                      ; multcore          ; work         ;
 ;          |mpar_add:padder|                     ; 10 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core|mpar_add:padder                                                                      ; mpar_add          ; work         ;
@@ -291,8 +294,8 @@ agreement for further details.
 ;             |mpar_add:sub_par_add|             ; 3 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add                                                 ; mpar_add          ; work         ;
 ;                |lpm_add_sub:adder[0]|          ; 3 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add|lpm_add_sub:adder[0]                            ; lpm_add_sub       ; work         ;
 ;                   |add_sub_pgh:auto_generated| ; 3 (3)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add|lpm_add_sub:adder[0]|add_sub_pgh:auto_generated ; add_sub_pgh       ; work         ;
-;    |lpm_mult:Mult1|                            ; 25 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1                                                                                                         ; lpm_mult          ; work         ;
-;       |multcore:mult_core|                     ; 25 (15)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1|multcore:mult_core                                                                                      ; multcore          ; work         ;
+;    |lpm_mult:Mult1|                            ; 26 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1                                                                                                         ; lpm_mult          ; work         ;
+;       |multcore:mult_core|                     ; 26 (16)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1|multcore:mult_core                                                                                      ; multcore          ; work         ;
 ;          |mpar_add:padder|                     ; 10 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1|multcore:mult_core|mpar_add:padder                                                                      ; mpar_add          ; work         ;
 ;             |lpm_add_sub:adder[0]|             ; 7 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1|multcore:mult_core|mpar_add:padder|lpm_add_sub:adder[0]                                                 ; lpm_add_sub       ; work         ;
 ;                |add_sub_lgh:auto_generated|    ; 7 (7)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult1|multcore:mult_core|mpar_add:padder|lpm_add_sub:adder[0]|add_sub_lgh:auto_generated                      ; add_sub_lgh       ; work         ;
@@ -331,10 +334,11 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +---------------------------------------------+----------------------------------------+
 ; pixel_data_RGB332[0,1,5..7]                 ; Stuck at GND due to stuck port data_in ;
 ; W_EN                                        ; Stuck at VCC due to stuck port data_in ;
+; fake_treasures:fkt|ShiftData[0]             ; Stuck at VCC due to stuck port data_in ;
 ; Dual_Port_RAM_M9K:mem|output_data[0,1,5..7] ; Stuck at GND due to stuck port data_in ;
 ; pixel_data_RGB332[4]                        ; Merged with pixel_data_RGB332[3]       ;
 ; pixel_data_RGB332[3]                        ; Merged with pixel_data_RGB332[2]       ;
-; Total Number of Removed Registers = 13      ;                                        ;
+; Total Number of Removed Registers = 14      ;                                        ;
 +---------------------------------------------+----------------------------------------+
 
 
@@ -354,12 +358,12 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 102   ;
+; Total registers                              ; 145   ;
 ; Number of registers using Synchronous Clear  ; 35    ;
-; Number of registers using Synchronous Load   ; 0     ;
+; Number of registers using Synchronous Load   ; 11    ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 24    ;
+; Number of registers using Clock Enable       ; 72    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
@@ -379,8 +383,7 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 ; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                     ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
 ; 3:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|pixel_count[8]     ;
-; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[1]      ;
-; 3:1                ; 32 bits   ; 64 LEs        ; 64 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|fake_treasures:fkt|cnt2              ;
+; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[9]      ;
 ; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; No         ; |DE0_NANO|VGA_DRIVER:driver|PIXEL_COLOR_OUT[2] ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
 
@@ -392,6 +395,17 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +---------------------------------+--------------------+------+------------------------------------+
 ; OPTIMIZE_POWER_DURING_SYNTHESIS ; NORMAL_COMPILATION ; -    ; -                                  ;
 +---------------------------------+--------------------+------+------------------------------------+
+
+
++-----------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: fake_treasures:fkt ;
++----------------+-------+----------------------------------------+
+; Parameter Name ; Value ; Type                                   ;
++----------------+-------+----------------------------------------+
+; Send           ; 0     ; Unsigned Binary                        ;
+; Count          ; 1     ; Unsigned Binary                        ;
++----------------+-------+----------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
 +-----------------------------------------------------------------------------------------+
@@ -976,32 +990,44 @@ Note: In order to hide this table in the UI and the text report file, please set
 +--------+--------+----------+-------------------------------------------------------------------------------------+
 
 
++-------------------------------------------------------------+
+; Port Connectivity Checks: "fake_treasures:fkt|countdown:cd" ;
++------------+-------+----------+-----------------------------+
+; Port       ; Type  ; Severity ; Details                     ;
++------------+-------+----------+-----------------------------+
+; RESET      ; Input ; Info     ; Stuck at GND                ;
+; DATA[9..6] ; Input ; Info     ; Stuck at VCC                ;
+; DATA[5..0] ; Input ; Info     ; Stuck at GND                ;
++------------+-------+----------+-----------------------------+
+
+
 +-----------------------------------------------------+
 ; Post-Synthesis Netlist Statistics for Top Partition ;
 +-----------------------+-----------------------------+
 ; Type                  ; Count                       ;
 +-----------------------+-----------------------------+
 ; boundary_port         ; 51                          ;
-; cycloneiii_ff         ; 102                         ;
-;     ENA               ; 14                          ;
+; cycloneiii_ff         ; 145                         ;
+;     ENA               ; 62                          ;
 ;     ENA SCLR          ; 10                          ;
 ;     SCLR              ; 25                          ;
-;     plain             ; 53                          ;
-; cycloneiii_lcell_comb ; 295                         ;
-;     arith             ; 127                         ;
-;         2 data inputs ; 98                          ;
+;     SLD               ; 11                          ;
+;     plain             ; 37                          ;
+; cycloneiii_lcell_comb ; 320                         ;
+;     arith             ; 151                         ;
+;         2 data inputs ; 122                         ;
 ;         3 data inputs ; 29                          ;
-;     normal            ; 168                         ;
+;     normal            ; 169                         ;
 ;         0 data inputs ; 1                           ;
-;         1 data inputs ; 9                           ;
-;         2 data inputs ; 24                          ;
-;         3 data inputs ; 48                          ;
-;         4 data inputs ; 86                          ;
+;         1 data inputs ; 11                          ;
+;         2 data inputs ; 43                          ;
+;         3 data inputs ; 30                          ;
+;         4 data inputs ; 84                          ;
 ; cycloneiii_pll        ; 1                           ;
 ; cycloneiii_ram_block  ; 12                          ;
 ;                       ;                             ;
-; Max LUT depth         ; 12.90                       ;
-; Average LUT depth     ; 6.37                        ;
+; Max LUT depth         ; 8.50                        ;
+; Average LUT depth     ; 4.31                        ;
 +-----------------------+-----------------------------+
 
 
@@ -1010,7 +1036,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:02     ;
+; Top            ; 00:00:01     ;
 +----------------+--------------+
 
 
@@ -1020,7 +1046,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
-    Info: Processing started: Tue Oct 30 17:33:32 2018
+    Info: Processing started: Fri Nov 02 14:06:25 2018
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off DE0_NANO -c DE0_NANO
 Warning (125092): Tcl Script File DE_NANO_SOPC.qip not found
     Info (125063): set_global_assignment -name QIP_FILE DE_NANO_SOPC.qip
@@ -1040,6 +1066,8 @@ Info (12021): Found 1 design units, including 1 entities, in source file thepll.
     Info (12023): Found entity 1: thePLL File: G:/ECE3400/Lab4_FPGA_Template/thePLL.v Line: 40
 Info (12021): Found 1 design units, including 1 entities, in source file fake_treasures.v
     Info (12023): Found entity 1: fake_treasures File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 1
+Info (12021): Found 1 design units, including 1 entities, in source file countdown.v
+    Info (12023): Found entity 1: countdown File: G:/ECE3400/Lab4_FPGA_Template/countdown.v Line: 1
 Info (12127): Elaborating entity "DE0_NANO" for the top level hierarchy
 Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(44): truncated value with size 32 to match size of target (15) File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 44
 Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(123): truncated value with size 32 to match size of target (15) File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 123
@@ -1056,7 +1084,14 @@ Warning (10034): Output port "GPIO_0_D[8]" at DE0_NANO.v(28) has no driver File:
 Warning (10034): Output port "GPIO_0_D[6]" at DE0_NANO.v(28) has no driver File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
 Warning (10034): Output port "GPIO_0_D[4..0]" at DE0_NANO.v(28) has no driver File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
 Info (12128): Elaborating entity "fake_treasures" for hierarchy "fake_treasures:fkt" File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 78
-Warning (10230): Verilog HDL assignment warning at fake_treasures.v(10): truncated value with size 32 to match size of target (16) File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 10
+Warning (10230): Verilog HDL assignment warning at fake_treasures.v(22): truncated value with size 32 to match size of target (16) File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 22
+Warning (10230): Verilog HDL assignment warning at fake_treasures.v(34): truncated value with size 32 to match size of target (16) File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 34
+Warning (10235): Verilog HDL Always Construct warning at fake_treasures.v(126): variable "SHIFTOUT" is read inside the Always Construct but isn't in the Always Construct's Event Control File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 126
+Warning (10272): Verilog HDL Case Statement warning at fake_treasures.v(165): case item expression covers a value already covered by a previous case item File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 165
+Warning (10272): Verilog HDL Case Statement warning at fake_treasures.v(168): case item expression covers a value already covered by a previous case item File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 168
+Warning (10272): Verilog HDL Case Statement warning at fake_treasures.v(186): case item expression covers a value already covered by a previous case item File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 186
+Warning (10272): Verilog HDL Case Statement warning at fake_treasures.v(189): case item expression covers a value already covered by a previous case item File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 189
+Info (12128): Elaborating entity "countdown" for hierarchy "fake_treasures:fkt|countdown:cd" File: G:/ECE3400/Lab4_FPGA_Template/fake_treasures.v Line: 227
 Info (12128): Elaborating entity "thePLL" for hierarchy "thePLL:thePLL_inst" File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 85
 Info (12128): Elaborating entity "altpll" for hierarchy "thePLL:thePLL_inst|altpll:altpll_component" File: G:/ECE3400/Lab4_FPGA_Template/thePLL.v Line: 99
 Info (12130): Elaborated megafunction instantiation "thePLL:thePLL_inst|altpll:altpll_component" File: G:/ECE3400/Lab4_FPGA_Template/thePLL.v Line: 99
@@ -1263,16 +1298,16 @@ Warning (21074): Design contains 15 input pin(s) that do not drive logic
     Warning (15610): No output dependent on input pin "GPIO_1_D[32]" File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 30
     Warning (15610): No output dependent on input pin "GPIO_1_D[33]" File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 30
     Warning (15610): No output dependent on input pin "KEY[1]" File: G:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 31
-Info (21057): Implemented 402 device resources after synthesis - the final resource count might be different
+Info (21057): Implemented 440 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 17 input pins
     Info (21059): Implemented 34 output pins
-    Info (21061): Implemented 338 logic cells
+    Info (21061): Implemented 376 logic cells
     Info (21064): Implemented 12 RAM segments
     Info (21065): Implemented 1 PLLs
-Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 65 warnings
-    Info: Peak virtual memory: 694 megabytes
-    Info: Processing ended: Tue Oct 30 17:33:50 2018
-    Info: Elapsed time: 00:00:18
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 71 warnings
+    Info: Peak virtual memory: 672 megabytes
+    Info: Processing ended: Fri Nov 02 14:06:42 2018
+    Info: Elapsed time: 00:00:17
     Info: Total CPU time (on all processors): 00:00:25
 
 

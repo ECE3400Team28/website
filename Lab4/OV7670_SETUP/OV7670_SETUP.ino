@@ -39,6 +39,28 @@ regs[7][1] = B10110101;
 //  regs[7][0] &= ~(1 << 5);
 //  regs[7][1] |= (1 << 7);
 //  regs[7][1] &= ~(1 << 5);
+
+regs[1][1] |= (1 << 6);
+regs[1][2] |= (1 << 1) | (1 << 2) | (1 << 3);
+regs[4][0] |= (1 << 4);
+regs[4][2] |= (1 << 3);
+
+  Serial.print("Writing back ");
+  Serial.print(regs[1][1], BIN);
+  Serial.println(" into register 0x11");
+  
+  
+  Serial.print("Writing back ");
+  Serial.print(regs[1][2], BIN);
+  Serial.println(" into register 0x12");
+  
+  Serial.print("Writing back ");
+  Serial.print(regs[4][0], BIN);
+  Serial.println(" into register 0x40");
+  
+  Serial.print("Writing back ");
+  Serial.print(regs[4][2], BIN);
+  Serial.println(" into register 0x42");
   
   Serial.print("Writing back ");
   Serial.print(regs[7][0], BIN);
@@ -47,7 +69,11 @@ regs[7][1] = B10110101;
   Serial.print("Writing back ");
   Serial.print(regs[7][1], BIN);
   Serial.println(" into register 0x71");
-  
+
+  OV7670_write_register(0x11, regs[1][1]);
+  OV7670_write_register(0x12, regs[1][2]);
+  OV7670_write_register(0x40, regs[4][0]);
+  OV7670_write_register(0x42, regs[4][2]);
   OV7670_write_register(0x70, regs[7][0]);
   OV7670_write_register(0x71, regs[7][1]);
   
@@ -61,9 +87,9 @@ regs[7][1] = B10110101;
 
 void loop(){
   delay(80);
-  uint16_t msg_resp=read_12_bits();
-  Serial.print("Received: ");
-  Serial.println(msg_resp, BIN);
+//  uint16_t msg_resp=read_after_pinhigh();
+//  Serial.print("Received: ");
+//  Serial.println(msg_resp, BIN);
 }
 
 uint16_t read_12_bits(){
@@ -78,11 +104,13 @@ uint16_t read_12_bits(){
 
 uint16_t read_after_pinhigh(){
   uint16_t msg_start = read_12_bits();
-  if (__builtin_popcount(msg_start) > 11)
+  if (__builtin_popcount(msg_start) > 10)
     return 0;
+  //return 123;
   //if (msg_start[11:0]
   while(!digitalRead(FPGA_PIN))
     delayMicroseconds(100);
+  delayMicroseconds(100);
   return read_12_bits();
 }
 
@@ -112,10 +140,23 @@ void read_key_registers(){
   Serial.print("Reg 0x11: ");
   regs[1][1] = read_register_value(0x11);
   Serial.println(regs[1][1], BIN);
+  Serial.print("Reg 0x12: ");
+  regs[1][2] = read_register_value(0x12);
+  Serial.println(regs[1][2], BIN);
+  Serial.print("Reg 0x1E: ");
+  regs[1][14] = read_register_value(0x1e);
+  Serial.println(regs[1][14], BIN);
   Serial.print("Reg 0x70: ");
   regs[7][0] = read_register_value(0x70);
   //Serial.println(regs[7][0]);
   Serial.println(regs[7][0], BIN);
+  Serial.print("Reg 0x40: ");
+  regs[4][0] = read_register_value(0x40);
+  //Serial.println(regs[7][0]);
+  Serial.println(regs[4][0], BIN);
+  Serial.print("Reg 0x42: ");
+  regs[4][2] = read_register_value(0x42);
+  Serial.println(regs[4][2], BIN);
   Serial.print("Reg 0x71: ");
   regs[7][1] = read_register_value(0x71);
   Serial.println(regs[7][1], BIN);

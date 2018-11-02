@@ -1,4 +1,4 @@
-module countdown {
+module countdown (
 	input 			CLK,
 	input				RESET,
 	input				LOAD,

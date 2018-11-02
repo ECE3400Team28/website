@@ -53,6 +53,22 @@ KEY[1] => ~NO_FANOUT~
 
 
 |DE0_NANO|fake_treasures:fkt
+CLK => cnt3[0].CLK
+CLK => cnt3[1].CLK
+CLK => cnt3[2].CLK
+CLK => cnt3[3].CLK
+CLK => cnt3[4].CLK
+CLK => cnt3[5].CLK
+CLK => cnt3[6].CLK
+CLK => cnt3[7].CLK
+CLK => cnt3[8].CLK
+CLK => cnt3[9].CLK
+CLK => cnt3[10].CLK
+CLK => cnt3[11].CLK
+CLK => cnt3[12].CLK
+CLK => cnt3[13].CLK
+CLK => cnt3[14].CLK
+CLK => cnt3[15].CLK
 CLK => cnt2[0].CLK
 CLK => cnt2[1].CLK
 CLK => cnt2[2].CLK
@@ -85,7 +101,7 @@ CLK => cnt2[28].CLK
 CLK => cnt2[29].CLK
 CLK => cnt2[30].CLK
 CLK => cnt2[31].CLK
-CLK => OUTPUT~reg0.CLK
+CLK => CLK9600.CLK
 CLK => cnt1[0].CLK
 CLK => cnt1[1].CLK
 CLK => cnt1[2].CLK
@@ -102,7 +118,51 @@ CLK => cnt1[12].CLK
 CLK => cnt1[13].CLK
 CLK => cnt1[14].CLK
 CLK => cnt1[15].CLK
-OUTPUT <= OUTPUT~reg0.DB_MAX_OUTPUT_PORT_TYPE
+OUTPUT <= OUTPUT.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|DE0_NANO|fake_treasures:fkt|countdown:cd
+CLK => count[0].CLK
+CLK => count[1].CLK
+CLK => count[2].CLK
+CLK => count[3].CLK
+CLK => count[4].CLK
+CLK => count[5].CLK
+CLK => count[6].CLK
+CLK => count[7].CLK
+CLK => count[8].CLK
+CLK => count[9].CLK
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+RESET => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+LOAD => count.OUTPUTSELECT
+DATA[0] => count.DATAB
+DATA[1] => count.DATAB
+DATA[2] => count.DATAB
+DATA[3] => count.DATAB
+DATA[4] => count.DATAB
+DATA[5] => count.DATAB
+DATA[6] => count.DATAB
+DATA[7] => count.DATAB
+DATA[8] => count.DATAB
+DATA[9] => count.DATAB
+DONE <= Equal0.DB_MAX_OUTPUT_PORT_TYPE
 
 
 |DE0_NANO|thePLL:thePLL_inst

@@ -394,5 +394,5 @@ set_global_assignment -name VERILOG_FILE Dual_Port_RAM_M9K.v
 set_global_assignment -name VERILOG_FILE IMAGE_PROCESSOR.v
 set_global_assignment -name QIP_FILE thePLL.qip
 set_global_assignment -name VERILOG_FILE fake_treasures.v
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name VERILOG_FILE countdown.v
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
