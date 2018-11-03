@@ -1,0 +1,42 @@
+--lpm_mux CBX_DECLARE_ALL_CONNECTED_PORTS="OFF" DEVICE_FAMILY="Cyclone IV E" LPM_SIZE=4 LPM_WIDTH=2 LPM_WIDTHS=2 data result sel
+--VERSION_BEGIN 15.0 cbx_lpm_mux 2015:04:22:18:04:08:SJ cbx_mgl 2015:04:22:18:06:50:SJ  VERSION_END
+
+
+-- Copyright (C) 1991-2015 Altera Corporation. All rights reserved.
+--  Your use of Altera Corporation's design tools, logic functions 
+--  and other software and tools, and its AMPP partner logic 
+--  functions, and any output files from any of the foregoing 
+--  (including device programming or simulation files), and any 
+--  associated documentation or information are expressly subject 
+--  to the terms and conditions of the Altera Program License 
+--  Subscription Agreement, the Altera Quartus II License Agreement,
+--  the Altera MegaCore Function License Agreement, or other 
+--  applicable license agreement, including, without limitation, 
+--  that your use is for the sole purpose of programming logic 
+--  devices manufactured by Altera and sold by Altera or its 
+--  authorized distributors.  Please refer to the applicable 
+--  agreement for further details.
+
+
+
+--synthesis_resources = lut 4 
+SUBDESIGN mux_2nb
+( 
+	data[7..0]	:	input;
+	result[1..0]	:	output;
+	sel[1..0]	:	input;
+) 
+VARIABLE 
+	result_node[1..0]	: WIRE;
+	sel_node[1..0]	: WIRE;
+	w_data105w[3..0]	: WIRE;
+	w_data135w[3..0]	: WIRE;
+
+BEGIN 
+	result[] = result_node[];
+	result_node[] = ( (((w_data135w[1..1] & sel_node[0..0]) & (! (((w_data135w[0..0] & (! sel_node[1..1])) & (! sel_node[0..0])) # (sel_node[1..1] & (sel_node[0..0] # w_data135w[2..2]))))) # ((((w_data135w[0..0] & (! sel_node[1..1])) & (! sel_node[0..0])) # (sel_node[1..1] & (sel_node[0..0] # w_data135w[2..2]))) & (w_data135w[3..3] # (! sel_node[0..0])))), (((w_data105w[1..1] & sel_node[0..0]) & (! (((w_data105w[0..0] & (! sel_node[1..1])) & (! sel_node[0..0])) # (sel_node[1..1] & (sel_node[0..0] # w_data105w[2..2]))))) # ((((w_data105w[0..0] & (! sel_node[1..1])) & (! sel_node[0..0])) # (sel_node[1..1] & (sel_node[0..0] # w_data105w[2..2]))) & (w_data105w[3..3] # (! sel_node[0..0])))));
+	sel_node[] = ( sel[1..0]);
+	w_data105w[] = ( data[6..6], data[4..4], data[2..2], data[0..0]);
+	w_data135w[] = ( data[7..7], data[5..5], data[3..3], data[1..1]);
+END;
+--VALID FILE
