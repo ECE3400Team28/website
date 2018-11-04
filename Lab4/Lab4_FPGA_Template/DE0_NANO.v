@@ -82,8 +82,8 @@ reg W_EN = 1'b1;
 
 ///////* CREATE ANY LOCAL WIRES YOU NEED FOR YOUR PLL *///////
 wire c0_sig; //24 MHz
-wire c1_sig;
-wire c2_sig;
+wire c1_sig; //25 MHz
+wire c2_sig; //50 MHz
 
 ///////* INSTANTIATE YOUR PLL HERE *///////
 PLL	PLL_inst (
@@ -99,7 +99,7 @@ Dual_Port_RAM_M9K mem(
 	.w_addr(WRITE_ADDRESS),
 	.r_addr(READ_ADDRESS),
 	.w_en(W_EN),
-	.clk_W(CLOCK_50),
+	.clk_W(c2_sig),
 	.clk_R(c1_sig), // DO WE NEED TO READ SLOWER THAN WRITE??
 	.output_data(MEM_OUTPUT)
 );
@@ -125,6 +125,7 @@ IMAGE_PROCESSOR proc(
 	.VGA_VSYNC_NEG(VGA_VSYNC_NEG),
 	.RESULT(RESULT)
 );
+
 ///////* Update Read Address *///////
 always @ (VGA_PIXEL_X, VGA_PIXEL_Y) begin
 		READ_ADDRESS = (VGA_PIXEL_X + VGA_PIXEL_Y*`SCREEN_WIDTH);
@@ -161,6 +162,7 @@ always @(posedge PCLK, posedge VSYNC)begin
 	 if (VSYNC == 1'b1)begin 
 	     W_EN = 1'b0;
 	     X_ADDR = 0;
+		 CAM_COUNT = 1'b0;
 		  end 
 	
 	if(X_ADDR >(`SCREEN_WIDTH-1) || Y_ADDR >(`SCREEN_HEIGHT-1))begin
