@@ -2,7 +2,7 @@
 
 This website is the official Github page for Team 28 of the ECE 3400 maze exploration robot competition. Team 28, also known as :ANGRY: or Angry Reacts, is the highest numbered (and highest quality) team. Our robots were built with an Arduino Uno, a Cyclone IV FPGA, custom 3D-printed components, and various sensors and servos. To hear more about the competition or our robot, please take a look at [our website](https://ece3400team28.github.io/website/) or the [ECE 3400 course page](https://cei-lab.github.io/ece3400-2018/).
 
-This website was built off of [Freelancer](http://startbootstrap.com/template-overviews/freelancer/). Freelancer is a one page freelancer portfolio theme for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/). The rest of this ReadMe is taken from the Freelancer Github page and explains how to get started with Bootstrap templates.
+This website was built off of [Freelancer](http://startbootstrap.com/template-overviews/freelancer/). Freelancer is a one page freelancer portfolio theme for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/). The rest of this ReadMe is taken from the Freelancer download ReadMe and explains how to get started with Bootstrap templates.
 
 ## Status
 
