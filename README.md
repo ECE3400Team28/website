@@ -1,12 +1,8 @@
-# [Start Bootstrap - Freelancer](https://startbootstrap.com/template-overviews/freelancer/)
+# [:ANGRY: - Cornell ECE 3400 FALL 2018 Team 28](https://ece3400team28.github.io/website/)
 
-[Freelancer](http://startbootstrap.com/template-overviews/freelancer/) is a one page freelancer portfolio theme for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/). This theme features several content sections, a responsive portfolio grid with hover effects, full page portfolio item modals, and a working PHP contact form.
+This website is the official Github page for Team 28 of the ECE 3400 maze exploration robot competition. Team 28, also known as :ANGRY: or Angry Reacts, is the highest numbered (and highest quality) team. Our robots were built with an Arduino Uno, a Cyclone IV FPGA, custom 3D-printed components, and various sensors and servos. To hear more about the competition or our robot, please take a look at [our website](https://ece3400team28.github.io/website/) or the [ECE 3400 course page](https://cei-lab.github.io/ece3400-2018/).
 
-## Preview
-
-[![Freelancer Preview](https://startbootstrap.com/assets/img/templates/freelancer.jpg)](https://blackrockdigital.github.io/startbootstrap-freelancer/)
-
-**[View Live Preview](https://blackrockdigital.github.io/startbootstrap-freelancer/)**
+This website was built off of [Freelancer](http://startbootstrap.com/template-overviews/freelancer/). Freelancer is a one page freelancer portfolio theme for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/). The rest of this ReadMe is taken from the Freelancer Github page and explains how to get started with Bootstrap templates.
 
 ## Status
 
@@ -18,7 +14,7 @@
 
 ## Download and Installation
 
-To begin using this template, choose one of the following options to get started:
+To begin using the Freelancer template, choose one of the following options to get started:
 * [Download the latest release on Start Bootstrap](https://startbootstrap.com/template-overviews/freelancer/)
 * Install via npm: `npm i startbootstrap-freelancer`
 * Clone the repo: `git clone https://github.com/BlackrockDigital/startbootstrap-freelancer.git`

@@ -168,7 +168,7 @@ section h2 {
 }
 
 header.masthead {
-  padding-top: calc(6rem + 72px);
+  padding-top: calc(3rem + 72px);
   padding-bottom: 6rem;
 }
 
@@ -184,7 +184,7 @@ header.masthead h2 {
 
 @media (min-width: 992px) {
   header.masthead {
-    padding-top: calc(6rem + 106px);
+    padding-top: calc(4rem + 72px);
     padding-bottom: 6rem;
   }
   header.masthead h1 {
@@ -395,6 +395,10 @@ form .row:first-child .floating-label-form-group {
 
 .contract-content {
   text-align: left;
+}
+
+#about a {
+  color: #ddd;
 }
 
 a {
