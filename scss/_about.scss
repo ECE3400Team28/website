@@ -29,3 +29,50 @@
 #about a {
   color: #ddd;
 }
+
+/* hide */
+#video:not(:hover) #list {
+  font-size: 0;
+  margin: 0;
+  opacity: 0;
+  padding: 0;
+  /* fade out, then shrink */
+  transition: opacity .25s,
+              font-size .5s .25s,
+              margin .5s .25s,
+              padding .5s .25s;
+}
+
+#kevin:not(:hover) #moreinfo {
+  font-size: 0;
+  margin: 0;
+  opacity: 0;
+  padding: 0;
+  /* fade out, then shrink */
+  transition: opacity .25s,
+              font-size .5s .25s,
+              margin .5s .25s,
+              padding .5s .25s;
+}
+
+/* reveal */
+#video:hover #list {
+  /* unshrink, then fade in */
+  transition: font-size .25s,
+              margin .25s,
+              padding .25s,
+              opacity .5s .25s;
+}
+
+#kevin:hover #moreinfo {
+  /* unshrink, then fade in */
+  transition: font-size .25s,
+              margin .25s,
+              padding .25s,
+              opacity .5s .25s;
+}
+/*
+#video #list {
+  margin: .5em 1em;
+  padding: 1em;
+}*/

@@ -24,3 +24,14 @@ header.masthead {
 
   }
 }
+
+header.masthead::after {
+  content: "";
+  background: url(../img/labbench_dark.jpg);
+  top: 0;
+  left: 0;
+  bottom: -200px;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
+}
