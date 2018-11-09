@@ -1,5 +1,5 @@
 Analysis & Synthesis report for DE0_NANO
-Mon Nov 05 17:50:35 2018
+Tue Nov 06 18:42:57 2018
 Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 
 
@@ -57,15 +57,15 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +------------------------------------+---------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Mon Nov 05 17:50:34 2018       ;
+; Analysis & Synthesis Status        ; Successful - Tue Nov 06 18:42:56 2018       ;
 ; Quartus Prime Version              ; 17.0.0 Build 595 04/25/2017 SJ Lite Edition ;
 ; Revision Name                      ; DE0_NANO                                    ;
 ; Top-level Entity Name              ; DE0_NANO                                    ;
 ; Family                             ; Cyclone IV E                                ;
-; Total logic elements               ; 215                                         ;
-;     Total combinational functions  ; 203                                         ;
-;     Dedicated logic registers      ; 70                                          ;
-; Total registers                    ; 70                                          ;
+; Total logic elements               ; 255                                         ;
+;     Total combinational functions  ; 249                                         ;
+;     Dedicated logic registers      ; 78                                          ;
+; Total registers                    ; 78                                          ;
 ; Total pins                         ; 51                                          ;
 ; Total virtual pins                 ; 0                                           ;
 ; Total memory bits                  ; 202,752                                     ;
@@ -182,17 +182,17 @@ agreement for further details.
 +----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------+---------+
 ; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                                   ; Library ;
 +----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------+---------+
-; VGA_DRIVER.v                     ; yes             ; User Verilog HDL File        ; F:/ECE3400/Lab4_FPGA_Template/VGA_DRIVER.v                                     ;         ;
-; DE0_NANO.v                       ; yes             ; User Verilog HDL File        ; F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v                                       ;         ;
-; PLL.v                            ; yes             ; User Wizard-Generated File   ; F:/ECE3400/Lab4_FPGA_Template/PLL.v                                            ;         ;
-; Dual_Port_RAM_M9K.v              ; yes             ; User Verilog HDL File        ; F:/ECE3400/Lab4_FPGA_Template/Dual_Port_RAM_M9K.v                              ;         ;
-; IMAGE_PROCESSOR.v                ; yes             ; User Verilog HDL File        ; F:/ECE3400/Lab4_FPGA_Template/IMAGE_PROCESSOR.v                                ;         ;
+; VGA_DRIVER.v                     ; yes             ; User Verilog HDL File        ; F:/ECE3400/TeamFPGA/VGA_DRIVER.v                                               ;         ;
+; DE0_NANO.v                       ; yes             ; User Verilog HDL File        ; F:/ECE3400/TeamFPGA/DE0_NANO.v                                                 ;         ;
+; PLL.v                            ; yes             ; User Wizard-Generated File   ; F:/ECE3400/TeamFPGA/PLL.v                                                      ;         ;
+; Dual_Port_RAM_M9K.v              ; yes             ; User Verilog HDL File        ; F:/ECE3400/TeamFPGA/Dual_Port_RAM_M9K.v                                        ;         ;
+; IMAGE_PROCESSOR.v                ; yes             ; User Verilog HDL File        ; F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v                                          ;         ;
 ; altpll.tdf                       ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altpll.tdf              ;         ;
 ; aglobal170.inc                   ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/aglobal170.inc          ;         ;
 ; stratix_pll.inc                  ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/stratix_pll.inc         ;         ;
 ; stratixii_pll.inc                ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/stratixii_pll.inc       ;         ;
 ; cycloneii_pll.inc                ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/cycloneii_pll.inc       ;         ;
-; db/pll_altpll.v                  ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/pll_altpll.v                                  ;         ;
+; db/pll_altpll.v                  ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/pll_altpll.v                                            ;         ;
 ; altsyncram.tdf                   ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altsyncram.tdf          ;         ;
 ; stratix_ram_block.inc            ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/stratix_ram_block.inc   ;         ;
 ; lpm_mux.inc                      ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/lpm_mux.inc             ;         ;
@@ -201,10 +201,10 @@ agreement for further details.
 ; altrom.inc                       ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altrom.inc              ;         ;
 ; altram.inc                       ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altram.inc              ;         ;
 ; altdpram.inc                     ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altdpram.inc            ;         ;
-; db/altsyncram_j5f1.tdf           ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/altsyncram_j5f1.tdf                           ;         ;
-; db/decode_msa.tdf                ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/decode_msa.tdf                                ;         ;
-; db/decode_f8a.tdf                ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/decode_f8a.tdf                                ;         ;
-; db/mux_6nb.tdf                   ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/mux_6nb.tdf                                   ;         ;
+; db/altsyncram_j5f1.tdf           ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/altsyncram_j5f1.tdf                                     ;         ;
+; db/decode_msa.tdf                ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/decode_msa.tdf                                          ;         ;
+; db/decode_f8a.tdf                ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/decode_f8a.tdf                                          ;         ;
+; db/mux_6nb.tdf                   ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/mux_6nb.tdf                                             ;         ;
 ; lpm_mult.tdf                     ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/lpm_mult.tdf            ;         ;
 ; lpm_add_sub.inc                  ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/lpm_add_sub.inc         ;         ;
 ; multcore.inc                     ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/multcore.inc            ;         ;
@@ -224,8 +224,8 @@ agreement for further details.
 ; addcore.inc                      ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/addcore.inc             ;         ;
 ; look_add.inc                     ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/look_add.inc            ;         ;
 ; alt_stratix_add_sub.inc          ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/alt_stratix_add_sub.inc ;         ;
-; db/add_sub_lgh.tdf               ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/add_sub_lgh.tdf                               ;         ;
-; db/add_sub_pgh.tdf               ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/Lab4_FPGA_Template/db/add_sub_pgh.tdf                               ;         ;
+; db/add_sub_lgh.tdf               ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/add_sub_lgh.tdf                                         ;         ;
+; db/add_sub_pgh.tdf               ; yes             ; Auto-Generated Megafunction  ; F:/ECE3400/TeamFPGA/db/add_sub_pgh.tdf                                         ;         ;
 ; altshift.tdf                     ; yes             ; Megafunction                 ; c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altshift.tdf            ;         ;
 +----------------------------------+-----------------+------------------------------+--------------------------------------------------------------------------------+---------+
 
@@ -235,20 +235,20 @@ agreement for further details.
 +---------------------------------------------+---------------------------------------------------------------------------------+
 ; Resource                                    ; Usage                                                                           ;
 +---------------------------------------------+---------------------------------------------------------------------------------+
-; Estimated Total logic elements              ; 215                                                                             ;
+; Estimated Total logic elements              ; 255                                                                             ;
 ;                                             ;                                                                                 ;
-; Total combinational functions               ; 203                                                                             ;
+; Total combinational functions               ; 249                                                                             ;
 ; Logic element usage by number of LUT inputs ;                                                                                 ;
-;     -- 4 input functions                    ; 56                                                                              ;
-;     -- 3 input functions                    ; 63                                                                              ;
-;     -- <=2 input functions                  ; 84                                                                              ;
+;     -- 4 input functions                    ; 91                                                                              ;
+;     -- 3 input functions                    ; 70                                                                              ;
+;     -- <=2 input functions                  ; 88                                                                              ;
 ;                                             ;                                                                                 ;
 ; Logic elements by mode                      ;                                                                                 ;
-;     -- normal mode                          ; 121                                                                             ;
+;     -- normal mode                          ; 167                                                                             ;
 ;     -- arithmetic mode                      ; 82                                                                              ;
 ;                                             ;                                                                                 ;
-; Total registers                             ; 70                                                                              ;
-;     -- Dedicated logic registers            ; 70                                                                              ;
+; Total registers                             ; 78                                                                              ;
+;     -- Dedicated logic registers            ; 78                                                                              ;
 ;     -- I/O registers                        ; 0                                                                               ;
 ;                                             ;                                                                                 ;
 ; I/O pins                                    ; 51                                                                              ;
@@ -260,9 +260,9 @@ agreement for further details.
 ;     -- PLLs                                 ; 1                                                                               ;
 ;                                             ;                                                                                 ;
 ; Maximum fan-out node                        ; PLL:PLL_inst|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[0] ;
-; Maximum fan-out                             ; 56                                                                              ;
-; Total fan-out                               ; 1752                                                                            ;
-; Average fan-out                             ; 4.29                                                                            ;
+; Maximum fan-out                             ; 58                                                                              ;
+; Total fan-out                               ; 1928                                                                            ;
+; Average fan-out                             ; 4.17                                                                            ;
 +---------------------------------------------+---------------------------------------------------------------------------------+
 
 
@@ -271,7 +271,7 @@ agreement for further details.
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
 ; Compilation Hierarchy Node                     ; Combinational ALUTs ; Dedicated Logic Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                              ; Entity Name       ; Library Name ;
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
-; |DE0_NANO                                      ; 203 (84)            ; 70 (48)                   ; 202752      ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
+; |DE0_NANO                                      ; 249 (130)           ; 78 (56)                   ; 202752      ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
 ;    |Dual_Port_RAM_M9K:mem|                     ; 8 (0)               ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem                                                                                                  ; Dual_Port_RAM_M9K ; work         ;
 ;       |altsyncram:mem_rtl_0|                   ; 8 (0)               ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0                                                                             ; altsyncram        ; work         ;
 ;          |altsyncram_j5f1:auto_generated|      ; 8 (0)               ; 2 (2)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated                                              ; altsyncram_j5f1   ; work         ;
@@ -324,12 +324,12 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 70    ;
-; Number of registers using Synchronous Clear  ; 36    ;
+; Total registers                              ; 78    ;
+; Number of registers using Synchronous Clear  ; 21    ;
 ; Number of registers using Synchronous Load   ; 0     ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 26    ;
+; Number of registers using Clock Enable       ; 30    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
@@ -358,10 +358,14 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
 ; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                     ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
-; 3:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|pixel_count[5]     ;
-; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|X_ADDR[1]                            ;
-; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[1]      ;
+; 3:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|pixel_count[9]     ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|X_ADDR[3]                            ;
+; 4:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; Yes        ; |DE0_NANO|data[15]                             ;
+; 5:1                ; 8 bits    ; 24 LEs        ; 16 LEs               ; 8 LEs                  ; Yes        ; |DE0_NANO|data[0]                              ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|Y_ADDR[0]                            ;
+; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[9]      ;
 ; 3:1                ; 11 bits   ; 22 LEs        ; 11 LEs               ; 11 LEs                 ; No         ; |DE0_NANO|X_ADDR                               ;
+; 3:1                ; 11 bits   ; 22 LEs        ; 22 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|Y_ADDR                               ;
 ; 3:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|VGA_DRIVER:driver|PIXEL_COLOR_OUT[7] ;
 +--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
 
@@ -963,26 +967,26 @@ Note: In order to hide this table in the UI and the text report file, please set
 ; Type                  ; Count                       ;
 +-----------------------+-----------------------------+
 ; boundary_port         ; 51                          ;
-; cycloneiii_ff         ; 70                          ;
-;     ENA               ; 16                          ;
+; cycloneiii_ff         ; 78                          ;
+;     ENA               ; 20                          ;
 ;     ENA SCLR          ; 10                          ;
-;     SCLR              ; 26                          ;
-;     plain             ; 18                          ;
-; cycloneiii_lcell_comb ; 204                         ;
+;     SCLR              ; 11                          ;
+;     plain             ; 37                          ;
+; cycloneiii_lcell_comb ; 250                         ;
 ;     arith             ; 82                          ;
 ;         2 data inputs ; 53                          ;
 ;         3 data inputs ; 29                          ;
-;     normal            ; 122                         ;
+;     normal            ; 168                         ;
 ;         0 data inputs ; 1                           ;
 ;         1 data inputs ; 7                           ;
-;         2 data inputs ; 24                          ;
-;         3 data inputs ; 34                          ;
-;         4 data inputs ; 56                          ;
+;         2 data inputs ; 28                          ;
+;         3 data inputs ; 41                          ;
+;         4 data inputs ; 91                          ;
 ; cycloneiii_pll        ; 1                           ;
 ; cycloneiii_ram_block  ; 32                          ;
 ;                       ;                             ;
-; Max LUT depth         ; 5.70                        ;
-; Average LUT depth     ; 3.27                        ;
+; Max LUT depth         ; 6.10                        ;
+; Average LUT depth     ; 3.76                        ;
 +-----------------------+-----------------------------+
 
 
@@ -991,7 +995,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:07     ;
+; Top            ; 00:00:01     ;
 +----------------+--------------+
 
 
@@ -1001,43 +1005,45 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
-    Info: Processing started: Mon Nov 05 17:50:07 2018
+    Info: Processing started: Tue Nov 06 18:42:40 2018
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off DE0_NANO -c DE0_NANO
 Warning (125092): Tcl Script File DE_NANO_SOPC.qip not found
     Info (125063): set_global_assignment -name QIP_FILE DE_NANO_SOPC.qip
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 4 of the 4 processors detected
 Info (12021): Found 1 design units, including 1 entities, in source file vga_driver.v
-    Info (12023): Found entity 1: VGA_DRIVER File: F:/ECE3400/Lab4_FPGA_Template/VGA_DRIVER.v Line: 14
+    Info (12023): Found entity 1: VGA_DRIVER File: F:/ECE3400/TeamFPGA/VGA_DRIVER.v Line: 14
 Info (12021): Found 1 design units, including 1 entities, in source file de0_nano.v
-    Info (12023): Found entity 1: DE0_NANO File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 5
+    Info (12023): Found entity 1: DE0_NANO File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file pll.v
-    Info (12023): Found entity 1: PLL File: F:/ECE3400/Lab4_FPGA_Template/PLL.v Line: 40
+    Info (12023): Found entity 1: PLL File: F:/ECE3400/TeamFPGA/PLL.v Line: 40
 Info (12021): Found 1 design units, including 1 entities, in source file dual_port_ram_m9k.v
-    Info (12023): Found entity 1: Dual_Port_RAM_M9K File: F:/ECE3400/Lab4_FPGA_Template/Dual_Port_RAM_M9K.v Line: 4
+    Info (12023): Found entity 1: Dual_Port_RAM_M9K File: F:/ECE3400/TeamFPGA/Dual_Port_RAM_M9K.v Line: 4
 Info (12021): Found 1 design units, including 1 entities, in source file image_processor.v
-    Info (12023): Found entity 1: IMAGE_PROCESSOR File: F:/ECE3400/Lab4_FPGA_Template/IMAGE_PROCESSOR.v Line: 6
+    Info (12023): Found entity 1: IMAGE_PROCESSOR File: F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v Line: 6
 Info (12127): Elaborating entity "DE0_NANO" for the top level hierarchy
-Warning (10036): Verilog HDL or VHDL warning at DE0_NANO.v(54): object "pixel_data_RGB332" assigned a value but never read File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 54
-Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(62): truncated value with size 32 to match size of target (15) File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 62
-Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(131): truncated value with size 32 to match size of target (15) File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 131
-Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(155): truncated value with size 32 to match size of target (15) File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 155
-Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(175): truncated value with size 32 to match size of target (15) File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 175
-Warning (10034): Output port "GPIO_0_D[32..24]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[22]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[20]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[18]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[16]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[14]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[12]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[10]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[8]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[6]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Warning (10034): Output port "GPIO_0_D[4..0]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-Info (12128): Elaborating entity "PLL" for hierarchy "PLL:PLL_inst" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 94
-Info (12128): Elaborating entity "altpll" for hierarchy "PLL:PLL_inst|altpll:altpll_component" File: F:/ECE3400/Lab4_FPGA_Template/PLL.v Line: 99
-Info (12130): Elaborated megafunction instantiation "PLL:PLL_inst|altpll:altpll_component" File: F:/ECE3400/Lab4_FPGA_Template/PLL.v Line: 99
-Info (12133): Instantiated megafunction "PLL:PLL_inst|altpll:altpll_component" with the following parameter: File: F:/ECE3400/Lab4_FPGA_Template/PLL.v Line: 99
+Warning (10036): Verilog HDL or VHDL warning at DE0_NANO.v(56): object "pixel_data_RGB332" assigned a value but never read File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 56
+Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(64): truncated value with size 32 to match size of target (15) File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 64
+Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(133): truncated value with size 32 to match size of target (15) File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 133
+Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(157): truncated value with size 32 to match size of target (15) File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 157
+Warning (10230): Verilog HDL assignment warning at DE0_NANO.v(164): truncated value with size 32 to match size of target (15) File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 164
+Warning (10034): Output port "GPIO_0_D[32]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[30]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[28..24]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[22]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[20]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[18]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[16]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[14]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[12]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[10]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[8]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[6]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Warning (10034): Output port "GPIO_0_D[4..0]" at DE0_NANO.v(28) has no driver File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+Info (12128): Elaborating entity "PLL" for hierarchy "PLL:PLL_inst" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 96
+Info (12128): Elaborating entity "altpll" for hierarchy "PLL:PLL_inst|altpll:altpll_component" File: F:/ECE3400/TeamFPGA/PLL.v Line: 99
+Info (12130): Elaborated megafunction instantiation "PLL:PLL_inst|altpll:altpll_component" File: F:/ECE3400/TeamFPGA/PLL.v Line: 99
+Info (12133): Instantiated megafunction "PLL:PLL_inst|altpll:altpll_component" with the following parameter: File: F:/ECE3400/TeamFPGA/PLL.v Line: 99
     Info (12134): Parameter "bandwidth_type" = "AUTO"
     Info (12134): Parameter "clk0_divide_by" = "25"
     Info (12134): Parameter "clk0_duty_cycle" = "50"
@@ -1101,16 +1107,15 @@ Info (12133): Instantiated megafunction "PLL:PLL_inst|altpll:altpll_component" w
     Info (12134): Parameter "port_extclk3" = "PORT_UNUSED"
     Info (12134): Parameter "width_clock" = "5"
 Info (12021): Found 1 design units, including 1 entities, in source file db/pll_altpll.v
-    Info (12023): Found entity 1: PLL_altpll File: F:/ECE3400/Lab4_FPGA_Template/db/pll_altpll.v Line: 30
+    Info (12023): Found entity 1: PLL_altpll File: F:/ECE3400/TeamFPGA/db/pll_altpll.v Line: 30
 Info (12128): Elaborating entity "PLL_altpll" for hierarchy "PLL:PLL_inst|altpll:altpll_component|PLL_altpll:auto_generated" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/altpll.tdf Line: 898
-Info (12128): Elaborating entity "Dual_Port_RAM_M9K" for hierarchy "Dual_Port_RAM_M9K:mem" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 105
-Warning (10036): Verilog HDL or VHDL warning at Dual_Port_RAM_M9K.v(34): object "r_addr_reg" assigned a value but never read File: F:/ECE3400/Lab4_FPGA_Template/Dual_Port_RAM_M9K.v Line: 34
-Info (12128): Elaborating entity "VGA_DRIVER" for hierarchy "VGA_DRIVER:driver" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 117
-Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(71): truncated value with size 32 to match size of target (10) File: F:/ECE3400/Lab4_FPGA_Template/VGA_DRIVER.v Line: 71
-Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(75): truncated value with size 32 to match size of target (10) File: F:/ECE3400/Lab4_FPGA_Template/VGA_DRIVER.v Line: 75
-Info (12128): Elaborating entity "IMAGE_PROCESSOR" for hierarchy "IMAGE_PROCESSOR:proc" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 127
-Warning (10034): Output port "RESULT" at IMAGE_PROCESSOR.v(26) has no driver File: F:/ECE3400/Lab4_FPGA_Template/IMAGE_PROCESSOR.v Line: 26
-Warning (12158): Entity "IMAGE_PROCESSOR" contains only dangling pins File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 127
+Info (12128): Elaborating entity "Dual_Port_RAM_M9K" for hierarchy "Dual_Port_RAM_M9K:mem" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 107
+Warning (10036): Verilog HDL or VHDL warning at Dual_Port_RAM_M9K.v(34): object "r_addr_reg" assigned a value but never read File: F:/ECE3400/TeamFPGA/Dual_Port_RAM_M9K.v Line: 34
+Info (12128): Elaborating entity "VGA_DRIVER" for hierarchy "VGA_DRIVER:driver" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 119
+Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(71): truncated value with size 32 to match size of target (10) File: F:/ECE3400/TeamFPGA/VGA_DRIVER.v Line: 71
+Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(75): truncated value with size 32 to match size of target (10) File: F:/ECE3400/TeamFPGA/VGA_DRIVER.v Line: 75
+Info (12128): Elaborating entity "IMAGE_PROCESSOR" for hierarchy "IMAGE_PROCESSOR:proc" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 129
+Warning (10034): Output port "RESULT" at IMAGE_PROCESSOR.v(26) has no driver File: F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v Line: 26
 Warning (276027): Inferred dual-clock RAM node "Dual_Port_RAM_M9K:mem|mem_rtl_0" from synchronous design logic.  The read-during-write behavior of a dual-clock RAM is undefined and may not match the behavior of the original design.
 Info (19000): Inferred 1 megafunctions from design logic
     Info (276029): Inferred altsyncram megafunction from the following design logic: "Dual_Port_RAM_M9K:mem|mem_rtl_0" 
@@ -1130,8 +1135,8 @@ Info (19000): Inferred 1 megafunctions from design logic
         Info (286033): Parameter WRCONTROL_ACLR_A set to NONE
         Info (286033): Parameter RAM_BLOCK_TYPE set to M9K
 Info (278001): Inferred 2 megafunctions from design logic
-    Info (278003): Inferred multiplier megafunction ("lpm_mult") from the following logic: "Mult0" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 62
-    Info (278003): Inferred multiplier megafunction ("lpm_mult") from the following logic: "Mult1" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 131
+    Info (278003): Inferred multiplier megafunction ("lpm_mult") from the following logic: "Mult0" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 64
+    Info (278003): Inferred multiplier megafunction ("lpm_mult") from the following logic: "Mult1" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 133
 Info (12130): Elaborated megafunction instantiation "Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0"
 Info (12133): Instantiated megafunction "Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0" with the following parameter:
     Info (12134): Parameter "OPERATION_MODE" = "DUAL_PORT"
@@ -1150,15 +1155,15 @@ Info (12133): Instantiated megafunction "Dual_Port_RAM_M9K:mem|altsyncram:mem_rt
     Info (12134): Parameter "WRCONTROL_ACLR_A" = "NONE"
     Info (12134): Parameter "RAM_BLOCK_TYPE" = "M9K"
 Info (12021): Found 1 design units, including 1 entities, in source file db/altsyncram_j5f1.tdf
-    Info (12023): Found entity 1: altsyncram_j5f1 File: F:/ECE3400/Lab4_FPGA_Template/db/altsyncram_j5f1.tdf Line: 34
+    Info (12023): Found entity 1: altsyncram_j5f1 File: F:/ECE3400/TeamFPGA/db/altsyncram_j5f1.tdf Line: 34
 Info (12021): Found 1 design units, including 1 entities, in source file db/decode_msa.tdf
-    Info (12023): Found entity 1: decode_msa File: F:/ECE3400/Lab4_FPGA_Template/db/decode_msa.tdf Line: 23
+    Info (12023): Found entity 1: decode_msa File: F:/ECE3400/TeamFPGA/db/decode_msa.tdf Line: 23
 Info (12021): Found 1 design units, including 1 entities, in source file db/decode_f8a.tdf
-    Info (12023): Found entity 1: decode_f8a File: F:/ECE3400/Lab4_FPGA_Template/db/decode_f8a.tdf Line: 23
+    Info (12023): Found entity 1: decode_f8a File: F:/ECE3400/TeamFPGA/db/decode_f8a.tdf Line: 23
 Info (12021): Found 1 design units, including 1 entities, in source file db/mux_6nb.tdf
-    Info (12023): Found entity 1: mux_6nb File: F:/ECE3400/Lab4_FPGA_Template/db/mux_6nb.tdf Line: 23
-Info (12130): Elaborated megafunction instantiation "lpm_mult:Mult0" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 62
-Info (12133): Instantiated megafunction "lpm_mult:Mult0" with the following parameter: File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 62
+    Info (12023): Found entity 1: mux_6nb File: F:/ECE3400/TeamFPGA/db/mux_6nb.tdf Line: 23
+Info (12130): Elaborated megafunction instantiation "lpm_mult:Mult0" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 64
+Info (12133): Instantiated megafunction "lpm_mult:Mult0" with the following parameter: File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 64
     Info (12134): Parameter "LPM_WIDTHA" = "15"
     Info (12134): Parameter "LPM_WIDTHB" = "8"
     Info (12134): Parameter "LPM_WIDTHP" = "23"
@@ -1172,14 +1177,14 @@ Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|multcore:mul
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|multcore:mult_core|mpar_add:padder", which is child of megafunction instantiation "lpm_mult:Mult0" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/multcore.tdf Line: 229
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|lpm_add_sub:adder[1]", which is child of megafunction instantiation "lpm_mult:Mult0" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/mpar_add.tdf Line: 78
 Info (12021): Found 1 design units, including 1 entities, in source file db/add_sub_lgh.tdf
-    Info (12023): Found entity 1: add_sub_lgh File: F:/ECE3400/Lab4_FPGA_Template/db/add_sub_lgh.tdf Line: 23
+    Info (12023): Found entity 1: add_sub_lgh File: F:/ECE3400/TeamFPGA/db/add_sub_lgh.tdf Line: 23
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add", which is child of megafunction instantiation "lpm_mult:Mult0" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/mpar_add.tdf Line: 138
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add|lpm_add_sub:adder[0]", which is child of megafunction instantiation "lpm_mult:Mult0" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/mpar_add.tdf Line: 78
 Info (12021): Found 1 design units, including 1 entities, in source file db/add_sub_pgh.tdf
-    Info (12023): Found entity 1: add_sub_pgh File: F:/ECE3400/Lab4_FPGA_Template/db/add_sub_pgh.tdf Line: 23
+    Info (12023): Found entity 1: add_sub_pgh File: F:/ECE3400/TeamFPGA/db/add_sub_pgh.tdf Line: 23
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult0|altshift:external_latency_ffs", which is child of megafunction instantiation "lpm_mult:Mult0" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/lpm_mult.tdf Line: 352
-Info (12130): Elaborated megafunction instantiation "lpm_mult:Mult1" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 131
-Info (12133): Instantiated megafunction "lpm_mult:Mult1" with the following parameter: File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 131
+Info (12130): Elaborated megafunction instantiation "lpm_mult:Mult1" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 133
+Info (12133): Instantiated megafunction "lpm_mult:Mult1" with the following parameter: File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 133
     Info (12134): Parameter "LPM_WIDTHA" = "10"
     Info (12134): Parameter "LPM_WIDTHB" = "8"
     Info (12134): Parameter "LPM_WIDTHP" = "18"
@@ -1196,47 +1201,45 @@ Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult1|multcore:mul
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult1|multcore:mult_core|mpar_add:padder|mpar_add:sub_par_add|lpm_add_sub:adder[0]", which is child of megafunction instantiation "lpm_mult:Mult1" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/mpar_add.tdf Line: 78
 Info (12131): Elaborated megafunction instantiation "lpm_mult:Mult1|altshift:external_latency_ffs", which is child of megafunction instantiation "lpm_mult:Mult1" File: c:/intelfpga_lite/17.0/quartus/libraries/megafunctions/lpm_mult.tdf Line: 352
 Warning (13024): Output pins are stuck at VCC or GND
-    Warning (13410): Pin "GPIO_0_D[0]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[1]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[2]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[3]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[4]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[6]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[8]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[10]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[12]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[14]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[16]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[18]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[20]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[22]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[24]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[25]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[26]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[27]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[28]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[29]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[30]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[31]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
-    Warning (13410): Pin "GPIO_0_D[32]" is stuck at GND File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[0]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[1]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[2]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[3]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[4]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[6]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[8]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[10]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[12]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[14]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[16]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[18]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[20]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[22]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[24]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[25]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[26]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[27]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[28]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[30]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
+    Warning (13410): Pin "GPIO_0_D[32]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
 Info (286030): Timing-Driven Synthesis is running
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 1 node(s), including 0 DDIO, 1 PLL, 0 transceiver and 0 LCELL
 Warning (21074): Design contains 4 input pin(s) that do not drive logic
-    Warning (15610): No output dependent on input pin "GPIO_1_D[20]" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 30
-    Warning (15610): No output dependent on input pin "GPIO_1_D[21]" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 30
-    Warning (15610): No output dependent on input pin "GPIO_1_D[22]" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 30
-    Warning (15610): No output dependent on input pin "KEY[1]" File: F:/ECE3400/Lab4_FPGA_Template/DE0_NANO.v Line: 31
-Info (21057): Implemented 301 device resources after synthesis - the final resource count might be different
+    Warning (15610): No output dependent on input pin "GPIO_1_D[20]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 30
+    Warning (15610): No output dependent on input pin "GPIO_1_D[21]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 30
+    Warning (15610): No output dependent on input pin "GPIO_1_D[22]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 30
+    Warning (15610): No output dependent on input pin "KEY[1]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 31
+Info (21057): Implemented 341 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 17 input pins
     Info (21059): Implemented 34 output pins
-    Info (21061): Implemented 217 logic cells
+    Info (21061): Implemented 257 logic cells
     Info (21064): Implemented 32 RAM segments
     Info (21065): Implemented 1 PLLs
-Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 53 warnings
-    Info: Peak virtual memory: 673 megabytes
-    Info: Processing ended: Mon Nov 05 17:50:35 2018
-    Info: Elapsed time: 00:00:28
-    Info: Total CPU time (on all processors): 00:00:25
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 52 warnings
+    Info: Peak virtual memory: 675 megabytes
+    Info: Processing ended: Tue Nov 06 18:42:57 2018
+    Info: Elapsed time: 00:00:17
+    Info: Total CPU time (on all processors): 00:00:27
 
 
