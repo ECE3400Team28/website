@@ -30,6 +30,7 @@ const int frontWallLED = 6;
 #define pin_Button   8
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
+const int LEFTTHRESHOLD  = 200; // FIXME: This is not the correct value for the left sensor threshold! 
 int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 int LIGHT_RIGHT_THRESHOLD = 600;//540;
 int LIGHT_LEFT_THRESHOLD = 600;//620;
@@ -285,18 +286,22 @@ void linefollow(){
 void wallfollow(){
   MotorLeft.write(90);
   MotorRight.write(90);
-  digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
-  digitalWrite(mux_sel_1, LOW);
-  delay(20);
-  wallRight = analogRead(A5);
+
   digitalWrite(mux_sel_0, LOW);  //when 00 we read from the front wall 
   digitalWrite(mux_sel_1, LOW)
   delay(20);
   wallFront = analogRead(A5);
+  
+  digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
+  digitalWrite(mux_sel_1, LOW);
+  delay(20);
+  wallRight = analogRead(A5);
+ 
   digitalWrite(mux_sel_0, LOW);  //when 10 we read from the left wall 
   digitalWrite(mux_sel_1, HIGH)
   delay(20);
   wallLeft = analogRead(A5);
+  
   Serial.println(wallFront);
   //Serial.println(wallRight);
   //Serial.println(wallFront);
