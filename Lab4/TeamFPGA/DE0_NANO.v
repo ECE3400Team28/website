@@ -49,6 +49,8 @@ reg[15:0] data;
 reg[7:0]  downsampled;
 
 assign GPIO_0_D[33] = c0_sig;
+assign GPIO_0_D[31] = c1_sig;
+assign GPIO_0_D[29] = c2_sig;
 
 ///// PIXEL DATA /////
 reg [7:0]	pixel_data_RGB332 = BLUE;
@@ -158,11 +160,17 @@ always @(posedge PCLK)begin
 		end 
 	else begin 
 		X_ADDR = 0;
+		if (data  != 25327) begin
+			Y_ADDR = Y_ADDR + 1;
+			data = 25327;
 		end
+	end
 	 if (VSYNC == 1'b1)begin 
 	     W_EN = 1'b0;
 	     X_ADDR = 0;
 		 CAM_COUNT = 1'b0;
+		 data = 25327;
+		 Y_ADDR = 0;
 		  end 
 	
 	if(X_ADDR >(`SCREEN_WIDTH-1) || Y_ADDR >(`SCREEN_HEIGHT-1))begin
@@ -170,14 +178,5 @@ always @(posedge PCLK)begin
 		end 
 	 
 end
-
-always @(negedge HREF)begin 
-    Y_ADDR = Y_ADDR + 1;
-	 
-	 if (VSYNC == 1'b1)begin 
-	     Y_ADDR = 0;
-		  end 
-	 end 
-
 	
 endmodule 
