@@ -13,10 +13,6 @@ Servo MotorRight;
 int LightDataC;
 int LightDataL;
 int LightDataR;
-const int LightCenter = A2;
-const int LightRight = A3;
-const int LightLeft = A1;
-
 int wallRight;
 int wallFront;
 int wallLeft;
@@ -25,12 +21,13 @@ const int detectRobotLED = 6;
 //const int mux = 7;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
+const int mux_sel_2 = 1;
 const int rightWallLED = 4;
 const int frontWallLED = 6;
 #define pin_Button   8
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
-const int LEFTTHRESHOLD  = 200; // FIXME: This is not the correct value for the left sensor threshold! 
+const int LEFTTHRESHOLD  = 280; 
 int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 int LIGHT_RIGHT_THRESHOLD = 600;//540;
 int LIGHT_LEFT_THRESHOLD = 600;//620;
@@ -101,7 +98,7 @@ facing_direction current_dir = S;
 void setup() {
   // put your setup code here, to run once:
   pinMode(pin_Button, INPUT);
-  pinMode(A4, INPUT);           //USED for microphone input
+  //pinMode(A4, INPUT);           //USED for microphone input
   Serial.begin(115200); // use the serial port
 
   // remove wall sensors from 5v line to prevent weird interference
@@ -116,15 +113,13 @@ void setup() {
   int PWM2 = 3;
   pinMode(PWM1, OUTPUT); 
   pinMode(PWM2, OUTPUT); 
-  pinMode(LightCenter, INPUT);  //A2
-  pinMode(LightRight, INPUT);   //A3
-  pinMode(LightLeft, INPUT);    //A1
-  pinMode(A5, INPUT);           //USED for wall distance sensor for walls 
+  pinMode(A5, INPUT);           //MUX output 
   pinMode(detectRobotLED, OUTPUT);
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux_sel_0, OUTPUT);
   pinMode(mux_sel_1, OUTPUT);
+  pinMode(mux_sel_2, OUTPUT);
   MotorLeft.attach(PWM1); 
   MotorRight.attach(PWM2);
   MotorLeft.write(90);
@@ -188,18 +183,24 @@ void turnLeft(){
     MotorRight.write(80);
     delay(600); // move away from current line
     // added the following check for current status:
-    LightDataC = analogRead(LightCenter); 
-    delay(1);
-    LightDataL = analogRead(LightLeft);
-    delay(1);
-    LightDataR = analogRead(LightRight);
-    delay(1);
+    
+//    LightDataC = analogRead(LightCenter); 
+//    delay(1);
+//    LightDataL = analogRead(LightLeft);
+//    delay(1);
+//    LightDataR = analogRead(LightRight);
+//    delay(1);
+
+    readMux();
+    
     // end check;
     while(!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)){
        // keep checking
-       LightDataC = analogRead(LightCenter);
-       LightDataL = analogRead(LightLeft);
-       LightDataR = analogRead(LightRight);
+//       LightDataC = analogRead(LightCenter);
+//       LightDataL = analogRead(LightLeft);
+//       LightDataR = analogRead(LightRight);
+
+       readMux();
     }
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -211,15 +212,18 @@ void turnRight(){
     MotorRight.write(100);
     delay(600); // move away from current line
     // added the following check for current status:
-    LightDataC = analogRead(LightCenter);
-    LightDataL = analogRead(LightLeft);
-    LightDataR = analogRead(LightRight);
+//    LightDataC = analogRead(LightCenter);
+//    LightDataL = analogRead(LightLeft);
+//    LightDataR = analogRead(LightRight);
+
+    readMux();
     // end check
     while(!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)){
        // keep checking
-       LightDataC = analogRead(LightCenter);
-       LightDataL = analogRead(LightLeft);
-       LightDataR = analogRead(LightRight);
+//       LightDataC = analogRead(LightCenter);
+//       LightDataL = analogRead(LightLeft);
+//       LightDataR = analogRead(LightRight);
+       readMux();
     }
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -229,10 +233,26 @@ void turnRight(){
 void linefollow(){
      //Below LIGHTTHRESHOLD is white tape
      //Above LIGHTTHRESHOLD is dark
+//
+//     digitalWrite(mux_sel_0, HIGH);
+//     digitalWrite(mux_sel_0, HIGH);
+//     digitalWrite(mux_sel_0, LOW);
+//     delay(20);
+//     LightDataC = analogRead(A5);
+//
+//     digitalWrite(mux_sel_0, HIGH);
+//     digitalWrite(mux_sel_0, LOW);
+//     digitalWrite(mux_sel_0, HIGH);
+//     delay(20);
+//     LightDataL = analogRead(A5);
+//
+//     digitalWrite(mux_sel_0, LOW);
+//     digitalWrite(mux_sel_0, LOW);
+//     digitalWrite(mux_sel_0, HIGH);
+//     delay(20);
+//     LightDataR = analogRead(A5);
 
-     LightDataC = analogRead(LightCenter);
-     LightDataL = analogRead(LightLeft);
-     LightDataR = analogRead(LightRight);
+     readMux();
 
      bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
      bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
@@ -287,20 +307,25 @@ void wallfollow(){
   MotorLeft.write(90);
   MotorRight.write(90);
 
-  digitalWrite(mux_sel_0, LOW);  //when 00 we read from the front wall 
-  digitalWrite(mux_sel_1, LOW)
-  delay(20);
-  wallFront = analogRead(A5);
-  
-  digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
-  digitalWrite(mux_sel_1, LOW);
-  delay(20);
-  wallRight = analogRead(A5);
- 
-  digitalWrite(mux_sel_0, LOW);  //when 10 we read from the left wall 
-  digitalWrite(mux_sel_1, HIGH)
-  delay(20);
-  wallLeft = analogRead(A5);
+//  digitalWrite(mux_sel_0, LOW);  //when 000 we read from the front wall 
+//  digitalWrite(mux_sel_1, LOW);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(20);
+//  wallFront = analogRead(A5);
+//  
+//  digitalWrite(mux_sel_0, HIGH);  //when 001 we read from the right wall
+//  digitalWrite(mux_sel_1, LOW);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(20);
+//  wallRight = analogRead(A5);
+// 
+//  digitalWrite(mux_sel_0, LOW);  //when 010 we read from the left wall 
+//  digitalWrite(mux_sel_1, HIGH);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(20);
+//  wallLeft = analogRead(A5);
+
+  readMux();
   
   Serial.println(wallFront);
   //Serial.println(wallRight);
@@ -372,13 +397,15 @@ void wallfollow(){
       else current_dir = (facing_direction) (current_dir - 1);
       
       //delay(1000);
-
-      digitalWrite(mux, HIGH); //when high we read from the right wall
-      delay(20);
-      wallRight = analogRead(A5);
-      digitalWrite(mux, LOW);  //when low we read from the front wall 
-      delay(20);
-      wallFront = analogRead(A5);
+//
+//      digitalWrite(mux, HIGH); //when high we read from the right wall
+//      delay(20);
+//      wallRight = analogRead(A5);
+//      digitalWrite(mux, LOW);  //when low we read from the front wall 
+//      delay(20);
+//      wallFront = analogRead(A5);
+      
+      readMux();
       
       if (wallRight >= RIGHTTHRESHOLD) {
         digitalWrite(rightWallLED, HIGH);
@@ -412,6 +439,53 @@ void wallfollow(){
     // broadcast();
   }
   return;
+}
+
+void readMux() {
+  // 000 Front wall
+  digitalWrite(mux_sel_0, LOW);   
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallFront = analogRead(A5);
+  
+  // 001 Right wall
+  digitalWrite(mux_sel_0, HIGH);  
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallRight = analogRead(A5);
+  
+  // 010 Left wall
+  digitalWrite(mux_sel_0, LOW);   
+  digitalWrite(mux_sel_1, HIGH);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallLeft = analogRead(A5);
+  
+  // 011 front line
+  digitalWrite(mux_sel_0, HIGH);  
+  digitalWrite(mux_sel_1, HIGH);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  LightDataC = analogRead(A5);
+  
+  // 100 right line
+  digitalWrite(mux_sel_0, LOW);  
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, HIGH);
+  delay(20);
+  LightDataR = analogRead(A5);
+  
+  // 101 left line
+  digitalWrite(mux_sel_0, HIGH);  
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, HIGH);
+  delay(20);
+  LightDataL = analogRead(A5);
+  
+  // 110 microphone
+  // 111 IR maybe?
 }
 
 boolean detect() {
@@ -469,7 +543,11 @@ boolean readSignal() {
   delay(10);
   cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    fft_input[i] = analogRead(A4); // put real data into even bins
+    digitalWrite(mux_sel_0, LOW);   
+    digitalWrite(mux_sel_1, HIGH);
+    digitalWrite(mux_sel_2, HIGH);
+    delay(20);
+    fft_input[i] = analogRead(A5); // put real data into even bins
     fft_input[i+1] = 0; // set odd bins to 0
   }
   fft_window(); // window the data for better frequency response
