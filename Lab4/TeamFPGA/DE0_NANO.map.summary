@@ -1,14 +1,14 @@
-Analysis & Synthesis Status : Successful - Tue Nov 06 18:42:56 2018
+Analysis & Synthesis Status : Successful - Fri Nov 09 16:00:16 2018
 Quartus Prime Version : 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 Revision Name : DE0_NANO
 Top-level Entity Name : DE0_NANO
 Family : Cyclone IV E
-Total logic elements : 255
-    Total combinational functions : 249
-    Dedicated logic registers : 78
-Total registers : 78
+Total logic elements : 266
+    Total combinational functions : 251
+    Dedicated logic registers : 99
+Total registers : 99
 Total pins : 51
 Total virtual pins : 0
-Total memory bits : 202,752
+Total memory bits : 177,408
 Embedded Multiplier 9-bit elements : 0
 Total PLLs : 1

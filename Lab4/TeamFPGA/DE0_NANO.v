@@ -77,6 +77,9 @@ assign GPIO_0_D[5] = VGA_VSYNC_NEG;
 assign VGA_RESET = ~KEY[0];
 
 ///// I/O for Img Proc /////
+assign GPIO_0_D[32] = RESULT[0];
+assign GPIO_0_D[30] = RESULT[1];
+assign GPIO_0_D[28] = RESULT[2];
 wire [2:0] RESULT;
 
 /* WRITE ENABLE */
@@ -140,17 +143,19 @@ always @ (VGA_PIXEL_X, VGA_PIXEL_Y) begin
         end
 end
 
-logic prevHREF;
-logic prevVSYNC;
+reg prevHREF;
+reg prevHREF2;
+reg prevVSYNC;
+reg prevVSYNC2;
 
 //DOWNSAMPLE
 always @(posedge PCLK)begin 
-   if (VSYNC & ~prevVSYNC) begin
+   if (VSYNC & prevVSYNC & ~prevVSYNC2) begin
         // posedge vsync
         Y_ADDR = 0;
         X_ADDR = 0;
         CAM_COUNT = 0;
-    end else if (~HREF & prevHREF) begin
+    end else if (~HREF & ~prevHREF & prevHREF2) begin
         // negedge HREF
         Y_ADDR = Y_ADDR + 1;
         X_ADDR = 0;
@@ -160,16 +165,28 @@ always @(posedge PCLK)begin
         if (HREF) begin
             if (CAM_COUNT == 1'b0)begin
                   W_EN = 1'b0;
-                  data = CAM_DATA << 8;
+                  //data = CAM_DATA << 8;
+						data[7:0] = CAM_DATA;
                   CAM_COUNT = 1'b1;
                   X_ADDR = X_ADDR;
               end
               else begin
-                 data = data | CAM_DATA;
+                 //data = data | CAM_DATA;
+					  data[15:8] = CAM_DATA;
                   CAM_COUNT = 1'b0;
-                  downsampled[7:5] = data[15:13];
+//                  downsampled[7:5] = data[7:5];
+//                  downsampled[4:2] = data[2:0];
+//                  downsampled[1:0] = data[12:11];
+						downsampled[7:5] = data[15:14];
                   downsampled[4:2] = data[10:8];
                   downsampled[1:0] = data[4:3];
+                  
+//                  downsampled[7:5] = data[4:2]; // close on the color bar, red/blue switch?
+//                  downsampled[4:2] = data[10:8];
+//                  downsampled[1:0] = data[15:14];
+                  //downsampled[7:5] = data[8:6];
+                  //downsampled[4:2] = data[2:0];
+                  //downsampled[1:0] = data[12:11];
                   X_ADDR = X_ADDR + 1;
                   W_EN = 1'b1;
               end
@@ -178,12 +195,16 @@ always @(posedge PCLK)begin
         end
     end
     
+    prevHREF2 = prevHREF;
     prevHREF = HREF;
-    prevVSYNC = VSYNC;
     
-    if(X_ADDR >(`SCREEN_WIDTH-1) || Y_ADDR >(`SCREEN_HEIGHT-1))begin
-                W_EN = 1'b0;
-        end 
+	 prevVSYNC2 = prevVSYNC;
+	 prevVSYNC = VSYNC;
+	 
+    
+    //if(X_ADDR >(`SCREEN_WIDTH-1) || Y_ADDR >(`SCREEN_HEIGHT-1))begin
+    //            W_EN = 1'b0;
+    //    end 
      
 end
     

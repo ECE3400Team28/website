@@ -20,9 +20,12 @@ module IMAGE_PROCESSOR (
 input   [7:0]   PIXEL_IN;
 input       CLK;
 
+input VSYNC;
+input HREF;
+
 input [9:0] VGA_PIXEL_X;
 input [9:0] VGA_PIXEL_Y;
-input           VGA_VSYNC_NEG;
+//input           VGA_VSYNC_NEG;
 
 output reg [2:0] RESULT;
 
