@@ -502,7 +502,7 @@ boolean detect() {
   ADMUX = 0x40; // use adc3
   DIDR0 = 0x01; // turn off the digital input for adc3
 
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+  for (int i = 0 ; i < FHT_N ; i ++) { // save 256 samples
     while(!(ADCSRA & 0x10)); // wait for adc to be ready
     ADCSRA = 0xf5; // restart adc
     byte m = ADCL; // fetch adc data
@@ -511,7 +511,7 @@ boolean detect() {
     k -= 0x0200; // form into a signed int
     k <<= 6; // form into a 16b signed int
     fht_input[i] = k; // put real data into even bins
-    fht_input[i+1] = 0; // set odd bins to 0
+    //fht_input[i+1] = 0; // set odd bins to 0 - no longer necessary with FHT
   }
   fht_window(); // window the data for better frequency response
   fht_reorder(); // reorder the data before doing the fft
@@ -541,15 +541,15 @@ boolean detect() {
 
 boolean readSignal() {
   // now uses FHT library
+  
+  digitalWrite(mux_sel_0, LOW);   
+  digitalWrite(mux_sel_1, HIGH);
+  digitalWrite(mux_sel_2, HIGH);
   delay(10);
   cli();  // UDRE interrupt slows this way down on arduino1.0
-  for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
-    digitalWrite(mux_sel_0, LOW);   
-    digitalWrite(mux_sel_1, HIGH);
-    digitalWrite(mux_sel_2, HIGH);
-    delay(20);
+  for (int i = 0 ; i < FHT_N ; i ++) { // save 256 samples
     fht_input[i] = analogRead(A5); // put real data into even bins
-    fht_input[i+1] = 0; // set odd bins to 0
+    //fht_input[i+1] = 0; // set odd bins to 0 - no longer necessary for FHT
   }
   fht_window(); // window the data for better frequency response
   fht_reorder(); // reorder the data before doing the fft
