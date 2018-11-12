@@ -128,6 +128,9 @@ IMAGE_PROCESSOR proc(
     .VGA_PIXEL_X(VGA_PIXEL_X),
     .VGA_PIXEL_Y(VGA_PIXEL_Y),
     .VSYNC(VSYNC),
+	 .prevVSYNC(prevVSYNC),
+	 .prevVSYNC2(prevVSYNC2),
+	 .prevVSYNC3(prevVSYNC3),
     .HREF(HREF),
     .RESULT(RESULT)
 );
@@ -145,17 +148,21 @@ end
 
 reg prevHREF;
 reg prevHREF2;
+reg prevHREF3;
 reg prevVSYNC;
 reg prevVSYNC2;
+reg prevVSYNC3;
 
 //DOWNSAMPLE
 always @(posedge PCLK)begin 
-   if (VSYNC & prevVSYNC & ~prevVSYNC2) begin
+   //if (VSYNC & prevVSYNC & ~prevVSYNC2 & ~prevVSYNC3) begin
+	if (VSYNC & prevVSYNC & ~prevVSYNC2) begin
         // posedge vsync
         Y_ADDR = 0;
         X_ADDR = 0;
         CAM_COUNT = 0;
-    end else if (~HREF & ~prevHREF & prevHREF2) begin
+    end else if (~HREF & ~prevHREF & prevHREF2 & prevHREF3) begin
+//	 end else if (~HREF & ~prevHREF & prevHREF2) begin
         // negedge HREF
         Y_ADDR = Y_ADDR + 1;
         X_ADDR = 0;
@@ -174,16 +181,34 @@ always @(posedge PCLK)begin
                  //data = data | CAM_DATA;
 					  data[15:8] = CAM_DATA;
                   CAM_COUNT = 1'b0;
-//                  downsampled[7:5] = data[7:5];
-//                  downsampled[4:2] = data[2:0];
-//                  downsampled[1:0] = data[12:11];
-						downsampled[7:5] = data[15:14];
+
+// currently gets best results
+
+						downsampled[7:5] = data[15:13];
                   downsampled[4:2] = data[10:8];
                   downsampled[1:0] = data[4:3];
+
+//						downsampled[7:5] = data[15:13];
+//                  downsampled[4:2] = data[11:9];
+//                  downsampled[1:0] = data[3:2];
+						
+						//downsampled = data[7:0];
+						downsampled[7:5] = {data[15], 2'b0};
+//						downsampled[7:5] = {3'b0};
+						downsampled[4:2] = {data[10], 2'b0};
+//						downsampled[4:2] = {3'b0};
+						downsampled[1:0] = {data[4], 1'b0};
+//						downsampled[1:0] = {2'b0};
                   
-//                  downsampled[7:5] = data[4:2]; // close on the color bar, red/blue switch?
+                  
+//                  downsampled[7:5] = data[4:2]; // close on the color bar, red/blue switch on real :(
 //                  downsampled[4:2] = data[10:8];
 //                  downsampled[1:0] = data[15:14];
+
+//                  downsampled[7:5] = data[7:5]; // what if msb is lsb
+//                  downsampled[4:2] = data[2:0]; // okay probably not
+//                  downsampled[1:0] = data[12:11];
+
                   //downsampled[7:5] = data[8:6];
                   //downsampled[4:2] = data[2:0];
                   //downsampled[1:0] = data[12:11];
@@ -195,9 +220,11 @@ always @(posedge PCLK)begin
         end
     end
     
+	 prevHREF3 = prevHREF2;
     prevHREF2 = prevHREF;
     prevHREF = HREF;
     
+	 prevVSYNC3 = prevVSYNC2;
 	 prevVSYNC2 = prevVSYNC;
 	 prevVSYNC = VSYNC;
 	 
