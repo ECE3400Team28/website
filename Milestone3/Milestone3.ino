@@ -1,7 +1,7 @@
 #define LOG_OUT 1 // use the log output function
-#define FFT_N 256 // set to 256 point fft
+#define FHT_N 256 // set to 256 point fft
 
-#include <FFT.h> // include the library
+#include <FHT.h> // include the library
 #include <Servo.h>
 #include <SPI.h>
 #include "nRF24L01.h"
@@ -510,22 +510,22 @@ boolean detect() {
     int k = (j << 8) | m; // form into an int
     k -= 0x0200; // form into a signed int
     k <<= 6; // form into a 16b signed int
-    fft_input[i] = k; // put real data into even bins
-    fft_input[i+1] = 0; // set odd bins to 0
+    fht_input[i] = k; // put real data into even bins
+    fht_input[i+1] = 0; // set odd bins to 0
   }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
+  fht_window(); // window the data for better frequency response
+  fht_reorder(); // reorder the data before doing the fft
+  fht_run(); // process the data in the fft
+  fht_mag_log(); // take the output of the fft
   sei();
 
 //  Serial.println("start");
-//  for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-//    Serial.println(fft_log_out[i]); // send out the data
+//  for (byte i = 0 ; i < FHT_N/2 ; i++) { 
+//    Serial.println(fht_log_out[i]); // send out the data
 //  }
   bool detected = false;
   for (int j = 38; j < 44; ++j) {
-    if (fft_log_out[j] >= 150){
+    if (fht_log_out[j] >= 150){
       //We have detected another robot
       // return settings to original
       detected = true;
@@ -540,6 +540,7 @@ boolean detect() {
 }
 
 boolean readSignal() {
+  // now uses FHT library
   delay(10);
   cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
@@ -547,17 +548,17 @@ boolean readSignal() {
     digitalWrite(mux_sel_1, HIGH);
     digitalWrite(mux_sel_2, HIGH);
     delay(20);
-    fft_input[i] = analogRead(A5); // put real data into even bins
-    fft_input[i+1] = 0; // set odd bins to 0
+    fht_input[i] = analogRead(A5); // put real data into even bins
+    fht_input[i+1] = 0; // set odd bins to 0
   }
-  fft_window(); // window the data for better frequency response
-  fft_reorder(); // reorder the data before doing the fft
-  fft_run(); // process the data in the fft
-  fft_mag_log(); // take the output of the fft
+  fht_window(); // window the data for better frequency response
+  fht_reorder(); // reorder the data before doing the fft
+  fht_run(); // process the data in the fft
+  fht_mag_log(); // take the output of the fft
   sei();
-  Serial.println(fft_log_out[19]);
+  Serial.println(fht_log_out[19]);
   for (int j = 17; j < 23; ++j) {
-    if (fft_log_out[j] >= 60){
+    if (fht_log_out[j] >= 60){
       //We have detected another robot
       // return settings to original
       return true;
