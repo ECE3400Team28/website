@@ -12,11 +12,15 @@
 					"strict" : false
 				},
 				{
-					"name" : "GPIO_0_D[9]",
+					"name" : "GPIO_0_D[15]",
 					"strict" : false
 				},
 				{
-					"name" : "GPIO_0_D[15]",
+					"name" : "GPIO_0_D[17]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[19]",
 					"strict" : false
 				},
 				{
@@ -44,11 +48,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "GPIO_1_D[33]",
+					"name" : "GPIO_1_D[32]",
 					"strict" : false
 				},
 				{
-					"name" : "GPIO_1_D[32]",
+					"name" : "GPIO_1_D[33]",
 					"strict" : false
 				},
 				{
@@ -56,7 +60,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "GPIO_1_D[31]",
+					"name" : "GPIO_1_D[24]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[25]",
 					"strict" : false
 				},
 				{
@@ -64,7 +72,23 @@
 					"strict" : false
 				},
 				{
+					"name" : "GPIO_1_D[30]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[29]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[31]",
+					"strict" : false
+				},
+				{
 					"name" : "GPIO_1_D[28]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[27]",
 					"strict" : false
 				}
 			]
