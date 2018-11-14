@@ -4,6 +4,7 @@
 #include <FHT.h> // include the library
 #include <Servo.h>
 #include <SPI.h>
+#include <StackArray.h>
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
@@ -28,9 +29,9 @@ const int frontWallLED = 6;
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
 const int LEFTTHRESHOLD  = 280; 
-int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-int LIGHT_RIGHT_THRESHOLD = 600;//540;
-int LIGHT_LEFT_THRESHOLD = 600;//620;
+const int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 600;//540;
+const int LIGHT_LEFT_THRESHOLD = 600;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -71,6 +72,9 @@ const uint8_t bm_not_explored= 0;
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
+const int rows = 2;
+const int columns = 3;
+int explored = 0;
 //uint8_t maze[9][9] = {
 // {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
 // {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
@@ -83,16 +87,26 @@ uint8_t y = 0;
 // {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
 //};
 
-uint8_t maze[2][3] = {
- {0, 0, 0},
- {0, 0, 0}
-};
+uint8_t maze[rows][columns] = { }; // initialized with zeros
 
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
 
 // The role of the current running sketch
 facing_direction current_dir = S;
 
+class Node {
+  public:
+    uint8_t x;
+    uint8_t y;
+    int cost;
+    Node(uint8_t xCoor, uint8_t yCoor, int c) {
+      x = xCoor;
+      y = yCoor;
+      cost = c;
+    }
+};
+
+StackArray<Node> frontier;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
@@ -159,18 +173,142 @@ void setup() {
 }
 
 void loop() {
-    Serial.println(F("start loop"));
-    forward();
-    linefollow();
+    //Serial.println(F("start loop"));
+    Node n(x, y, 0);
+    frontier.push(n);
+    while(!frontier.isEmpty()) {
+      Node loc = frontier.pop();
+      moveTo(loc.x, loc.y);
+      // now we are at the new location, so explore it
+      explore();
+      if (explored == rows*columns){
+        // we've explored the entire maze!
+        //Serial.println(F("done"));
+        while(1){
+          MotorLeft.write(90);
+          MotorRight.write(90);
+        }
+      }
 
+      // for each action we can take, add the nodes to the frontier.
+      if (maze[x][y] & bm_wall_north == 0) {
+        // there's no wall to the north
+        if (x-1 >= 0 && maze[x-1][y] == 0) {
+          // the new location is valid and it has not been explored
+          Node n_new(x-1, y, 0);
+          frontier.push(n_new);
+        }
+      }
+      if (maze[x][y] & bm_wall_east == 0) {
+        // there's no wall to the east
+        if (y+1 < columns && maze[x][y+1] == 0) {
+          // the new location is valid and it has not been explored 
+          Node n_new(x, y+1, 0);
+          frontier.push(n_new);
+        }
+      }
+      if (maze[x][y] & bm_wall_south == 0) {
+        // there's no wall to the south
+        if (x+1 < rows && maze[x+1][y] == 0) {
+          // the new location is valid and it has not been explored
+          Node n_new(x+1, y, 0);
+          frontier.push(n_new);
+        }
+      }
+      if (maze[x][y] & bm_wall_west == 0) {
+        // there's no wall to the west
+        if (y-1 >= 0 && maze[x][y-1] == 0) {
+          // the new location is valid and it has not been explored
+          Node n_new(x, y-1, 0);
+          frontier.push(n_new);
+        }
+      }
+    }
     // IR
     
-    if (detect()){
-      turnLeft();
-      digitalWrite(detectRobotLED, HIGH);
-    } else {
-      digitalWrite(detectRobotLED, LOW);
+//    if (detect()){
+//      turnLeft();
+//      digitalWrite(detectRobotLED, HIGH);
+//    } else {
+//      digitalWrite(detectRobotLED, LOW);
+//    }
+}
+
+/*
+ *  Moves the robot to the coordinate (x,y) using A* search to find the shortest path if stuck
+ */
+void moveTo(uint8_t loc_x, uint8_t loc_y) {
+  if (x == loc_x && y == loc_y) return;
+  if (abs(x-loc_x) == 1 && abs(y-loc_y) == 1) {
+    // we can move directly to this location in one move, might need to turn though
+  }
+  x = loc_x;
+  y = loc_y;
+}
+
+/* 
+ *  Explores the current location by detecting walls & treasures and broadcasting the information. Increments the number of explored tiles.
+ *  Assumes the current location has not been explored yet.
+*/
+void explore() {
+  if (maze[x][y] != 0 ) return; // we've already explored this tile
+  MotorLeft.write(90);
+  MotorRight.write(90);
+  readMux();
+
+  // **** Check three walls because the 4th wall is the way we came into this cell, so there's no wall anyway ****//
+  
+  // check the right wall
+  if (wallRight >= RIGHTTHRESHOLD) {
+    digitalWrite(rightWallLED, HIGH);
+    if (current_dir == N) {
+      maze[x][y] |= bm_wall_east;
+    } else if (current_dir == E) {
+      maze[x][y] |= bm_wall_south;
+    } else if (current_dir == S) {
+      maze[x][y] |= bm_wall_west;
+    } else if (current_dir == W) {
+      maze[x][y] |= bm_wall_north;
     }
+  } else {
+    digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+  }
+
+  // check the front wall
+  if (wallFront >= FRONTTHRESHOLD) {
+    digitalWrite(frontWallLED, HIGH);
+    if (current_dir == N) {
+      maze[x][y] |= bm_wall_north;
+    } else if (current_dir == E) {
+      maze[x][y] |= bm_wall_east;
+    } else if (current_dir == S) {
+      maze[x][y] |= bm_wall_south;
+    } else if (current_dir == W) {
+      maze[x][y] |= bm_wall_west;
+    }
+  } else {
+    digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+  }
+
+  // check the left wall
+  if (wallLeft >= LEFTTHRESHOLD) {
+    //digitalWrite(leftWallLED, HIGH);
+    if (current_dir == N) {
+      maze[x][y] |= bm_wall_west;
+    } else if (current_dir == E) {
+      maze[x][y] |= bm_wall_north;
+    } else if (current_dir == S) {
+      maze[x][y] |= bm_wall_east;
+    } else if (current_dir == W) {
+      maze[x][y] |= bm_wall_south;
+    }
+  } else {
+    //digitalWrite(leftWallLED, LOW);   // turn the LED off by making the voltage LOW
+  }
+  
+  maze[x][y] |= bm_explored;
+  broadcast(); // keep broadcasting until successful
+  explored++;
 }
 
 void forward(){
