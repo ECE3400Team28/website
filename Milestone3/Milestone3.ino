@@ -88,7 +88,7 @@ int explored = 0;
 //};
 
 uint8_t maze[rows][columns] = { }; // initialized with zeros
-
+bool visited[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
 
 // The role of the current running sketch
@@ -99,14 +99,17 @@ class Node {
     uint8_t x;
     uint8_t y;
     int cost;
-    Node(uint8_t xCoor, uint8_t yCoor, int c) {
+    Node *parent;
+    Node(uint8_t xCoor, uint8_t yCoor, int c, Node *node) {
       x = xCoor;
       y = yCoor;
       cost = c;
+      parent = node;
     }
 };
 
 StackArray<Node> frontier;
+StackArray<Node> frontier_a;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
@@ -174,11 +177,11 @@ void setup() {
 
 void loop() {
     //Serial.println(F("start loop"));
-    Node n(x, y, 0);
+    Node n(x, y, 0, NULL);
     frontier.push(n);
     while(!frontier.isEmpty()) {
       Node loc = frontier.pop();
-      moveTo(loc.x, loc.y);
+      moveTo(greedy(loc.x, loc.y));
       // now we are at the new location, so explore it
       explore();
       if (explored == rows*columns){
@@ -195,7 +198,7 @@ void loop() {
         // there's no wall to the north
         if (x-1 >= 0 && maze[x-1][y] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x-1, y, 0);
+          Node n_new(x-1, y, 0, NULL);
           frontier.push(n_new);
         }
       }
@@ -203,7 +206,7 @@ void loop() {
         // there's no wall to the east
         if (y+1 < columns && maze[x][y+1] == 0) {
           // the new location is valid and it has not been explored 
-          Node n_new(x, y+1, 0);
+          Node n_new(x, y+1, 0, NULL);
           frontier.push(n_new);
         }
       }
@@ -211,7 +214,7 @@ void loop() {
         // there's no wall to the south
         if (x+1 < rows && maze[x+1][y] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x+1, y, 0);
+          Node n_new(x+1, y, 0, NULL);
           frontier.push(n_new);
         }
       }
@@ -219,7 +222,7 @@ void loop() {
         // there's no wall to the west
         if (y-1 >= 0 && maze[x][y-1] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x, y-1, 0);
+          Node n_new(x, y-1, 0, NULL);
           frontier.push(n_new);
         }
       }
@@ -235,15 +238,75 @@ void loop() {
 }
 
 /*
- *  Moves the robot to the coordinate (x,y) using A* search to find the shortest path if stuck
+ *  Uses greedy search to find the shortest path of explored tiles if stuck.
  */
-void moveTo(uint8_t loc_x, uint8_t loc_y) {
-  if (x == loc_x && y == loc_y) return;
-  if (abs(x-loc_x) == 1 && abs(y-loc_y) == 1) {
-    // we can move directly to this location in one move, might need to turn though
+Node greedy(uint8_t loc_x, uint8_t loc_y) {
+  int heuristic = abs(x-loc_x) + abs(y-loc_y);
+  Node n(x, y, heuristic, NULL);
+  frontier_a.push(n);
+  while(!frontier_a.isEmpty()){
+    Node loc = frontier_a.pop();
+    visited[loc.x][loc.y] = true;
+    if (loc.x == loc_x && loc.y == loc_y) return loc;
+    
+    // for each action we can take, add the nodes to the frontier.
+    if (maze[loc.x][loc.y] & bm_wall_north == 0) {
+      // there's no wall to the north
+      if (loc.x-1 >= 0 && !visited[loc.x-1][loc.y]) {
+        // the new location is valid and we have not visited it
+        if (maze[loc.x-1][loc.y] > 0 || (loc.x-1 == loc_x && loc.y == loc_y)) {
+          // we have explored this location before OR this location is the goal state
+          int heuristic = abs(loc.x-1-loc_x) + abs(loc.y-loc_y);
+          Node n_new(loc.x-1, loc.y, heuristic, &loc);
+          frontier.push(n_new);
+        }
+      }
+    }
+    if (maze[loc.x][loc.y] & bm_wall_east == 0) {
+      // there's no wall to the east
+      if (loc.y+1 < columns && !visited[loc.x][loc.y+1] ) {
+        // the new location is valid and we have not visited it
+        if (maze[loc.x][loc.y+1] > 0 || (loc.x == loc_x && loc.y+1 == loc_y)){
+          // we have explored this location before OR this location is the goal state
+          int heuristic = abs(loc.x-loc_x) + abs(loc.y+1-loc_y);
+          Node n_new(loc.x, loc.y+1, heuristic, &loc);
+          frontier.push(n_new);
+        }
+      }
+    }
+    if (maze[loc.x][loc.y] & bm_wall_south == 0) {
+      // there's no wall to the south
+      if (loc.x+1 < rows && !visited[loc.x+1][loc.y]) {
+        // the new location is valid and it has not been explored
+        if (maze[loc.x+1][loc.y] > 0 || (loc.x+1 == loc_x && loc.y == loc_y)){
+          // we have explored this location before OR this location is the goal state
+          int heuristic = abs(loc.x+1-loc_x) + abs(loc.y-loc_y);
+          Node n_new(loc.x+1, loc.y, heuristic, &loc);
+          frontier.push(n_new);
+        }
+      }
+    }
+    if (maze[loc.x][loc.y] & bm_wall_west == 0) {
+      // there's no wall to the west
+      if (loc.y-1 >= 0 && !visited[loc.x][loc.y-1]) {
+        // the new location is valid and it has not been explored
+        if (maze[loc.x][loc.y-1] > 0 || (loc.x == loc_x && loc.y-1 == loc_y)){
+          // we have explored this location before OR this location is the goal state
+          int heuristic = abs(loc.x-loc_x) + abs(loc.y-1-loc_y);
+          Node n_new(loc.x, loc.y-1, heuristic, &loc);
+          frontier.push(n_new);
+        }
+      }
+    }
   }
-  x = loc_x;
-  y = loc_y;
+}
+
+/*
+ * Moves robot to the location described by the node.
+ * Assumptions: There is an open path to the node, but it might encounter enemy robots.
+ */
+void moveTo(Node node) {
+  
 }
 
 /* 
