@@ -12,6 +12,7 @@ module IMAGE_PROCESSOR (
 	 prevVSYNC,
 	 prevVSYNC2,
 	 prevVSYNC3,
+	 PIXEL_OUT,
     HREF,
     RESULT
 );
@@ -34,6 +35,7 @@ input [9:0] VGA_PIXEL_Y;
 //input           VGA_VSYNC_NEG;
 
 output reg [2:0] RESULT;
+output reg [7:0] PIXEL_OUT;
 
 reg [23:0] blue_cnt;
 reg [23:0] red_cnt;
@@ -47,15 +49,23 @@ localparam R_CNT_THRESHOLD = 24'd25000;
 localparam B_CNT_THRESHOLD = 24'd20000;
 
 always @(posedge CLK) begin
-    if (HREF) begin
-        if (PIXEL_IN[1:0] > 2'b10 && PIXEL_IN[4:2] < 3'b011 && PIXEL_IN[7:5] < 3'b011) blue_cnt = blue_cnt + 24'b1;
+	if (HREF) begin
+		PIXEL_OUT = 8'b00000000;
+		if (PIXEL_IN[1:0] > 2'b10 && PIXEL_IN[4:2] < 3'b011 && PIXEL_IN[7:5] < 3'b101) begin
+			blue_cnt = blue_cnt + 24'b1;
+			PIXEL_OUT = 8'b00000011;
+		end
 		  //if (PIXEL_IN[1:0] < 2'b10) blue_cnt = blue_cnt + 24'b1;
 //        else if (PIXEL_IN[7:5] > 3'b010) red_cnt = red_cnt + 24'b1;
-		  else if (PIXEL_IN[7:5] > 3'b010 && PIXEL_IN[4:2] < 3'b011) red_cnt = red_cnt + 24'b1;
-		  if (PIXEL_IN[1:0] < 2'b10) null_cnt = null_cnt + 24'b1;
-        //else null_cnt = null_cnt + 24'b1;
-    end
-	 if (VSYNC & prevVSYNC & ~prevVSYNC2 & ~prevVSYNC3) begin
+		else if (PIXEL_IN[7:5] > 3'b010 && PIXEL_IN[4:2] < 3'b011) begin
+			red_cnt = red_cnt + 24'b1;
+			PIXEL_OUT = 8'b00011100;
+		end
+		if (PIXEL_IN[1:0] < 2'b10) null_cnt = null_cnt + 24'b1;
+      //else null_cnt = null_cnt + 24'b1;
+	end
+//	 if (VSYNC & prevVSYNC & ~prevVSYNC2 & ~prevVSYNC3) begin
+	if (VSYNC & prevVSYNC & ~prevVSYNC2) begin
 //    if (VSYNC & ~lastSync) begin
         // posedge vsync
 		  blue_cnt_p = (blue_cnt_p - (blue_cnt_p >> 3) ) + (blue_cnt >> 3);
@@ -66,7 +76,8 @@ always @(posedge CLK) begin
         if (red_cnt_p > R_CNT_THRESHOLD) RESULT[1] = 1'b1;
 		  if (null_cnt > B_CNT_THRESHOLD) RESULT[0] = 1'b1;
     end
-	 if (~VSYNC & ~prevVSYNC & prevVSYNC2 & prevVSYNC3) begin
+//	 if (~VSYNC & ~prevVSYNC & prevVSYNC2 & prevVSYNC3) begin
+	 if (~VSYNC & ~prevVSYNC & prevVSYNC2) begin
     //if (~VSYNC & lastSync) begin
         // negedge vsync
         blue_cnt = 0;

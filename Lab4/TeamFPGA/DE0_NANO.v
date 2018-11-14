@@ -109,11 +109,13 @@ Dual_Port_RAM_M9K mem(
     .output_data(MEM_OUTPUT)
 );
 
+wire [7:0] PIXEL_OUT;
+
 ///////* VGA Module *///////
 VGA_DRIVER driver (
     .RESET(VGA_RESET),
     .CLOCK(c1_sig),
-    .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? MEM_OUTPUT : BLUE),
+    .PIXEL_COLOR_IN(VGA_READ_MEM_EN ? PIXEL_OUT : BLUE),
     .PIXEL_X(VGA_PIXEL_X),
     .PIXEL_Y(VGA_PIXEL_Y),
     .PIXEL_COLOR_OUT({GPIO_0_D[9],GPIO_0_D[11],GPIO_0_D[13],GPIO_0_D[15],GPIO_0_D[17],GPIO_0_D[19],GPIO_0_D[21],GPIO_0_D[23]}),
@@ -131,6 +133,7 @@ IMAGE_PROCESSOR proc(
 	 .prevVSYNC(prevVSYNC),
 	 .prevVSYNC2(prevVSYNC2),
 	 .prevVSYNC3(prevVSYNC3),
+	 .PIXEL_OUT(PIXEL_OUT),
     .HREF(HREF),
     .RESULT(RESULT)
 );
@@ -161,8 +164,10 @@ always @(posedge PCLK)begin
         Y_ADDR = 0;
         X_ADDR = 0;
         CAM_COUNT = 0;
-    end else if (~HREF & ~prevHREF & prevHREF2 & prevHREF3) begin
+//    end else if (~HREF & ~prevHREF & prevHREF2 & prevHREF3) begin
+	end else if (~HREF & ~prevHREF & ~prevHREF2 & prevHREF3) begin
 //	 end else if (~HREF & ~prevHREF & prevHREF2) begin
+//	 end else if (~HREF & prevHREF) begin
         // negedge HREF
         Y_ADDR = Y_ADDR + 1;
         X_ADDR = 0;
@@ -172,13 +177,11 @@ always @(posedge PCLK)begin
         if (HREF) begin
             if (CAM_COUNT == 1'b0)begin
                   W_EN = 1'b0;
-                  //data = CAM_DATA << 8;
 						data[7:0] = CAM_DATA;
                   CAM_COUNT = 1'b1;
                   X_ADDR = X_ADDR;
               end
               else begin
-                 //data = data | CAM_DATA;
 					  data[15:8] = CAM_DATA;
                   CAM_COUNT = 1'b0;
 
@@ -188,30 +191,6 @@ always @(posedge PCLK)begin
                   downsampled[4:2] = data[10:8];
                   downsampled[1:0] = data[4:3];
 
-//						downsampled[7:5] = data[15:13];
-//                  downsampled[4:2] = data[11:9];
-//                  downsampled[1:0] = data[3:2];
-						
-						//downsampled = data[7:0];
-						downsampled[7:5] = {data[15], 2'b0};
-//						downsampled[7:5] = {3'b0};
-						downsampled[4:2] = {data[10], 2'b0};
-//						downsampled[4:2] = {3'b0};
-						downsampled[1:0] = {data[4], 1'b0};
-//						downsampled[1:0] = {2'b0};
-                  
-                  
-//                  downsampled[7:5] = data[4:2]; // close on the color bar, red/blue switch on real :(
-//                  downsampled[4:2] = data[10:8];
-//                  downsampled[1:0] = data[15:14];
-
-//                  downsampled[7:5] = data[7:5]; // what if msb is lsb
-//                  downsampled[4:2] = data[2:0]; // okay probably not
-//                  downsampled[1:0] = data[12:11];
-
-                  //downsampled[7:5] = data[8:6];
-                  //downsampled[4:2] = data[2:0];
-                  //downsampled[1:0] = data[12:11];
                   X_ADDR = X_ADDR + 1;
                   W_EN = 1'b1;
               end
