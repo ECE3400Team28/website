@@ -25,6 +25,7 @@ const int mux_sel_1 = 7;
 const int mux_sel_2 = 1;
 const int rightWallLED = 4;
 const int frontWallLED = 6;
+// const int leftWallLED= ????;
 #define pin_Button   8
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
@@ -88,10 +89,7 @@ int explored = 0;
 //};
 
 uint8_t maze[rows][columns] = { }; // initialized with zeros
-bool visited[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
-
-// The role of the current running sketch
 facing_direction current_dir = S;
 
 class Node {
@@ -100,16 +98,16 @@ class Node {
     uint8_t y;
     int cost;
     Node *parent;
-    Node(uint8_t xCoor, uint8_t yCoor, int c, Node *node) {
+    Node *next;
+    Node(uint8_t xCoor, uint8_t yCoor, int c, Node *node1, Node *node2) {
       x = xCoor;
       y = yCoor;
       cost = c;
-      parent = node;
+      parent = node1;
+      next = node2;
     }
 };
 
-StackArray<Node> frontier;
-StackArray<Node> frontier_a;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
@@ -134,6 +132,7 @@ void setup() {
   pinMode(detectRobotLED, OUTPUT);
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
+  //  pinMode(leftWallLED, OUTPUT);
   pinMode(mux_sel_0, OUTPUT);
   pinMode(mux_sel_1, OUTPUT);
   pinMode(mux_sel_2, OUTPUT);
@@ -176,8 +175,9 @@ void setup() {
 }
 
 void loop() {
-    //Serial.println(F("start loop"));
-    Node n(x, y, 0, NULL);
+    StackArray<Node> frontier;
+    Serial.println(F("start loop"));
+    Node n(x, y, 0, NULL, NULL);
     frontier.push(n);
     while(!frontier.isEmpty()) {
       Node loc = frontier.pop();
@@ -186,19 +186,19 @@ void loop() {
       explore();
       if (explored == rows*columns){
         // we've explored the entire maze!
-        //Serial.println(F("done"));
+        Serial.println(F("done"));
         while(1){
           MotorLeft.write(90);
           MotorRight.write(90);
         }
       }
 
-      // for each action we can take, add the nodes to the frontier.
+      // for each action we can take (move N/S/E/W), add the nodes to the frontier.
       if (maze[x][y] & bm_wall_north == 0) {
         // there's no wall to the north
         if (x-1 >= 0 && maze[x-1][y] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x-1, y, 0, NULL);
+          Node n_new(x-1, y, 0, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -206,7 +206,7 @@ void loop() {
         // there's no wall to the east
         if (y+1 < columns && maze[x][y+1] == 0) {
           // the new location is valid and it has not been explored 
-          Node n_new(x, y+1, 0, NULL);
+          Node n_new(x, y+1, 0, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -214,7 +214,7 @@ void loop() {
         // there's no wall to the south
         if (x+1 < rows && maze[x+1][y] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x+1, y, 0, NULL);
+          Node n_new(x+1, y, 0, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -222,7 +222,7 @@ void loop() {
         // there's no wall to the west
         if (y-1 >= 0 && maze[x][y-1] == 0) {
           // the new location is valid and it has not been explored
-          Node n_new(x, y-1, 0, NULL);
+          Node n_new(x, y-1, 0, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -241,11 +241,24 @@ void loop() {
  *  Uses greedy search to find the shortest path of explored tiles if stuck.
  */
 Node greedy(uint8_t loc_x, uint8_t loc_y) {
+  //StackArray<Node> frontier_g;
+  bool visited[rows][columns] = { }; // initialized with zeros
   int heuristic = abs(x-loc_x) + abs(y-loc_y);
-  Node n(x, y, heuristic, NULL);
-  frontier_a.push(n);
-  while(!frontier_a.isEmpty()){
-    Node loc = frontier_a.pop();
+  Node n(x, y, heuristic, NULL, NULL);
+  Node *first = &n;
+  Node *last = &n;
+  while (first != NULL){
+    Node loc = findAndReturnMin(first);
+    if (&loc == first) {
+      first = loc.next;
+      first->parent = NULL;
+    } else {
+      loc.parent->next = loc.next;
+    }
+    if (&loc == last) {
+      last = loc.parent;
+      last->next = NULL;
+    }
     visited[loc.x][loc.y] = true;
     if (loc.x == loc_x && loc.y == loc_y) return loc;
     
@@ -257,8 +270,9 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
         if (maze[loc.x-1][loc.y] > 0 || (loc.x-1 == loc_x && loc.y == loc_y)) {
           // we have explored this location before OR this location is the goal state
           int heuristic = abs(loc.x-1-loc_x) + abs(loc.y-loc_y);
-          Node n_new(loc.x-1, loc.y, heuristic, &loc);
-          frontier.push(n_new);
+          Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL);
+          last->next = &n_new;
+          last = &n_new;
         }
       }
     }
@@ -269,8 +283,9 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
         if (maze[loc.x][loc.y+1] > 0 || (loc.x == loc_x && loc.y+1 == loc_y)){
           // we have explored this location before OR this location is the goal state
           int heuristic = abs(loc.x-loc_x) + abs(loc.y+1-loc_y);
-          Node n_new(loc.x, loc.y+1, heuristic, &loc);
-          frontier.push(n_new);
+          Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL);
+          last->next = &n_new;
+          last = &n_new;
         }
       }
     }
@@ -281,8 +296,9 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
         if (maze[loc.x+1][loc.y] > 0 || (loc.x+1 == loc_x && loc.y == loc_y)){
           // we have explored this location before OR this location is the goal state
           int heuristic = abs(loc.x+1-loc_x) + abs(loc.y-loc_y);
-          Node n_new(loc.x+1, loc.y, heuristic, &loc);
-          frontier.push(n_new);
+          Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL);
+          last->next = &n_new;
+          last = &n_new;
         }
       }
     }
@@ -293,8 +309,9 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
         if (maze[loc.x][loc.y-1] > 0 || (loc.x == loc_x && loc.y-1 == loc_y)){
           // we have explored this location before OR this location is the goal state
           int heuristic = abs(loc.x-loc_x) + abs(loc.y-1-loc_y);
-          Node n_new(loc.x, loc.y-1, heuristic, &loc);
-          frontier.push(n_new);
+          Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL);
+          last->next = &n_new;
+          last = &n_new;
         }
       }
     }
@@ -302,11 +319,54 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
 }
 
 /*
- * Moves robot to the location described by the node.
+ * Finds and returns the node with the lowest cost. Assumes that the node passed in is not NULL.
+ */
+Node findAndReturnMin(Node *first) {
+  int min_cost = first->cost;
+  Node min_node = *first;
+  while (first != NULL) {
+    if (first->cost < min_cost) {
+      min_cost = first->cost;
+      min_node = *first;
+    }
+    first = first->next;
+  }
+  return min_node;
+}
+
+
+/*
+ * Moves robot to the location described by the node. Obtains the path through the node's parent.
  * Assumptions: There is an open path to the node, but it might encounter enemy robots.
  */
 void moveTo(Node node) {
-  
+  StackArray<Node> path;
+  Node *parent = node.parent;
+  while (parent != NULL) { // the path does not contain the starting (current) location.
+    path.push(node);
+    node = *parent;
+    parent = node.parent;
+  }
+  while (!path.isEmpty()){
+    Node next = path.pop();
+
+    // turn to face the correct direction: the next node should be one tile away.
+    int x_diff = next.x - x;
+    int y_diff = next.y - y;
+    facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
+    while (current_dir != dir_to_face) {
+      if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
+      else turnRight();
+    }
+
+    // move to the next intersection
+    forward();
+    linefollow(); // I changed this to return at the intersection
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    x = next.x;
+    y = next.y;
+  }
 }
 
 /* 
@@ -379,6 +439,7 @@ void forward(){
     MotorRight.write(99);
 }
 
+// Turns robot left 90 degrees and updates the currently facing direction.
 void turnLeft(){
     MotorLeft.write(80);
     MotorRight.write(80);
@@ -405,9 +466,12 @@ void turnLeft(){
     }
     MotorLeft.write(90);
     MotorRight.write(90);
+    if (current_dir == 0) current_dir = (facing_direction) 3;
+    else current_dir = (facing_direction) (current_dir - 1);
     return;
 }
 
+// Turns robot right 90 degrees and updates the currently facing direction.
 void turnRight(){
     MotorLeft.write(100);
     MotorRight.write(100);
@@ -428,6 +492,7 @@ void turnRight(){
     }
     MotorLeft.write(90);
     MotorRight.write(90);
+    current_dir = (facing_direction) ((current_dir + 1) % 4);
     return;
 }
 
@@ -468,7 +533,7 @@ void linefollow(){
      } else if (leftOnLine && rightOnLine) {
            forward();
            delay(650);
-           wallfollow();
+           // wallfollow();
            Serial.println(F("intersection"));
            return;
      } else if (centerOnLine && leftOnLine) {
