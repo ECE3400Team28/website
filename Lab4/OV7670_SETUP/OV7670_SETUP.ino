@@ -1,9 +1,10 @@
-
 #include <Wire.h>
 //#include "help.h"
 
-#define OV7670_I2C_ADDRESS 0x21 /*TODO: write this in hex (eg. 0xAB) */
-#define FPGA_PIN           5
+#define OV7670_I2C_ADDRESS 0x21
+#define FPGA_PIN_2         5
+#define FPGA_PIN_1         6
+#define FPGA_PIN_0         7
 
 int wantcbar = 0;
 uint8_t regs[16][16];
@@ -68,7 +69,6 @@ void setup() {
 
   int reg_to_write[] = {0x00, 0x01, 0x02, 0x04, 0x07, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x14, 0x1e, 0x3e, 0x40, 0x42, 0x70, 0x71, 0x8c};
 //  int reg_to_write[] = {0x0c, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71};
-//  int reg_to_write[] = {0x0c, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71};
   for (int i=0; i<sizeof reg_to_write/sizeof reg_to_write[0]; i++) {
     int num = reg_to_write[i] % 16;
     int num2 = (reg_to_write[i] - num) >> 4;
@@ -86,69 +86,84 @@ void setup() {
 
   set_color_matrix();
   
-  pinMode(FPGA_PIN, INPUT);
+  pinMode(FPGA_PIN_2, INPUT);
+  pinMode(FPGA_PIN_1, INPUT);
+  pinMode(FPGA_PIN_0, INPUT);
 }
 
 void loop(){
-  delay(50000);
-  if (wantcbar == 1) {
-    Serial.println("writing colorbar on");
-    regs[4][2] |= (1 << 3);
-    OV7670_write_register(0x42, regs[4][2]);
-    regs[1][2] |= (1 << 1);
-    OV7670_write_register(0x12, regs[1][2]);
-    regs[7][0] |= (1 << 7);
-    OV7670_write_register(0x70, regs[7][0]);
-    regs[7][1] |= (1 << 7);
-    OV7670_write_register(0x71, regs[7][1]);
-  } else {
-    regs[4][2] &= ~(1 << 3);
-    OV7670_write_register(0x42, regs[4][2]);
-    regs[1][2] &= ~(1 << 1);
-    OV7670_write_register(0x12, regs[1][2]);
-    regs[7][0] &= ~(1 << 7);
-    OV7670_write_register(0x70, regs[7][0]);
-    regs[7][1] &= ~(1 << 7);
-    OV7670_write_register(0x71, regs[7][1]);
-    Serial.println("writing colorbar off");
+  delay(100);
+  int FPGA_read = 0;
+
+  FPGA_read += (digitalRead(FPGA_PIN_2) << 2);
+  FPGA_read += (digitalRead(FPGA_PIN_1) << 1);
+  FPGA_read += (digitalRead(FPGA_PIN_0) << 0);
+  Serial.print(F("Received "));
+  Serial.println(FPGA_read, BIN);
+
+  switch (FPGA_read) {
+    case 0:
+      break;
+    case 1:
+      Serial.println(F("blue square"));
+      break;
+    case 2:
+      Serial.println(F("red square"));
+      break;
+    case 3:
+      Serial.println(F("blue dia"));
+      break;
+    case 4:
+      Serial.println(F("red dia"));
+      break;
+    case 5:
+      Serial.println(F("blue tr"));
+      break;
+    case 6:
+      Serial.println(F("red tr"));
+      break;
+    default:
+      Serial.println(F("No treasure"));
+      break;
   }
   
-  read_key_registers();
-  
-
-//  delay(80);
-//  uint16_t msg_resp=read_after_pinhigh();
-//  Serial.print("Received: ");
-//  Serial.println(msg_resp, BIN);
+//  bool detectBlue = digitalRead(FPGA_PIN_B);
+//  bool detectRed = digitalRead(FPGA_PIN_R);
+//  if (detectBlue && detectRed) {
+//    Serial.println(F("Both colors detected"));
+//  } else if (detectBlue) {
+//    Serial.println(F("Blue treasure detected"));
+//  } else if (detectRed) {
+//    Serial.println(F("Red treasure detected"));
+//  } else {
+//    Serial.println(F("No treasure detected"));
+//  }
 }
 
-uint16_t read_12_bits(){
-  uint16_t msg = 0;
-  for (int i = 0; i < 12; i++) {
-    msg = msg << 1;
-    msg |= digitalRead(FPGA_PIN);
-    delayMicroseconds(100);
-  }
-  return msg;
-}
-
-uint16_t read_after_pinhigh(){
-  uint16_t msg_start = read_12_bits();
-  if (__builtin_popcount(msg_start) > 10)
-    return 0;
-  //return 123;
-  //if (msg_start[11:0]
-  while(!digitalRead(FPGA_PIN))
-    delayMicroseconds(100);
-  delayMicroseconds(100);
-  return read_12_bits();
-}
-
+//uint16_t read_12_bits(){
+//  uint16_t msg = 0;
+//  for (int i = 0; i < 12; i++) {
+//    msg = msg << 1;
+//    msg |= digitalRead(FPGA_PIN);
+//    delayMicroseconds(100);
+//  }
+//  return msg;
+//}
+//
+//uint16_t read_after_pinhigh(){
+//  uint16_t msg_start = read_12_bits();
+//  if (__builtin_popcount(msg_start) > 10)
+//    return 0;
+//  //return 123;
+//  //if (msg_start[11:0]
+//  while(!digitalRead(FPGA_PIN))
+//    delayMicroseconds(100);
+//  delayMicroseconds(100);
+//  return read_12_bits();
+//}
 
 ///////// Function Definition //////////////
 void read_key_registers(){
-  /*TODO: DEFINE THIS FUNCTION*/
-
   int key_regs[] = {0x00, 0x01, 0x02, 0x04, 0x07, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71, 0x8c};
   for (int i=0; i<sizeof key_regs/sizeof key_regs[0]; i++) {
    Serial.print("Reg 0x");
@@ -160,62 +175,6 @@ void read_key_registers(){
    regs[num2][num] = read_register_value(key_regs[i]);
    Serial.println(regs[num2][num], BIN);
   }
-  
-//  Serial.print("Reg 0x00: ");
-//  //Serial.println(read_register_value(0x00), BIN);
-//  regs[0][0] = read_register_value(0x00);
-//  Serial.println(regs[0][0], BIN);
-//  Serial.print("Reg 0x01: ");
-//  regs[0][1] = read_register_value(0x01);
-//  Serial.println(regs[0][1], BIN);
-//  Serial.print("Reg 0x02: ");
-//  regs[0][2] = read_register_value(0x02);
-//  Serial.println(regs[0][2], BIN);
-//  Serial.print("Reg 0x04: ");
-//  regs[0][4] = read_register_value(0x04);
-//  Serial.println(regs[0][4], BIN);
-//  
-//  Serial.print("Reg 0x07: ");
-//  regs[0][7] = read_register_value(0x07);
-//  Serial.println(regs[0][7], BIN);
-//  
-//  Serial.print("Reg 0x0c: COM3 ");
-//  regs[0][12] = read_register_value(0x0c);
-//  Serial.println(regs[0][12], BIN);
-//  
-//  Serial.print("Reg 0x0d: COM4 ");
-//  regs[0][13] = read_register_value(0x0d);
-//  Serial.println(regs[0][13], BIN);
-//  
-//  Serial.print("Reg 0x10: ");
-//  regs[1][0] = read_register_value(0x10);
-//  Serial.println(regs[1][0], BIN);
-//  Serial.print("Reg 0x11: ");
-//  regs[1][1] = read_register_value(0x11);
-//  Serial.println(regs[1][1], BIN);
-//  Serial.print("Reg 0x12: COM7 ");
-//  regs[1][2] = read_register_value(0x12);
-//  Serial.println(regs[1][2], BIN);
-//  Serial.print("Reg 0x1E: ");
-//  regs[1][14] = read_register_value(0x1e);
-//  Serial.println(regs[1][14], BIN);
-//  Serial.print("Reg 0x70: ");
-//  regs[7][0] = read_register_value(0x70);
-//  //Serial.println(regs[7][0]);
-//  Serial.println(regs[7][0], BIN);
-//  Serial.print("Reg 0x40: ");
-//  regs[4][0] = read_register_value(0x40);
-//  //Serial.println(regs[7][0]);
-//  Serial.println(regs[4][0], BIN);
-//  Serial.print("Reg 0x42: ");
-//  regs[4][2] = read_register_value(0x42);
-//  Serial.println(regs[4][2], BIN);
-//  Serial.print("Reg 0x71: ");
-//  regs[7][1] = read_register_value(0x71);
-//  Serial.println(regs[7][1], BIN);
-//  Serial.print("Reg 0x8c: ");
-//  regs[8][12] = read_register_value(0x8c);
-//  Serial.println(regs[8][12], BIN);
 }
 
 byte read_register_value(int register_address){
