@@ -264,14 +264,14 @@ always @(posedge CLK) begin
 		
 		RESULT = 3'b000;
 		if (blue_cnt_p > B_CNT_THRESHOLD) begin
-			if (num_diag_p > DIA_THRESHOLD) RESULT = 3'b100;
-			else if (num_diag_p > TRI_THRESHOLD) RESULT = 3'b110;
-			else RESULT = 3'b010;
-		end
-		if (red_cnt_p > R_CNT_THRESHOLD) begin
 			if (num_diag_p > DIA_THRESHOLD) RESULT = 3'b011;
 			else if (num_diag_p > TRI_THRESHOLD) RESULT = 3'b101;
 			else RESULT = 3'b001;
+		end
+		if (red_cnt_p > R_CNT_THRESHOLD) begin
+			if (num_diag_p > DIA_THRESHOLD) RESULT = 3'b100;
+			else if (num_diag_p > TRI_THRESHOLD) RESULT = 3'b110;
+			else RESULT = 3'b010;
 		end
 		
 //		RESULT = 3'b000;
