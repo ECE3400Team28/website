@@ -1,10 +1,10 @@
-
 #include <Wire.h>
 //#include "help.h"
 
 #define OV7670_I2C_ADDRESS 0x21
-#define FPGA_PIN_B         5
-#define FPGA_PIN_R         6
+#define FPGA_PIN_2         5
+#define FPGA_PIN_1         6
+#define FPGA_PIN_0         7
 
 int wantcbar = 0;
 uint8_t regs[16][16];
@@ -86,23 +86,58 @@ void setup() {
 
   set_color_matrix();
   
-  pinMode(FPGA_PIN_B, INPUT);
-  pinMode(FPGA_PIN_R, INPUT);
+  pinMode(FPGA_PIN_2, INPUT);
+  pinMode(FPGA_PIN_1, INPUT);
+  pinMode(FPGA_PIN_0, INPUT);
 }
 
 void loop(){
   delay(100);
-  bool detectBlue = digitalRead(FPGA_PIN_B);
-  bool detectRed = digitalRead(FPGA_PIN_R);
-  if (detectBlue && detectRed) {
-    Serial.println(F("Both colors detected"));
-  } else if (detectBlue) {
-    Serial.println(F("Blue treasure detected"));
-  } else if (detectRed) {
-    Serial.println(F("Red treasure detected"));
-  } else {
-    Serial.println(F("No treasure detected"));
+  int FPGA_read = 0;
+
+  FPGA_read += (digitalRead(FPGA_PIN_2) << 2);
+  FPGA_read += (digitalRead(FPGA_PIN_1) << 1);
+  FPGA_read += (digitalRead(FPGA_PIN_0) << 0);
+  Serial.print(F("Received "));
+  Serial.println(FPGA_read, BIN);
+
+  switch (FPGA_read) {
+    case 0:
+      break;
+    case 1:
+      Serial.println(F("blue square"));
+      break;
+    case 2:
+      Serial.println(F("red square"));
+      break;
+    case 3:
+      Serial.println(F("blue dia"));
+      break;
+    case 4:
+      Serial.println(F("red dia"));
+      break;
+    case 5:
+      Serial.println(F("blue tr"));
+      break;
+    case 6:
+      Serial.println(F("red tr"));
+      break;
+    default:
+      Serial.println(F("No treasure"));
+      break;
   }
+  
+//  bool detectBlue = digitalRead(FPGA_PIN_B);
+//  bool detectRed = digitalRead(FPGA_PIN_R);
+//  if (detectBlue && detectRed) {
+//    Serial.println(F("Both colors detected"));
+//  } else if (detectBlue) {
+//    Serial.println(F("Blue treasure detected"));
+//  } else if (detectRed) {
+//    Serial.println(F("Red treasure detected"));
+//  } else {
+//    Serial.println(F("No treasure detected"));
+//  }
 }
 
 //uint16_t read_12_bits(){
