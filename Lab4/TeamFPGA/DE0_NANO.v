@@ -129,6 +129,7 @@ IMAGE_PROCESSOR proc(
     .CLK(c1_sig),
     .VGA_PIXEL_X(VGA_PIXEL_X),
     .VGA_PIXEL_Y(VGA_PIXEL_Y),
+	 .VGA_VSYNC_NEG(VGA_VSYNC_NEG),
     .VSYNC(VSYNC),
 	 .prevVSYNC(prevVSYNC),
 	 .prevVSYNC2(prevVSYNC2),
