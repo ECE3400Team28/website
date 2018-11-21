@@ -56,6 +56,7 @@ reg [15:0]              num_diag_d;
 reg [15:0]              num_diag_u_p;
 reg [15:0]              num_diag_d_p;
 reg [15:0]              num_straight;
+reg [15:0]              num_straight_p;
 
 // color counting
 reg [23:0] blue_cnt;
@@ -70,7 +71,32 @@ localparam B_CNT_THRESHOLD = 24'd8000;
 output reg [2:0] RESULT;
 output reg [7:0] PIXEL_OUT;
 
+reg [7:0] PIXEL_OUT_E;
+reg [7:0] PIXEL_OUT_C;
+
+reg [25:0] time_ctr;
+reg [1:0]  curr_output_sel;
+
+// change what output comes out to VGA every few seconds
 always @(posedge CLK) begin
+	time_ctr = time_ctr : 26'b1;
+	if (time_ctr == 26'd0) begin
+		curr_output_sel = curr_output_sel + 2'b1;
+	end
+	if (curr_output_sel[1] = 1'b1) begin
+		PIXEL_OUT = PIXEL_IN;
+	end else if (curr_output_sel = 2'b1) begin
+		PIXEL_OUT = PIXEL_OUT_C;
+	end else begin
+		PIXEL_OUT = PIXEL_OUT_E;
+	end
+end 
+
+assign PIXEL_OUT = PIXEL_OUT_E; // or PIXEL_OUT_E, PIXEL_IN
+
+always @(posedge CLK) begin
+	PIXEL_OUT_C = 8'b000_000_00;
+	PIXEL_OUT_E = 8'b000_000_00;
 	if (prev_VGA_Y != VGA_PIXEL_Y) begin
 		prevPixB2 = prevPixB;
 		prevPixR2 = prevPixR;
@@ -80,23 +106,22 @@ always @(posedge CLK) begin
 		currPixR = {`SCREEN_WIDTH{1'b0}};
 	end
 	if (VGA_PIXEL_X < `SCREEN_WIDTH && VGA_PIXEL_Y < `SCREEN_HEIGHT) begin
-		PIXEL_OUT = 8'b000_000_00;
 //		if (PIXEL_IN[1:0] < 2'b10 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[7:5] < 3'b101) begin
 		if (PIXEL_IN[1:0] <= 2'b10 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[7:5] < 3'b101) begin
 			// all pixels dark - what tends to be blue
 			blue_cnt = blue_cnt + 24'b1;
 			currPixB[VGA_PIXEL_X] = 1'b1;
-			PIXEL_OUT = 8'b000_000_11;
+			PIXEL_OUT_C = 8'b000_000_11;
 		end
 //		if (PIXEL_IN[7:5] > 3'b010 && PIXEL_IN[4:2] < 3'b011 && PIXEL_IN[1:0] <= 2'b10) begin
 		if (PIXEL_IN[7:5] >= 3'b010 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[1:0] <= 2'b10) begin
 			// anything somewhat red
 			red_cnt = red_cnt + 24'b1;
 			currPixR[VGA_PIXEL_X] = 1'b1;
-			PIXEL_OUT = 8'b111_000_00;
+			PIXEL_OUT_C = 8'b111_000_00;
 		end
 //		if (PIXEL_IN[1:0] >= 2'b10 && PIXEL_IN[4:2] > 3'b101 && PIXEL_IN[7:5] > 3'b101) begin
-//			PIXEL_OUT = 8'b111_111_11;
+//			PIXEL_OUT_C = 8'b111_111_11;
 //		end
 		if (PIXEL_IN[1:0] < 2'b10) null_cnt = null_cnt + 24'b1;
 		
@@ -125,49 +150,49 @@ always @(posedge CLK) begin
 			case (blue_recent)
 				9'b111_110_100: begin
 					// upper left
-					PIXEL_OUT = 8'b000_000_11;
+					PIXEL_OUT_E = 8'b000_000_11;
 					num_diag_u = num_diag_u + 1;
 				end
 				9'b111_011_001: begin
 					// upper right
-					PIXEL_OUT = 8'b000_000_11;
+					PIXEL_OUT_E = 8'b000_000_11;
 					num_diag_u = num_diag_u + 1;
 				end
 				9'b001_011_111: begin
 					// bottom right
-					PIXEL_OUT = 8'b000_000_11;
+					PIXEL_OUT_E = 8'b000_000_11;
 					num_diag_d = num_diag_d + 1;
 				end
 				9'b100_110_111: begin
 					// bottom left
-					PIXEL_OUT = 8'b000_000_11;
+					PIXEL_OUT_E = 8'b000_000_11;
 					num_diag_d = num_diag_d + 1;
 				end
-				default: PIXEL_OUT = PIXEL_OUT;
+				default: PIXEL_OUT_E = PIXEL_OUT_E;
 			endcase
 			
 			case (red_recent)
 				9'b111_110_100: begin
 					// upper left
-					PIXEL_OUT = 8'b111_000_00;
+					PIXEL_OUT_E = 8'b111_000_00;
 					num_diag_u = num_diag_u + 1;
 				end
 				9'b111_011_001: begin
 					// upper right
-					PIXEL_OUT = 8'b111_000_00;
+					PIXEL_OUT_E = 8'b111_000_00;
 					num_diag_u = num_diag_u + 1;
 				end
 				9'b001_011_111: begin
 					// bottom right
-					PIXEL_OUT = 8'b111_000_00;
+					PIXEL_OUT_E = 8'b111_000_00;
 					num_diag_d = num_diag_d + 1;
 				end
 				9'b100_110_111: begin
 					// bottom left
-					PIXEL_OUT = 8'b111_000_00;
+					PIXEL_OUT_E = 8'b111_000_00;
 					num_diag_d = num_diag_d + 1;
 				end
-				default: PIXEL_OUT = PIXEL_OUT;
+				default: PIXEL_OUT_E = PIXEL_OUT_E;
 			endcase
 		end
 	end
@@ -220,7 +245,6 @@ always @(posedge CLK) begin
 	
 	VGA_VSYNC_PREV = VGA_VSYNC_NEG;
 	prev_VGA_Y = VGA_PIXEL_Y;
-//	PIXEL_OUT = PIXEL_IN;
 end
 
 endmodule
