@@ -55,8 +55,8 @@ const uint8_t bm_treasure      = 112 ;// 7 << 4
 const uint8_t bm_treasure_none = 0  ; // 0 << 4
 const uint8_t bm_treasure_b_sq = 16 ; // 1 << 4
 const uint8_t bm_treasure_r_sq = 32 ; // 2 << 4
-const uint8_t bm_treasure_b_ci = 48 ; // 3 << 4
-const uint8_t bm_treasure_r_co = 64 ; // 4 << 4
+const uint8_t bm_treasure_b_di = 48 ; // 3 << 4
+const uint8_t bm_treasure_r_di = 64 ; // 4 << 4
 const uint8_t bm_treasure_b_tr = 80 ; // 5 << 4
 const uint8_t bm_treasure_r_tr = 96 ; // 6 << 4
 
@@ -65,11 +65,6 @@ const uint8_t bm_explored    = 128;
 const uint8_t bm_not_explored = 0;
 //#define explored_shift  7
 
-//// presence of other robot
-//#define bm_robot    1 << 1
-//#define bm_no_robot 0 << 1
-//#define robot_shift 1
-
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
@@ -77,17 +72,6 @@ uint8_t y = 0;
 const int rows = 2;
 const int columns = 3;
 int explored = 0;
-//uint8_t maze[9][9] = {
-// {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
-//};
 
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -464,7 +448,7 @@ void explore() {
   }
 
   maze[x][y] |= bm_explored;
-  broadcast(); // keep broadcasting until successful
+  broadcast();
   explored++;
 }
 
@@ -480,21 +464,11 @@ void turnLeft() {
   delay(600); // move away from current line
   // added the following check for current status:
 
-  //    LightDataC = analogRead(LightCenter);
-  //    delay(1);
-  //    LightDataL = analogRead(LightLeft);
-  //    delay(1);
-  //    LightDataR = analogRead(LightRight);
-  //    delay(1);
-
   readMux();
 
   // end check;
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
-    //       LightDataC = analogRead(LightCenter);
-    //       LightDataL = analogRead(LightLeft);
-    //       LightDataR = analogRead(LightRight);
 
     readMux();
   }
@@ -511,17 +485,11 @@ void turnRight() {
   MotorRight.write(100);
   delay(600); // move away from current line
   // added the following check for current status:
-  //    LightDataC = analogRead(LightCenter);
-  //    LightDataL = analogRead(LightLeft);
-  //    LightDataR = analogRead(LightRight);
 
   readMux();
   // end check
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
-    //       LightDataC = analogRead(LightCenter);
-    //       LightDataL = analogRead(LightLeft);
-    //       LightDataR = analogRead(LightRight);
     readMux();
   }
   MotorLeft.write(90);
@@ -533,24 +501,6 @@ void turnRight() {
 void linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
-  //
-  //     digitalWrite(mux_sel_0, HIGH);
-  //     digitalWrite(mux_sel_0, HIGH);
-  //     digitalWrite(mux_sel_0, LOW);
-  //     delay(20);
-  //     LightDataC = analogRead(A5);
-  //
-  //     digitalWrite(mux_sel_0, HIGH);
-  //     digitalWrite(mux_sel_0, LOW);
-  //     digitalWrite(mux_sel_0, HIGH);
-  //     delay(20);
-  //     LightDataL = analogRead(A5);
-  //
-  //     digitalWrite(mux_sel_0, LOW);
-  //     digitalWrite(mux_sel_0, LOW);
-  //     digitalWrite(mux_sel_0, HIGH);
-  //     delay(20);
-  //     LightDataR = analogRead(A5);
 
   readMux();
 
@@ -606,24 +556,6 @@ void linefollow() {
 void wallfollow() {
   MotorLeft.write(90);
   MotorRight.write(90);
-
-  //  digitalWrite(mux_sel_0, LOW);  //when 000 we read from the front wall
-  //  digitalWrite(mux_sel_1, LOW);
-  //  digitalWrite(mux_sel_2, LOW);
-  //  delay(20);
-  //  wallFront = analogRead(A5);
-  //
-  //  digitalWrite(mux_sel_0, HIGH);  //when 001 we read from the right wall
-  //  digitalWrite(mux_sel_1, LOW);
-  //  digitalWrite(mux_sel_2, LOW);
-  //  delay(20);
-  //  wallRight = analogRead(A5);
-  //
-  //  digitalWrite(mux_sel_0, LOW);  //when 010 we read from the left wall
-  //  digitalWrite(mux_sel_1, HIGH);
-  //  digitalWrite(mux_sel_2, LOW);
-  //  delay(20);
-  //  wallLeft = analogRead(A5);
 
   readMux();
 
@@ -695,15 +627,6 @@ void wallfollow() {
     turnLeft();
     if (current_dir - 1 < 0) current_dir = (facing_direction) 3;
     else current_dir = (facing_direction) (current_dir - 1);
-
-    //delay(1000);
-    //
-    //      digitalWrite(mux, HIGH); //when high we read from the right wall
-    //      delay(20);
-    //      wallRight = analogRead(A5);
-    //      digitalWrite(mux, LOW);  //when low we read from the front wall
-    //      delay(20);
-    //      wallFront = analogRead(A5);
 
     readMux();
 
@@ -859,8 +782,7 @@ boolean readSignal() {
   Serial.println(fht_log_out[19]);
   for (int j = 17; j < 23; ++j) {
     if (fht_log_out[j] >= 60) {
-      //We have detected another robot
-      // return settings to original
+      //660 Hz signal detected
       return true;
     }
   }
