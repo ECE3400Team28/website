@@ -24,18 +24,22 @@ void setup() {
   OV7670_write_register(0x12, B10000000);
   delay(100);
   
-  for (int i1=0; i1<15; i1++) {
-    for (int j1=0; j1<15; j1++) {
-      regs[i1][j1] = read_register_value(16*i1+j1);
-    }
-  }
+//  for (int i1=0; i1<15; i1++) {
+//    for (int j1=0; j1<15; j1++) {
+//      regs[i1][j1] = read_register_value(16*i1+j1);
+//    }
+//  }
   
   read_key_registers();
   
   delay(100);
 
+//  regs[0][0] = B00000001;
+//  regs[0][2] = B00000000;
+  regs[0][3] |= (1 << 7) | (1 << 6);
   regs[0][7] |= (1 << 3);
-  
+ // regs[0][1] = 0;
+ // regs[0][2] = 0;
   // com3 - bit 3 set for scaling
   //regs[0][12] |= (1 << 3);
   // com14 - bit 3 for manual scaling
@@ -60,15 +64,24 @@ void setup() {
   }
   regs[1][2] &= ~(1 << 0);
   regs[1][3] |= (1 << 1) | (1 << 2) | (1 << 3);
+ // regs[1][3] |= (1 << 1);
+ // regs[1][3] &= ~(1 << 2);
   regs[1][4] = B00000001;
   // COM9 - clear 6:3 for 2x gain ceiling, 0 to set gain
-  regs[1][14] |= (1 << 0);
+  //regs[1][14] |= (1 << 0);
+  regs[1][14] = 0;
   // 11 for 0 to ff color, bits 5:4 to 01 for RGB 565
   regs[4][0] |= (1 << 7) | (1 << 6) | (1 << 4);
-  regs[8][12] &= ~(1 << 1);
+
+  // RGB 444 off
+//  regs[8][12] &= ~(1 << 1);
+  // RGB 444 on
+   regs[8][12] |= (1 << 1);
 
   int reg_to_write[] = {0x00, 0x01, 0x02, 0x04, 0x07, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x14, 0x1e, 0x3e, 0x40, 0x42, 0x70, 0x71, 0x8c};
+   // int reg_to_write[] = {0x00, 0x03, 0x04, 0x07, 0x0c, 0x10, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42};
 //  int reg_to_write[] = {0x0c, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71};
+//  int reg_to_write[] = {0x02, 0x12, 0x40};
   for (int i=0; i<sizeof reg_to_write/sizeof reg_to_write[0]; i++) {
     int num = reg_to_write[i] % 16;
     int num2 = (reg_to_write[i] - num) >> 4;
@@ -79,6 +92,8 @@ void setup() {
     Serial.print(": ");
     Serial.println(regs[num2][num], BIN);
   }
+
+  //OV7670_write_register(0x
   
   delay(10);
   Serial.println("Reading back registers");
@@ -164,7 +179,7 @@ void loop(){
 
 ///////// Function Definition //////////////
 void read_key_registers(){
-  int key_regs[] = {0x00, 0x01, 0x02, 0x04, 0x07, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71, 0x8c};
+  int key_regs[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x07, 0x0b, 0x0c, 0x10, 0x11, 0x12, 0x13, 0x14, 0x1e, 0x40, 0x42, 0x70, 0x71, 0x8c};
   for (int i=0; i<sizeof key_regs/sizeof key_regs[0]; i++) {
    Serial.print("Reg 0x");
    int num = key_regs[i] % 16;

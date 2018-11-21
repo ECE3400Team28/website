@@ -100,18 +100,6 @@ always @(posedge CLK) begin
 //		end
 		if (PIXEL_IN[1:0] < 2'b10) null_cnt = null_cnt + 24'b1;
 		
-		// color edges
-//		if (currPixB[VGA_PIXEL_X] && ~prevPixB[VGA_PIXEL_X]) begin
-//			PIXEL_OUT = 8'b000_000_11;
-//		end else if (~currPixB[VGA_PIXEL_X] && prevPixB[VGA_PIXEL_X]) begin
-//			PIXEL_OUT = 8'b000_000_10;
-//		end
-//		if (currPixR[VGA_PIXEL_X] && ~prevPixR[VGA_PIXEL_X]) begin
-//			PIXEL_OUT = 8'b111_000_00;
-//		end else if (~currPixR[VGA_PIXEL_X] && prevPixR[VGA_PIXEL_X]) begin
-//			PIXEL_OUT = 8'b011_000_00;
-//		end
-
 		if ((VGA_PIXEL_X > 1) && (VGA_PIXEL_X < `SCREEN_WIDTH-2) && (VGA_PIXEL_Y > 1) && (VGA_PIXEL_Y < `SCREEN_HEIGHT-2)) begin
 			// for the pixels in the center
 			blue_recent[8] = prevPixB2[VGA_PIXEL_X-2];
@@ -155,26 +143,6 @@ always @(posedge CLK) begin
 					PIXEL_OUT = 8'b000_000_11;
 					num_diag_d = num_diag_d + 1;
 				end
-//				9'b000_111_111: begin
-//					// bottom
-//					PIXEL_OUT = 8'b000_000_10;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b111_111_000: begin
-//					// top
-//					PIXEL_OUT = 8'b000_000_10;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b011_011_011: begin
-//					// right
-//					PIXEL_OUT = 8'b000_000_10;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b110_110_110: begin
-//					// left
-//					PIXEL_OUT = 8'b000_000_10;
-//					num_straight = num_straight + 1;
-//				end
 				default: PIXEL_OUT = PIXEL_OUT;
 			endcase
 			
@@ -199,26 +167,6 @@ always @(posedge CLK) begin
 					PIXEL_OUT = 8'b111_000_00;
 					num_diag_d = num_diag_d + 1;
 				end
-//				9'b000_111_111: begin
-//					// bottom
-//					PIXEL_OUT = 8'b011_000_00;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b111_111_000: begin
-//					// top
-//					PIXEL_OUT = 8'b011_000_00;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b011_011_011: begin
-//					// right
-//					PIXEL_OUT = 8'b011_000_00;
-//					num_straight = num_straight + 1;
-//				end
-//				9'b110_110_110: begin
-//					// left
-//					PIXEL_OUT = 8'b011_000_00;
-//					num_straight = num_straight + 1;
-//				end
 				default: PIXEL_OUT = PIXEL_OUT;
 			endcase
 		end
