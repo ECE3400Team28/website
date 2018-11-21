@@ -187,11 +187,28 @@ always @(posedge PCLK)begin
                   CAM_COUNT = 1'b0;
 
 // currently gets best results
+//
+//						downsampled[7:5] = data[15:13];
+////                  downsampled[4:2] = data[10:8];
+//						downsampled[4:2] = 3'b0;
+//                  downsampled[1:0] = data[4:3];
 
-						downsampled[7:5] = data[15:13];
-                  downsampled[4:2] = data[10:8];
-                  downsampled[1:0] = data[4:3];
+//						downsampled[7:5] = data[7:5];
+////                  downsampled[4:2] = data[10:8];
+//						downsampled[4:2] = 3'b0;
+//                  downsampled[1:0] = data[11:10];
 
+// 444 msb second
+						downsampled[7:5] = data[11:9];
+                  downsampled[4:2] = data[7:5];
+//						downsampled[4:2] = 3'b0;
+                  downsampled[1:0] = data[3:2];
+
+// 444 msb first
+//						downsampled[7:5] = data[3:1];
+//                  downsampled[4:2] = data[15:13];
+////						downsampled[4:2] = 3'b0;
+//                  downsampled[1:0] = data[11:10];
                   X_ADDR = X_ADDR + 1;
                   W_EN = 1'b1;
               end

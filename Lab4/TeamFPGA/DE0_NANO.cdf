@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE22F17) Path("G:/ECE3400/TeamFPGA/") File("DE0_NANO.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE22F17) Path("F:/ECE3400/TeamFPGA/") File("DE0_NANO.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
