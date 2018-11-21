@@ -19,14 +19,14 @@ int wallRight;
 int wallFront;
 int wallLeft;
 
-const int detectRobotLED = 6;
+//const int detectRobotLED = ??;
 //const int mux = 7;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
 const int mux_sel_2 = 1;
 const int rightWallLED = 4;
 const int frontWallLED = 6;
-// const int leftWallLED= ????;
+const int leftWallLED = 18;
 #define pin_Button   8
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
@@ -55,23 +55,39 @@ const uint8_t bm_treasure      = 112 ;// 7 << 4
 const uint8_t bm_treasure_none = 0  ; // 0 << 4
 const uint8_t bm_treasure_b_sq = 16 ; // 1 << 4
 const uint8_t bm_treasure_r_sq = 32 ; // 2 << 4
-const uint8_t bm_treasure_b_di = 48 ; // 3 << 4
-const uint8_t bm_treasure_r_di = 64 ; // 4 << 4
+const uint8_t bm_treasure_b_ci = 48 ; // 3 << 4
+const uint8_t bm_treasure_r_co = 64 ; // 4 << 4
 const uint8_t bm_treasure_b_tr = 80 ; // 5 << 4
 const uint8_t bm_treasure_r_tr = 96 ; // 6 << 4
 
 // whether square explored
 const uint8_t bm_explored    = 128;
 const uint8_t bm_not_explored = 0;
+//#define explored_shift  7
+
+//// presence of other robot
+//#define bm_robot    1 << 1
+//#define bm_no_robot 0 << 1
+//#define robot_shift 1
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
-
 uint8_t x = 0;
 uint8_t y = 0;
 const int rows = 2;
 const int columns = 3;
 int explored = 0;
+//uint8_t maze[9][9] = {
+// {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
+//};
 
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -94,13 +110,13 @@ void setup() {
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
   int PWM2 = 3;
-  pinMode(PWM1, OUTPUT);
-  pinMode(PWM2, OUTPUT);
-  pinMode(A5, INPUT);           //MUX output
-  pinMode(detectRobotLED, OUTPUT);
+  pinMode(PWM1, OUTPUT); 
+  pinMode(PWM2, OUTPUT); 
+  pinMode(A5, INPUT);           //MUX output 
+  // pinMode(detectRobotLED, OUTPUT);
+  pinMode(leftWallLED, OUTPUT);
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
-  //  pinMode(leftWallLED, OUTPUT);
   pinMode(mux_sel_0, OUTPUT);
   pinMode(mux_sel_1, OUTPUT);
   pinMode(mux_sel_2, OUTPUT);
@@ -142,73 +158,83 @@ void setup() {
   delay(2000);
 }
 
-void loop() {
-  StackArray<Node> frontier;
-  Serial.println(F("start loop"));
-  Node n(x, y, 0, NULL, NULL);
-  frontier.push(n);
-  while (!frontier.isEmpty()) {
-    Node loc = frontier.pop();
-    moveTo(greedy(loc.x, loc.y));
-    // now we are at the new location, so explore it
-    explore();
-    if (explored == rows * columns) {
-      // we've explored the entire maze!
-      Serial.println(F("done"));
-      while (1) {
-        MotorLeft.write(90);
-        MotorRight.write(90);
+void loop() { // try not using stackarray- use doubly linked list
+    StackArray<Node> frontier;
+    Serial.println(F("start loop"));
+    Node n(x, y, 0, NULL, NULL);
+    frontier.push(n);
+    while(!frontier.isEmpty()) {
+      Node loc = frontier.pop();
+      Serial.print(loc.x);
+      Serial.println(loc.y);
+      moveTo(greedy(loc.x, loc.y));
+      // now we are at the new location, so explore it
+      explore();
+      if (explored == rows*columns){
+        // we've explored the entire maze!
+        Serial.println(F("done"));
+        while(1){
+          MotorLeft.write(90);
+          MotorRight.write(90);
+        }
+      }
+      
+      // for each action we can take (move N/S/E/W), add the nodes to the frontier. **CHANGE THIS TO ADD NODES IN ORDER DEPENDING ON CURRENT DIR**
+      if (!(maze[x][y] & bm_wall_north)) {
+        // there's no wall to the north
+        if (x-1 >= 0 && !(maze[x-1][y])) {
+          Serial.println(F("nodeN"));
+          // the new location is valid and it has not been explored
+          Node n_new(x-1, y, 0, NULL, NULL);
+          frontier.push(n_new);
+        }
+      }
+      if (!(maze[x][y] & bm_wall_east)) {
+        // there's no wall to the east
+        if (y+1 < columns && !(maze[x][y+1])) {
+          Serial.println(F("nodeE"));
+          // the new location is valid and it has not been explored 
+          Node n_new(x, y+1, 0, NULL, NULL);
+          frontier.push(n_new);
+        }
+      }
+      if (!(maze[x][y] & bm_wall_south)) {
+        // there's no wall to the south
+        if (x+1 < rows && !(maze[x+1][y])) {
+          Serial.println(F("nodeS"));
+          // the new location is valid and it has not been explored
+          Node n_new(x+1, y, 0, NULL, NULL);
+          frontier.push(n_new);
+        }
+      }
+      if (!(maze[x][y] & bm_wall_west)) {
+        // there's no wall to the west
+        if (y-1 >= 0 && !(maze[x][y-1])) {
+          Serial.println(F("nodeW"));
+          // the new location is valid and it has not been explored
+          Node n_new(x, y-1, 0, NULL, NULL);
+          frontier.push(n_new);
+        }
       }
     }
-
-    // for each action we can take (move N/S/E/W), add the nodes to the frontier.
-    if (maze[x][y] & bm_wall_north == 0) {
-      // there's no wall to the north
-      if (x - 1 >= 0 && maze[x - 1][y] == 0) {
-        // the new location is valid and it has not been explored
-        Node n_new(x - 1, y, 0, NULL, NULL);
-        frontier.push(n_new);
-      }
-    }
-    if (maze[x][y] & bm_wall_east == 0) {
-      // there's no wall to the east
-      if (y + 1 < columns && maze[x][y + 1] == 0) {
-        // the new location is valid and it has not been explored
-        Node n_new(x, y + 1, 0, NULL, NULL);
-        frontier.push(n_new);
-      }
-    }
-    if (maze[x][y] & bm_wall_south == 0) {
-      // there's no wall to the south
-      if (x + 1 < rows && maze[x + 1][y] == 0) {
-        // the new location is valid and it has not been explored
-        Node n_new(x + 1, y, 0, NULL, NULL);
-        frontier.push(n_new);
-      }
-    }
-    if (maze[x][y] & bm_wall_west == 0) {
-      // there's no wall to the west
-      if (y - 1 >= 0 && maze[x][y - 1] == 0) {
-        // the new location is valid and it has not been explored
-        Node n_new(x, y - 1, 0, NULL, NULL);
-        frontier.push(n_new);
-      }
-    }
-  }
-  // IR
-
-  //    if (detect()){
-  //      turnLeft();
-  //      digitalWrite(detectRobotLED, HIGH);
-  //    } else {
-  //      digitalWrite(detectRobotLED, LOW);
-  //    }
+    Serial.println(F("frontier is empty: should not reach this"));
+    while (1) {}
+    // IR
+    
+//    if (detect()){
+//      turnLeft();
+//      digitalWrite(detectRobotLED, HIGH);
+//    } else {
+//      digitalWrite(detectRobotLED, LOW);
+//    }
 }
 
 /*
     Uses greedy search to find the shortest path of explored tiles if stuck.
 */
 Node greedy(uint8_t loc_x, uint8_t loc_y) {
+  //StackArray<Node> frontier_g;
+  Serial.println(F("calculating path"));
   bool visited[rows][columns] = { }; // initialized with zeros
   int heuristic = abs(x - loc_x) + abs(y - loc_y);
   Node n(x, y, heuristic, NULL, NULL);
@@ -227,57 +253,86 @@ Node greedy(uint8_t loc_x, uint8_t loc_y) {
       last->next = NULL;
     }
     visited[loc.x][loc.y] = true;
-    if (loc.x == loc_x && loc.y == loc_y) return loc;
+    Serial.print(loc.x);
+    Serial.print(loc.y);
+    Serial.print(loc_x);
+    Serial.println(loc_y);
+    if (loc.x == loc_x && loc.y == loc_y) {
+      Serial.println(F("found loc"));
+      return loc;
+    }
 
     // for each action we can take, add the nodes to the frontier.
-    if (maze[loc.x][loc.y] & bm_wall_north == 0) {
+    if (!(maze[loc.x][loc.y] & bm_wall_north)) {
       // there's no wall to the north
       if (loc.x - 1 >= 0 && !visited[loc.x - 1][loc.y]) {
         // the new location is valid and we have not visited it
         if (maze[loc.x - 1][loc.y] > 0 || (loc.x - 1 == loc_x && loc.y == loc_y)) {
           // we have explored this location before OR this location is the goal state
-          int heuristic = abs(loc.x - 1 - loc_x) + abs(loc.y - loc_y);
-          Node n_new(loc.x - 1, loc.y, heuristic, &loc, NULL);
-          last->next = &n_new;
+          Serial.println(F("N"));
+          int heuristic = abs(loc.x-1-loc_x) + abs(loc.y-loc_y);
+          Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL);
+          if (first == NULL) {
+            first = &n_new;
+          } else {
+            last->next = &n_new;
+          }
           last = &n_new;
         }
       }
     }
-    if (maze[loc.x][loc.y] & bm_wall_east == 0) {
+    if (!(maze[loc.x][loc.y] & bm_wall_east)) {
       // there's no wall to the east
       if (loc.y + 1 < columns && !visited[loc.x][loc.y + 1] ) {
         // the new location is valid and we have not visited it
         if (maze[loc.x][loc.y + 1] > 0 || (loc.x == loc_x && loc.y + 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
-          int heuristic = abs(loc.x - loc_x) + abs(loc.y + 1 - loc_y);
-          Node n_new(loc.x, loc.y + 1, heuristic, &loc, NULL);
-          last->next = &n_new;
+          Serial.println(F("E"));
+          int heuristic = abs(loc.x-loc_x) + abs(loc.y+1-loc_y);
+          Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL);
+          Serial.print(n_new.x);
+          Serial.println(n_new.y);
+          if (first == NULL) {
+            first = &n_new;
+          } else {
+            last->next = &n_new;
+          }
           last = &n_new;
         }
       }
     }
-    if (maze[loc.x][loc.y] & bm_wall_south == 0) {
+    if (!(maze[loc.x][loc.y] & bm_wall_south)) {
       // there's no wall to the south
       if (loc.x + 1 < rows && !visited[loc.x + 1][loc.y]) {
         // the new location is valid and it has not been explored
         if (maze[loc.x + 1][loc.y] > 0 || (loc.x + 1 == loc_x && loc.y == loc_y)) {
           // we have explored this location before OR this location is the goal state
-          int heuristic = abs(loc.x + 1 - loc_x) + abs(loc.y - loc_y);
-          Node n_new(loc.x + 1, loc.y, heuristic, &loc, NULL);
-          last->next = &n_new;
+          Serial.println(F("S"));
+          int heuristic = abs(loc.x+1-loc_x) + abs(loc.y-loc_y);
+          Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL);
+          if (first == NULL) {
+            first = &n_new;
+          } else {
+            last->next = &n_new;
+          }
           last = &n_new;
         }
       }
     }
-    if (maze[loc.x][loc.y] & bm_wall_west == 0) {
+    if (!(maze[loc.x][loc.y] & bm_wall_west)) {
       // there's no wall to the west
       if (loc.y - 1 >= 0 && !visited[loc.x][loc.y - 1]) {
         // the new location is valid and it has not been explored
         if (maze[loc.x][loc.y - 1] > 0 || (loc.x == loc_x && loc.y - 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
-          int heuristic = abs(loc.x - loc_x) + abs(loc.y - 1 - loc_y);
-          Node n_new(loc.x, loc.y - 1, heuristic, &loc, NULL);
-          last->next = &n_new;
+          Serial.print(F("W"));
+          int heuristic = abs(loc.x-loc_x) + abs(loc.y-1-loc_y);
+          Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL);
+          if (first == NULL) {
+            first = &n_new;
+          } else {
+            last->next = &n_new;
+          }
           last = &n_new;
         }
       }
@@ -307,16 +362,28 @@ Node findAndReturnMin(Node *first) {
    Assumptions: There is an open path to the node, but it might encounter enemy robots.
 */
 void moveTo(Node node) {
+  if (x == node.x && y == node.y) {
+    // we are already at the location
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    return;
+  }
+  Serial.println(F("moving"));
   StackArray<Node> path;
   Node *parent = node.parent;
-  while (parent != NULL) { // the path does not contain the starting (current) location.
+ // while (parent != NULL) { // the path does not contain the starting (current) location.
+    Serial.println(node.x);
+    Serial.println(node.y);
     path.push(node);
     node = *parent;
     parent = node.parent;
-  }
-  while (!path.isEmpty()) {
+    
+  //}
+  Serial.println(F("done"));
+  while (!path.isEmpty()){
     Node next = path.pop();
-
+    Serial.println(next.x);
+    Serial.println(next.y);
     // turn to face the correct direction: the next node should be one tile away.
     int x_diff = next.x - x;
     int y_diff = next.y - y;
@@ -382,7 +449,7 @@ void explore() {
 
   // check the left wall
   if (wallLeft >= LEFTTHRESHOLD) {
-    //digitalWrite(leftWallLED, HIGH);
+    digitalWrite(leftWallLED, HIGH);
     if (current_dir == N) {
       maze[x][y] |= bm_wall_west;
     } else if (current_dir == E) {
@@ -393,11 +460,11 @@ void explore() {
       maze[x][y] |= bm_wall_south;
     }
   } else {
-    //digitalWrite(leftWallLED, LOW);   // turn the LED off by making the voltage LOW
+    digitalWrite(leftWallLED, LOW);   // turn the LED off by making the voltage LOW
   }
 
   maze[x][y] |= bm_explored;
-  broadcast();
+  broadcast(); // keep broadcasting until successful
   explored++;
 }
 
@@ -411,12 +478,24 @@ void turnLeft() {
   MotorLeft.write(80);
   MotorRight.write(80);
   delay(600); // move away from current line
-  
   // added the following check for current status:
+
+  //    LightDataC = analogRead(LightCenter);
+  //    delay(1);
+  //    LightDataL = analogRead(LightLeft);
+  //    delay(1);
+  //    LightDataR = analogRead(LightRight);
+  //    delay(1);
+
   readMux();
+
   // end check;
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
+    //       LightDataC = analogRead(LightCenter);
+    //       LightDataL = analogRead(LightLeft);
+    //       LightDataR = analogRead(LightRight);
+
     readMux();
   }
   MotorLeft.write(90);
@@ -431,10 +510,18 @@ void turnRight() {
   MotorLeft.write(100);
   MotorRight.write(100);
   delay(600); // move away from current line
-  
+  // added the following check for current status:
+  //    LightDataC = analogRead(LightCenter);
+  //    LightDataL = analogRead(LightLeft);
+  //    LightDataR = analogRead(LightRight);
+
   readMux();
   // end check
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
+    // keep checking
+    //       LightDataC = analogRead(LightCenter);
+    //       LightDataL = analogRead(LightLeft);
+    //       LightDataR = analogRead(LightRight);
     readMux();
   }
   MotorLeft.write(90);
@@ -444,10 +531,29 @@ void turnRight() {
 }
 
 void linefollow() {
-  readMux();
-  
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
+  //
+  //     digitalWrite(mux_sel_0, HIGH);
+  //     digitalWrite(mux_sel_0, HIGH);
+  //     digitalWrite(mux_sel_0, LOW);
+  //     delay(20);
+  //     LightDataC = analogRead(A5);
+  //
+  //     digitalWrite(mux_sel_0, HIGH);
+  //     digitalWrite(mux_sel_0, LOW);
+  //     digitalWrite(mux_sel_0, HIGH);
+  //     delay(20);
+  //     LightDataL = analogRead(A5);
+  //
+  //     digitalWrite(mux_sel_0, LOW);
+  //     digitalWrite(mux_sel_0, LOW);
+  //     digitalWrite(mux_sel_0, HIGH);
+  //     delay(20);
+  //     LightDataR = analogRead(A5);
+
+  readMux();
+
   bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
   bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
   bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
@@ -635,47 +741,47 @@ void wallfollow() {
   return;
 }
 
-void readMux() {
+void readMux() { // change this so we only read once based on the input mux select value
   // 000 Front wall
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delayMicroseconds(20);
+  delay(20);
   wallFront = analogRead(A5);
 
   // 001 Right wall
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delayMicroseconds(20);
+  delay(20);
   wallRight = analogRead(A5);
 
   // 010 Left wall
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delayMicroseconds(20);
+  delay(20);
   wallLeft = analogRead(A5);
 
   // 011 front line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delayMicroseconds(20);
+  delay(20);
   LightDataC = analogRead(A5);
 
   // 100 right line
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delayMicroseconds(20);
+  delay(20);
   LightDataR = analogRead(A5);
 
   // 101 left line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delayMicroseconds(20);
+  delay(20);
   LightDataL = analogRead(A5);
 
   // 110 microphone
@@ -753,7 +859,8 @@ boolean readSignal() {
   Serial.println(fht_log_out[19]);
   for (int j = 17; j < 23; ++j) {
     if (fht_log_out[j] >= 60) {
-      // 660 Hz signal detected
+      //We have detected another robot
+      // return settings to original
       return true;
     }
   }

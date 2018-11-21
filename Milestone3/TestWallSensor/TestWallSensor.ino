@@ -5,15 +5,17 @@ int wallLeft;
 
 int rightWallLED = 13;
 int frontWallLED = 12;
-int SOMETHRESHOLD = 1;
+int leftWallLED  = 18;
+int SOMETHRESHOLD = 600;
 
-#define pin_PowerMux 1
+//#define pin_PowerMux 1
 
 int LightCenter = A2;
 int LightRight = A3;
 int LightLeft = A1;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
+const int mux_sel_2 = 17;
 
 void setup() {
   // put your setup code here, to run once:
@@ -27,7 +29,8 @@ void setup() {
 
     pinMode(mux_sel_0, OUTPUT);
     pinMode(mux_sel_1, OUTPUT);
-    pinMode(pin_PowerMux, INPUT);
+    pinMode(mux_sel_2, OUTPUT);
+//    pinMode(pin_PowerMux, INPUT);
     
     Serial.begin(9600);
 }
@@ -52,30 +55,33 @@ void outputLine(){
 }
 
 void outputWall(){
-  pinMode(pin_PowerMux, OUTPUT);
-  digitalWrite(pin_PowerMux, LOW);
-  delay(100);
-  digitalWrite(pin_PowerMux, HIGH);
-  delay(100);
-  digitalWrite(pin_PowerMux, LOW);
-  delay(100);
+//  pinMode(pin_PowerMux, OUTPUT);
+//  digitalWrite(pin_PowerMux, LOW);
+//  delay(100);
+//  digitalWrite(pin_PowerMux, HIGH);
+//  delay(100);
+//  digitalWrite(pin_PowerMux, LOW);
+//  delay(100);
   
   digitalWrite(mux_sel_0, LOW);  //when 00 we read from the front wall 
   digitalWrite(mux_sel_1, LOW);
-  delay(20);
-  wallFront = analogRead(A5);
+  digitalWrite(mux_sel_2, LOW);
+  delay(100);
+  wallFront = analogRead(A5);\
   
   digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
   digitalWrite(mux_sel_1, LOW);
-  delay(20);
+  digitalWrite(mux_sel_2, LOW);
+  delay(100);
   wallRight = analogRead(A5);
  
   digitalWrite(mux_sel_0, LOW);  //when 10 we read from the left wall 
   digitalWrite(mux_sel_1, HIGH);
-  delay(20);
+  digitalWrite(mux_sel_2, LOW);
+  delay(100);
   wallLeft = analogRead(A5);
   
-  pinMode(pin_PowerMux, INPUT);
+//  pinMode(pin_PowerMux, INPUT);
   Serial.println("Right");
   Serial.println(wallRight);
   Serial.println("Front");
@@ -84,8 +90,9 @@ void outputWall(){
   Serial.println(wallLeft);
   delay(100);
   
-//  if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+//  if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)//
 //  if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
+//  if (wallLeft  >= SOMETHRESHOLD) digitalWrite(leftWallLED, HIGH); else digitalWrite(leftWallLED, LOW);
 //  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD){ //if greater than threshold there is a wall 
 //      //we can go straight
 //      return;
