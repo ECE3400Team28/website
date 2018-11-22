@@ -1,0 +1,89 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "GPIO_0_D[5]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[7]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[9]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[11]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[13]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[21]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[23]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[28]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[30]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0_D[32]",
+					"strict" : false
+				},
+				{
+					"name" : "KEY[0]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[23]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[33]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[32]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[27]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[26]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[25]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[29]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[30]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_1_D[31]",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
