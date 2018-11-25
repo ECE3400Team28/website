@@ -95,7 +95,7 @@
         </div>
       </div>
     </section>
-    
+
     <!-- Team Section -->
     <section class="bg-dark text-white mb-0" id="team">
       <div class="container">
@@ -119,7 +119,7 @@
           </div>
           <div class="col-sm-3 text-center">
             <div class="team-member">
-              <img class="mx-auto rounded-circle" src="img/profile.png" alt="">
+              <img class="mx-auto rounded-circle" src="img/Liliet.png" alt="">
               <h4 class="ex1">Liliet Sosa</h4>
               <h5 class="font-weight-light">Junior, ECE</h5>
             </div>
@@ -325,13 +325,13 @@
               <pre class="text-left">
                 <code>
 const short LED_PIN = 7;
-                
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin LED_PIN as an output.
   pinMode(LED_PIN, OUTPUT);
 }
-                
+
 // the loop function runs over and over again forever
 void loop() {
   digitalWrite(LED_PIN, HIGH);       // turn the LED on (HIGH is the voltage level)
@@ -357,16 +357,16 @@ void loop() {
               <pre class="mb-0 text-left">
                 <code>
 int INPUT_PIN = A0;
-                  
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(9600);
 }
-                  
+
 // the loop function runs over and over again forever
 void loop() {
   delay(100);
-                  
+
   // Analog input read
   int input = analogRead(INPUT_PIN);
   Serial.println(input);
@@ -406,7 +406,7 @@ void loop() {
   // Analog input read
   int input = analogRead(INPUT_PIN);
   Serial.println(input);
-  
+
   // PWM
   analogWrite(LED_PIN, input/4);
 }
@@ -610,7 +610,7 @@ void loop() {
   sei();
   Serial.println("start");
   String out = "";
-  for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+  for (byte i = 0 ; i < FFT_N/2 ; i++) {
     Serial.println(out + fft_log_out[i] + " " + i); //send out data
   }
   while(1) {} // we inserted this so that it only prints one result
@@ -686,13 +686,13 @@ boolean readSignal() {
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Prelab</h4>
               <p class="mb-3 text-left">
-                Unlike the microphone circuit, using AnalogRead will not be fast enough for IR purposes. 
-                We want to be able to detect 6kHz signals, which would require a sampling frequency of 
-                approximately 12kHz. However, the maximum with AnalogRead is approximately 8930Hz, 
-                as discussed above. Instead, we will have to read directly from the ADC pin result 
-                register to increase our sampling frequency. Since we will have to sample at such a high frequency, 
-                it will be difficult to do other processing simultaneously - we will have to carefully 
-                determine when to measure as to not miss other robots while were are making decisions 
+                Unlike the microphone circuit, using AnalogRead will not be fast enough for IR purposes.
+                We want to be able to detect 6kHz signals, which would require a sampling frequency of
+                approximately 12kHz. However, the maximum with AnalogRead is approximately 8930Hz,
+                as discussed above. Instead, we will have to read directly from the ADC pin result
+                register to increase our sampling frequency. Since we will have to sample at such a high frequency,
+                it will be difficult to do other processing simultaneously - we will have to carefully
+                determine when to measure as to not miss other robots while were are making decisions
                 about where to drive.
               </p>
               <p class="mb-3 text-left">
@@ -716,7 +716,7 @@ boolean readSignal() {
                 <li class="li-center">1x 10nF Capacitor</li>
               </ul>
               <p class="mb-3 text-left">
-                Overall our circuit for detecting other robots can be broken down into 3 stages. 
+                Overall our circuit for detecting other robots can be broken down into 3 stages.
                 A picture of our completed IR circuit is below. You can see that one the top right
                 of the image, there exist two phototransistors in series. That then feeds into the
                 op-amp ICs, and the output commes out of the light blue wire which goes off-screen
@@ -726,27 +726,27 @@ boolean readSignal() {
                 <img class="img-fluid mb-3" src="img/Lab 2 Photos/IR_circuit.jpg" alt="Completed IR Capture and Amplification Circuit"></img>
                 <figcaption>Figure: Completed IR Capture and Amplification Circuit</figcaption>
               </figure>
-              
+
               <h5 class="text-secondary text-left mb-3">Stage 1: IR Capture</h4>
               <p class="mb-3 text-left">
-                The first stage of our circuit is similar to the suggested circuit in the <a href="https://cei-lab.github.io/ece3400-2018/lab2.html">lab 2 handout</a>. However, rather we chose to use two resistors in parallel and two phototransistors in series to increase the amplitude of the produced signal. Figure 1 shows this stage of the circuit. As the output of our circuit ranged from 20mVpp to 100mVpp at very close distances, we decided to amplify the output of this stage to increase the distance we can detect other robots from. 
+                The first stage of our circuit is similar to the suggested circuit in the <a href="https://cei-lab.github.io/ece3400-2018/lab2.html">lab 2 handout</a>. However, rather we chose to use two resistors in parallel and two phototransistors in series to increase the amplitude of the produced signal. Figure 1 shows this stage of the circuit. As the output of our circuit ranged from 20mVpp to 100mVpp at very close distances, we decided to amplify the output of this stage to increase the distance we can detect other robots from.
               </p>
               <figure>
                 <img class="img-fluid mb-3" src="img/Lab 2 Photos/IR_capture_circuit.png" alt="IR Capture Circuit"></img>
                 <figcaption>Figure: IR Capture Circuit</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                Once we implemented the output capture circuit, we probed the output of 
-                the first stage with an oscilloscope when holding a treasure close to 
-                the phototransistors. The treasures were tunable in frequency, so we 
-                were able to output both a 6.2kHz signal and a 18kHz signal, which 
-                approximate the frequencies emitted by the other robots and the decoy 
-                robots in the maze respectively. While there is a visible signal, its 
-                peak-to-peak voltage is very small, meaning that the Arduino would not 
-                easily be able to tell when the signal was present. In addition, in 
-                order to even get this clear of a signal, we needed to hold the IR 
-                source very close to the phototransistors, which would not be a viable 
-                solution for detecting robots from several inches away. We needed to 
+                Once we implemented the output capture circuit, we probed the output of
+                the first stage with an oscilloscope when holding a treasure close to
+                the phototransistors. The treasures were tunable in frequency, so we
+                were able to output both a 6.2kHz signal and a 18kHz signal, which
+                approximate the frequencies emitted by the other robots and the decoy
+                robots in the maze respectively. While there is a visible signal, its
+                peak-to-peak voltage is very small, meaning that the Arduino would not
+                easily be able to tell when the signal was present. In addition, in
+                order to even get this clear of a signal, we needed to hold the IR
+                source very close to the phototransistors, which would not be a viable
+                solution for detecting robots from several inches away. We needed to
                 add analog amplification.
               </p>
               <figure>
@@ -760,42 +760,42 @@ boolean readSignal() {
                 <figcaption>Figure: Amplification Circuit Diagram</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                This stage is responsible for amplifying the output of our IR capture circuit. 
-                The circuit itself can be seen in figure 2 below. It should be noted that the 
-                output of the IR capture circuit has a DC bias of approximately 2.5V. Since we 
-                plan to have 20x gain, this would mean our signal would always hit the max voltage 
-                of 5V and would appear to be a constant high signal. Thus, to remove this bias 
-                we implemented a high pass RC filter using a 10k resistor and 10nF capacitor 
-                which has a cutoff frequency of roughly 1592Hz. 
+                This stage is responsible for amplifying the output of our IR capture circuit.
+                The circuit itself can be seen in figure 2 below. It should be noted that the
+                output of the IR capture circuit has a DC bias of approximately 2.5V. Since we
+                plan to have 20x gain, this would mean our signal would always hit the max voltage
+                of 5V and would appear to be a constant high signal. Thus, to remove this bias
+                we implemented a high pass RC filter using a 10k resistor and 10nF capacitor
+                which has a cutoff frequency of roughly 1592Hz.
               </p>
               <p class="mb-3 text-left">
-                We then fed the output of the low pass filter into a non-inverting amplifier. 
-                We used a 20k resistor and 1k resistor set up in a negative feedback loop to 
-                achieve a gain of roughly 20x. We found that this amplification level gave us 
+                We then fed the output of the low pass filter into a non-inverting amplifier.
+                We used a 20k resistor and 1k resistor set up in a negative feedback loop to
+                achieve a gain of roughly 20x. We found that this amplification level gave us
                 the clearest results on our output.
               </p>
-              
+
               <h5 class="text-secondary text-left mb-3">Stage 3: Comparator</h4>
               <figure>
                 <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_comp_circuit.png" alt="Comparator Circuit Diagram"></img>
                 <figcaption>Figure: Comparator Circuit Diagram</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                In order to further amplify our output, we fed the output of the amplification 
-                circuit to a comparator circuit, which we hoped would further increase the 
-                gain of our circuit and improve the signal quality. We first sent the input 
-                through a unity gain voltage buffer which ensured that as we experimented 
-                with different types of amplifiers and comparator circuits, the gain of each 
-                would act independently. With our final design, we no longer need the unity 
-                gain amplifier and may remove it to compact our circuit. 
+                In order to further amplify our output, we fed the output of the amplification
+                circuit to a comparator circuit, which we hoped would further increase the
+                gain of our circuit and improve the signal quality. We first sent the input
+                through a unity gain voltage buffer which ensured that as we experimented
+                with different types of amplifiers and comparator circuits, the gain of each
+                would act independently. With our final design, we no longer need the unity
+                gain amplifier and may remove it to compact our circuit.
               </p>
               <p class="mb-3 text-left">
-                The second half uses a comparator with a voltage generated with a voltage divider. 
-                We first determined a voltage that we wanted to compare against by stepping 
-                through voltage levels on a DC power supply until the desired result was achieved. 
-                We found that we were able to get the clearest signal from the greatest range of 
-                distances for the IR treasure for a comparator reference voltage of 
-                approximately 23mV. The values of the resistors in the voltage divider were then 
+                The second half uses a comparator with a voltage generated with a voltage divider.
+                We first determined a voltage that we wanted to compare against by stepping
+                through voltage levels on a DC power supply until the desired result was achieved.
+                We found that we were able to get the clearest signal from the greatest range of
+                distances for the IR treasure for a comparator reference voltage of
+                approximately 23mV. The values of the resistors in the voltage divider were then
                 determined to approximate that voltage, since 5V * (430/100000) = 21.5mV.
               </p>
               <p class="mb-3 text-left">
@@ -808,36 +808,36 @@ boolean readSignal() {
 
               <h4 class="text-secondary text-left mb-3">FFT</h4>
               <p class="mb-3 text-left">
-                Once we had a high signal-to-noise ratio and a clear signal, we now wanted to 
-                be able to read data into the Arduino and process the inputs to determine the 
-                frequencies coming in. To do this we connected the output of our comparator 
-                circuit to pin A0 of the arduino. We then used adc0 to read in the output of 
-                the comparator circuit from the ADCL and ADCH registers and converted these 
-                values into a single 16 bit integer. These values were then stored in the 
-                <code>fft_input</code> array which was then used by the fft library to calculate the 
-                magnitude of each bin. The graph below shows the result of this operation 
-                for a 6kHz and 18kHz signal. 
+                Once we had a high signal-to-noise ratio and a clear signal, we now wanted to
+                be able to read data into the Arduino and process the inputs to determine the
+                frequencies coming in. To do this we connected the output of our comparator
+                circuit to pin A0 of the arduino. We then used adc0 to read in the output of
+                the comparator circuit from the ADCL and ADCH registers and converted these
+                values into a single 16 bit integer. These values were then stored in the
+                <code>fft_input</code> array which was then used by the fft library to calculate the
+                magnitude of each bin. The graph below shows the result of this operation
+                for a 6kHz and 18kHz signal.
               </p>
               <figure>
                 <img class="img-fluid mb-3" src="img/Lab 2 Photos/ir_6k_18k_comparison.png" alt="Overlaid FFT Output for Amplified IR Sensor Signal"></img>
                 <figcaption>Figure: Overlaid FFT Output for Amplified IR Sensor Signal</figcaption>
               </figure>
               <p class="mb-3 text-left">
-                As can be seen, the peak magnitude of the 6kHz signal is around bin 40. This 
-                result is relatively accurate as our base clock for the arduino is 16MHz with 
-                an ADC clock prescaler of 32. As each ADC read takes 13 clock cycles this 
-                results in a sampling frequency of 38461.53. As we take 256 samples this 
-                means that each bin represents 150.24 Hz. If we divide 6.08kHz by 150.24Hz 
-                we find that the peak of our 6kHz single should be in bin 40 which is what 
-                we found. 
+                As can be seen, the peak magnitude of the 6kHz signal is around bin 40. This
+                result is relatively accurate as our base clock for the arduino is 16MHz with
+                an ADC clock prescaler of 32. As each ADC read takes 13 clock cycles this
+                results in a sampling frequency of 38461.53. As we take 256 samples this
+                means that each bin represents 150.24 Hz. If we divide 6.08kHz by 150.24Hz
+                we find that the peak of our 6kHz single should be in bin 40 which is what
+                we found.
               </p>
               <p class="mb-3 text-left">
-                We then use this information to determine when a 6kHz signal is present by 
-                checking to see if the magnitude of bins 38 - 44 are above 150. We decided 
-                to use 150 as our threshold since general noise did not seem to create peaks 
-                above 75 and the 18kHz signal also does not generate peaks in that range 
-                above 100. By checking a range of bins we are able to determine if an 
-                approximate 6kHz signal is present while having some tolerance incase the 
+                We then use this information to determine when a 6kHz signal is present by
+                checking to see if the magnitude of bins 38 - 44 are above 150. We decided
+                to use 150 as our threshold since general noise did not seem to create peaks
+                above 75 and the 18kHz signal also does not generate peaks in that range
+                above 100. By checking a range of bins we are able to determine if an
+                approximate 6kHz signal is present while having some tolerance incase the
                 frequency is not exact. The code, which is inside of a loop, is as follows:
               </p>
               <pre class="mb-0 text-left"><code>
@@ -864,7 +864,7 @@ fft_mag_log(); // take the output of the fft
 
 sei(); // re-enable interrupts
 Serial.println("start");
-for (byte i = 0 ; i < FFT_N/2 ; i++) { 
+for (byte i = 0 ; i < FFT_N/2 ; i++) {
   Serial.println(fft_log_out[i]); // send out the data for off-chip processing
 }
 delay(1000);
@@ -931,7 +931,7 @@ for (int j = 38; j < 44; ++j) {
               </p>
               <pre class="mb-0 text-left">
                 <code>
-// walls 
+// walls
 #define bm_wall       15 << 0
 #define bm_wall_east  1 << 1
 #define bm_wall_north 1 << 3
@@ -1006,7 +1006,7 @@ void setup(void) {
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
-  
+
   // Start listening
   radio.startListening();
 
@@ -1043,7 +1043,7 @@ else
 
   // Spew it
   printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-    
+
   if (x == 8 && y == 8) {
       x = 0;
       y = 0;
@@ -1129,13 +1129,13 @@ if ( radio.available() )
                 The goal for this part of the lab was to integrate all of our robot’s sensing components, including recognizing the start signal of 660Hz with a microphone, line following, right-hand wall following, and detecting other robots while ignoring decoys. All of these features have been successfully built in previous labs/milestones, and so now we’ve integrated all of these features to prove that they can work together without interfering with each other.
               </p>
               <p class="mb-3 text-left">
-                Integrating all of our separate circuits and systems in order to complete lab 3 turned out to be more of a challenge than initially anticipated. For starters, our IR detection circuit, microphone circuit, sensor inputs, and servo controls all existed either on different breadboards or very far away from the arduino. This created a large mess of wires that made modifying and debugging our circuits difficult as every modification almost always resulted in accidently removing another wire. 
+                Integrating all of our separate circuits and systems in order to complete lab 3 turned out to be more of a challenge than initially anticipated. For starters, our IR detection circuit, microphone circuit, sensor inputs, and servo controls all existed either on different breadboards or very far away from the arduino. This created a large mess of wires that made modifying and debugging our circuits difficult as every modification almost always resulted in accidently removing another wire.
               </p>
               <p class="mb-3 text-left">
-                Cleaning up, we moved all of our circuitry to two half-breadboards which we mounted on the top level of our robot, with our arduino now being mounted on the lower level. This gave us better access to all of our circuitry as well as it helped to reduce the nest of wires making our robot easier to debug and cleaner looking as well. However, as we re-wired out inputs and outputs from our arduino we ran into the problem that we had more analog inputs than the arduino could handle. 
+                Cleaning up, we moved all of our circuitry to two half-breadboards which we mounted on the top level of our robot, with our arduino now being mounted on the lower level. This gave us better access to all of our circuitry as well as it helped to reduce the nest of wires making our robot easier to debug and cleaner looking as well. However, as we re-wired out inputs and outputs from our arduino we ran into the problem that we had more analog inputs than the arduino could handle.
               </p>
               <p class="mb-3 text-left">
-                To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. As we currently only needed to mux between two inputs we grounded the S1 and S2 selection inputs and connected digital pin 7 of our arduino to S0 of the mux. We then connected the output channel of the mux to analog input pin A5. 
+                To get around this problem, we used the CD74HC4051 analog multiplexer to switch between our wall sensors, since we only needed to be able to read from those sensors fairly infrequently. As we currently only needed to mux between two inputs we grounded the S1 and S2 selection inputs and connected digital pin 7 of our arduino to S0 of the mux. We then connected the output channel of the mux to analog input pin A5.
               </p>
               <p class="mb-3 text-left">
                 A rather unanticipated issue that arose from using the mux was that both of our sensors appeared to be changing based off of the values from the right one. At first we believed that one of the sensors was simply broken since the mux had been functioning originally. However, we discovered that the mux does not sit properly in the breadboard, causing some of the pins to not be fully connected. This resulted in only one of the wall sensors ever being read. To fix this problem we needed to bend several of the pins in order to better fit the breadboard.
@@ -1430,7 +1430,7 @@ void linefollow(){
     bool leftOnLine = LightDataL <= LIGHTTHRESHOLD;
     bool centerOnLine = LightDataC <= LIGHTTHRESHOLD;
     bool rightOnLine = LightDataR <= LIGHTTHRESHOLD;
-     
+
     if (centerOnLine && !leftOnLine && !rightOnLine) {
         // centered
         Serial.println("Centered");
@@ -1451,11 +1451,11 @@ void wallfollow(){
   wallFront = analogRead(A4);
   if (wallRight >= SOMETHRESHOLD) digitalWrite(rightWallLED, HIGH); else digitalWrite(rightWallLED, LOW);   // turn the right wall LED on
   if (wallFront >= SOMETHRESHOLD) digitalWrite(frontWallLED, HIGH); else digitalWrite(frontWallLED, LOW);   // turn the front wall LED on
-  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { // if greater than threshold there is a wall 
+  if (wallFront <= SOMETHRESHOLD && wallRight >= SOMETHRESHOLD) { // if greater than threshold there is a wall
       // following the right wall: we can go straight
       return;
   }
-  if (wallRight <= SOMETHRESHOLD){  // nothing on the right, so we can turn right 
+  if (wallRight <= SOMETHRESHOLD){  // nothing on the right, so we can turn right
       turnRight(); // turns right until the center line sensor hits a line
       return;
   }
@@ -1474,7 +1474,7 @@ void wallfollow(){
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">Avoiding other robots</h4>
               <p class="mb-5 text-left">
-                In order to be able to detect and avoid other robots, we needed to integrate the IR FFT detection with the other analog input reading that our Arduino does. However, we quickly found that the FFT detection code from Lab 2 changed some of the serial communication registers and timers, which results in servos behaving strangely or not moving at all. In order to get around this obstacle, we stored the state of the required registers and then restore them once the FFT is processed and we return: TIMSK0, ADCSRA, ADMUX, and DIDR0. 
+                In order to be able to detect and avoid other robots, we needed to integrate the IR FFT detection with the other analog input reading that our Arduino does. However, we quickly found that the FFT detection code from Lab 2 changed some of the serial communication registers and timers, which results in servos behaving strangely or not moving at all. In order to get around this obstacle, we stored the state of the required registers and then restore them once the FFT is processed and we return: TIMSK0, ADCSRA, ADMUX, and DIDR0.
               </p>
               <figure>
                 <img class="img-fluid mb-3" src="img/Milestone 2 Photos/Noise_5V.jpg" alt="Noise on Arduino 5V"></img>
@@ -1712,8 +1712,8 @@ void wallfollow(){
 
     <!-- Custom scripts for this template -->
     <script src="js/freelancer.min.js"></script>
-	
-   
+
+
 
   </body>
 
