@@ -189,8 +189,9 @@ void loop() { // try not using stackarray- use doubly linked list
         if (loc.x == x && loc.y == y) {
           //we are here
           Serial.println(F("already here"));
-          moveTo(&loc);
+          moveTo(&loc); // doesn't do anything but added it for consistency
         } else if (loc.x < x && !(maze[x][y] & bm_wall_north)) {
+          // the location is north, and there's no wall, so I can move
           Serial.println(F("moving north"));
           struct Node next;
           next.x = x-1;
@@ -198,6 +199,7 @@ void loop() { // try not using stackarray- use doubly linked list
           next.parent = &loc;
           moveTo(&next);
         } else if (loc.x > x && !(maze[x][y] & bm_wall_south)) {
+          // the location is south, and there's no wall, so I can move
           Serial.println(F("moving south"));
           struct Node next;
           next.x = x+1;
@@ -205,6 +207,7 @@ void loop() { // try not using stackarray- use doubly linked list
           next.parent = &loc;
           moveTo(&next);
         } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
+          // the location is west, and there's no wall, so I can move
           Serial.println(F("moving west"));
           struct Node next;
           next.x = x;
@@ -212,14 +215,20 @@ void loop() { // try not using stackarray- use doubly linked list
           next.parent = &loc;
           moveTo(&next);
         } else if (loc.y > y && !(maze[x][y] & bm_wall_east)) {
+          // the location is east, and there's no wall, so I can move
           Serial.println(F("moving east"));
           struct Node next;
           next.x = x;
           next.y = y+1;
           next.parent = &loc;
           moveTo(&next);
+        } else {
+          // the location is one away, but there is a wall so I have to run algorithm to find best path
+          Serial.println(F("need more than one step to reach it!"));
+          moveTo(greedy(loc.x, loc.y));
         }
       } else {
+        // location is more than one away, need to run algorithm
         Serial.println(F("need more than one step to reach it!"));
         moveTo(greedy(loc.x, loc.y));
       }
@@ -571,7 +580,7 @@ void moveTo(Node *node) {
     Serial.println(F("moving forward"));
     // move to the next intersection
     forward();
-    linefollow(); // I changed this to keep moving forward until intersection
+    while (!linefollow()); // keeps moving forward until reaches intersection
     MotorLeft.write(90);
     MotorRight.write(90);
     Serial.println(F("Arrived at destination"));
@@ -709,76 +718,78 @@ void turnRight() {
 }
 
 /***
- * Follows the line until it hits an intersection.
+ * Returns true upon seeing an intersection. Else returns false, and continues to follow the line.
  */
-void linefollow() {
+boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
-  while(1) {
-    digitalWrite(mux_sel_0, HIGH);
-    digitalWrite(mux_sel_0, HIGH);
-    digitalWrite(mux_sel_0, LOW);
-    delay(20);
-    LightDataC = analogRead(A5);
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_0, LOW);
+  delay(20);
+  LightDataC = analogRead(A5);
 
-    digitalWrite(mux_sel_0, HIGH);
-    digitalWrite(mux_sel_0, LOW);
-    digitalWrite(mux_sel_0, HIGH);
-    delay(20);
-    LightDataL = analogRead(A5);
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_0, HIGH);
+  delay(20);
+  LightDataL = analogRead(A5);
 
-    digitalWrite(mux_sel_0, LOW);
-    digitalWrite(mux_sel_0, LOW);
-    digitalWrite(mux_sel_0, HIGH);
-    delay(20);
-    LightDataR = analogRead(A5);
-    
-    Serial.println("new data");
-    Serial.println(LightDataL);
-    Serial.println(LightDataC);
-    Serial.println(LightDataR);
-    
-    bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
-    bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
-    bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
-    
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_0, HIGH);
+  delay(20);
+  LightDataR = analogRead(A5);
   
+  Serial.println("new data");
+  Serial.println(LightDataL);
+  Serial.println(LightDataC);
+  Serial.println(LightDataR);
   
-    if (centerOnLine && !leftOnLine && !rightOnLine) {
-      // centered
-      Serial.println(F("Centered"));
-    } else if (leftOnLine && rightOnLine) {
-      forward();
-      delay(650);
-      Serial.println(F("intersection"));
-      return;
-    } else if (centerOnLine && leftOnLine) {
-      // bot is veering right slightly, so we turn it left a bit
-      MotorRight.write(93);
-      MotorLeft.write(83);
-      Serial.println(F("Veering slightly right"));
-      delay(100);
-    } else if (centerOnLine && rightOnLine) {
-      // bot is veering left slightly, so we turn it right a bit
-      MotorRight.write(95);
-      MotorLeft.write(80);
-      Serial.println(F("Veering slightly left"));
-      delay(100);
-    } else if (leftOnLine) {
-      // bot is veering right a lot, so we turn it left more
-      Serial.println(F("A lot right"));
-      MotorRight.write(92);
-      MotorLeft.write(80);
-      delay(100);
-    } else if (rightOnLine) {
-      // bot is veering left a lot, so we turn it right more
-      Serial.println(F("A lot left"));
-      MotorLeft.write(90);
-      MotorRight.write(100);
-      delay(100);
-    } else {
-      Serial.println(F("other"));
-    }
+  bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
+  bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
+  bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
+ 
+  if (centerOnLine && !leftOnLine && !rightOnLine) {
+    // centered
+    Serial.println(F("Centered"));
+    return false;
+  } else if (leftOnLine && rightOnLine) {
+    forward();
+    delay(650);
+    Serial.println(F("intersection"));
+    return true;
+  } else if (centerOnLine && leftOnLine) {
+    // bot is veering right slightly, so we turn it left a bit
+    MotorRight.write(93);
+    MotorLeft.write(83);
+    Serial.println(F("Veering slightly right"));
+    delay(100);
+    return false;
+  } else if (centerOnLine && rightOnLine) {
+    // bot is veering left slightly, so we turn it right a bit
+    MotorRight.write(95);
+    MotorLeft.write(80);
+    Serial.println(F("Veering slightly left"));
+    delay(100);
+    return false;
+  } else if (leftOnLine) {
+    // bot is veering right a lot, so we turn it left more
+    Serial.println(F("A lot right"));
+    MotorRight.write(92);
+    MotorLeft.write(80);
+    delay(100);
+    return false;
+  } else if (rightOnLine) {
+    // bot is veering left a lot, so we turn it right more
+    Serial.println(F("A lot left"));
+    MotorLeft.write(90);
+    MotorRight.write(100);
+    delay(100);
+    return false;
+  } else {
+    Serial.println(F("other"));
+    return false;
   }
 }
 
