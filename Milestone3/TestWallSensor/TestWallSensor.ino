@@ -13,6 +13,9 @@ int SOMETHRESHOLD = 600;
 int LightCenter = A2;
 int LightRight = A3;
 int LightLeft = A1;
+int LightDataC;
+int LightDataR;
+int LightDataL;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
 const int mux_sel_2 = 17;
@@ -37,14 +40,15 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  outputWall();
-  //outputLine();
+  //outputWall();
+  outputLine();
 }
 
 void outputLine(){
-  int LightDataC = analogRead(LightCenter);
-  int LightDataL = analogRead(LightLeft);
-  int LightDataR = analogRead(LightRight);
+  readMux();
+//  int LightDataC = analogRead(LightCenter);
+//  int LightDataL = analogRead(LightLeft);
+//  int LightDataR = analogRead(LightRight);
   Serial.println("Center");
   Serial.println(LightDataC);
   Serial.println("Left");
@@ -63,24 +67,24 @@ void outputWall(){
 //  digitalWrite(pin_PowerMux, LOW);
 //  delay(100);
   
-  digitalWrite(mux_sel_0, LOW);  //when 00 we read from the front wall 
-  digitalWrite(mux_sel_1, LOW);
-  digitalWrite(mux_sel_2, LOW);
-  delay(100);
-  wallFront = analogRead(A5);\
-  
-  digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
-  digitalWrite(mux_sel_1, LOW);
-  digitalWrite(mux_sel_2, LOW);
-  delay(100);
-  wallRight = analogRead(A5);
- 
-  digitalWrite(mux_sel_0, LOW);  //when 10 we read from the left wall 
-  digitalWrite(mux_sel_1, HIGH);
-  digitalWrite(mux_sel_2, LOW);
-  delay(100);
-  wallLeft = analogRead(A5);
-  
+//  digitalWrite(mux_sel_0, LOW);  //when 00 we read from the front wall 
+//  digitalWrite(mux_sel_1, LOW);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(100);
+//  wallFront = analogRead(A5);\
+//  
+//  digitalWrite(mux_sel_0, HIGH);  //when 01 we read from the right wall
+//  digitalWrite(mux_sel_1, LOW);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(100);
+//  wallRight = analogRead(A5);
+// 
+//  digitalWrite(mux_sel_0, LOW);  //when 10 we read from the left wall 
+//  digitalWrite(mux_sel_1, HIGH);
+//  digitalWrite(mux_sel_2, LOW);
+//  delay(100);
+//  wallLeft = analogRead(A5);
+  readMux();
 //  pinMode(pin_PowerMux, INPUT);
   Serial.println("Right");
   Serial.println(wallRight);
@@ -107,4 +111,51 @@ void outputWall(){
 //      wallFront = analogRead(A4);
 //  }
 //  return;
+}
+
+void readMux() { // change this so we only read once based on the input mux select value
+  // 000 Front wall
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallFront = analogRead(A5);
+
+  // 001 Right wall
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallRight = analogRead(A5);
+
+  // 010 Left wall
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_1, HIGH);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  wallLeft = analogRead(A5);
+
+  // 011 front line
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_1, HIGH);
+  digitalWrite(mux_sel_2, LOW);
+  delay(20);
+  LightDataC = analogRead(A5);
+
+  // 100 right line
+  digitalWrite(mux_sel_0, LOW);
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, HIGH);
+  delay(20);
+  LightDataR = analogRead(A5);
+
+  // 101 left line
+  digitalWrite(mux_sel_0, HIGH);
+  digitalWrite(mux_sel_1, LOW);
+  digitalWrite(mux_sel_2, HIGH);
+  delay(20);
+  LightDataL = analogRead(A5);
+
+  // 110 microphone
+  // 111 IR maybe?
 }

@@ -8,7 +8,7 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
-#include "node.h"
+//#include "node.h"
 
 Servo MotorLeft;
 Servo MotorRight;
@@ -55,8 +55,8 @@ const uint8_t bm_treasure      = 112 ;// 7 << 4
 const uint8_t bm_treasure_none = 0  ; // 0 << 4
 const uint8_t bm_treasure_b_sq = 16 ; // 1 << 4
 const uint8_t bm_treasure_r_sq = 32 ; // 2 << 4
-const uint8_t bm_treasure_b_di = 48 ; // 3 << 4
-const uint8_t bm_treasure_r_di = 64 ; // 4 << 4
+const uint8_t bm_treasure_b_ci = 48 ; // 3 << 4
+const uint8_t bm_treasure_r_co = 64 ; // 4 << 4
 const uint8_t bm_treasure_b_tr = 80 ; // 5 << 4
 const uint8_t bm_treasure_r_tr = 96 ; // 6 << 4
 
@@ -65,17 +65,44 @@ const uint8_t bm_explored    = 128;
 const uint8_t bm_not_explored = 0;
 //#define explored_shift  7
 
+//// presence of other robot
+//#define bm_robot    1 << 1
+//#define bm_no_robot 0 << 1
+//#define robot_shift 1
+
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const int rows = 2;
-const int columns = 3;
+const int rows = 9;
+const int columns = 9;
 int explored = 0;
+//uint8_t maze[9][9] = {
+// {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
+// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
+// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
+//};
 
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
 facing_direction current_dir = S;
+
+// NODE ATTEMPT #2- GLENNA
+struct Node
+{
+  uint8_t x;
+  uint8_t y;
+  uint8_t cost;
+  struct Node *parent;
+  struct Node *next;
+  struct Node *prev;
+};
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
@@ -144,15 +171,60 @@ void setup() {
 
 void loop() { // try not using stackarray- use doubly linked list
     StackArray<Node> frontier;
-    Serial.println(F("start loop"));
-    Node n(x, y, 0, NULL, NULL);
+    Serial.println(F("start DFS"));
+    struct Node n;
+    n.x = x;
+    n.y = y;
+    n.parent = NULL;
+    //Node n(x, y, 0, NULL, NULL, NULL);
     frontier.push(n);
     while(!frontier.isEmpty()) {
-      Node loc = frontier.pop();
+      struct Node loc = frontier.pop();
+      Serial.print(F("next loc: "));
       Serial.print(loc.x);
       Serial.println(loc.y);
-      moveTo(greedy(loc.x, loc.y));
+      if (abs(loc.x-x) <= 1 || abs(loc.y-y) <= 1) {
+        // we are one step away from the target location, don't need to greedy search
+        Serial.println(F("one step away!"));
+        if (loc.x == x && loc.y == y) {
+          //we are here
+          Serial.println(F("already here"));
+          moveTo(&loc);
+        } else if (loc.x < x && !(maze[x][y] & bm_wall_north)) {
+          Serial.println(F("moving north"));
+          struct Node next;
+          next.x = x-1;
+          next.y = y;
+          next.parent = &loc;
+          moveTo(&next);
+        } else if (loc.x > x && !(maze[x][y] & bm_wall_south)) {
+          Serial.println(F("moving south"));
+          struct Node next;
+          next.x = x+1;
+          next.y = y;
+          next.parent = &loc;
+          moveTo(&next);
+        } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
+          Serial.println(F("moving west"));
+          struct Node next;
+          next.x = x;
+          next.y = y-1;
+          next.parent = &loc;
+          moveTo(&next);
+        } else if (loc.y > y && !(maze[x][y] & bm_wall_east)) {
+          Serial.println(F("moving east"));
+          struct Node next;
+          next.x = x;
+          next.y = y+1;
+          next.parent = &loc;
+          moveTo(&next);
+        }
+      } else {
+        Serial.println(F("need more than one step to reach it!"));
+        moveTo(greedy(loc.x, loc.y));
+      }
       // now we are at the new location, so explore it
+      Serial.println(F("exploring"));
       explore();
       if (explored == rows*columns){
         // we've explored the entire maze!
@@ -169,7 +241,11 @@ void loop() { // try not using stackarray- use doubly linked list
         if (x-1 >= 0 && !(maze[x-1][y])) {
           Serial.println(F("nodeN"));
           // the new location is valid and it has not been explored
-          Node n_new(x-1, y, 0, NULL, NULL);
+          struct Node n_new;
+          n_new.x = x-1;
+          n_new.y = y;
+          n_new.parent = NULL;
+          //Node n_new(x-1, y, 0, NULL, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -178,7 +254,11 @@ void loop() { // try not using stackarray- use doubly linked list
         if (y+1 < columns && !(maze[x][y+1])) {
           Serial.println(F("nodeE"));
           // the new location is valid and it has not been explored 
-          Node n_new(x, y+1, 0, NULL, NULL);
+          struct Node n_new;
+          n_new.x = x;
+          n_new.y = y+1;
+          n_new.parent = NULL;
+          //Node n_new(x, y+1, 0, NULL, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -187,7 +267,11 @@ void loop() { // try not using stackarray- use doubly linked list
         if (x+1 < rows && !(maze[x+1][y])) {
           Serial.println(F("nodeS"));
           // the new location is valid and it has not been explored
-          Node n_new(x+1, y, 0, NULL, NULL);
+          struct Node n_new;
+          n_new.x = x+1;
+          n_new.y = y;
+          n_new.parent = NULL;
+          //Node n_new(x+1, y, 0, NULL, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -196,7 +280,11 @@ void loop() { // try not using stackarray- use doubly linked list
         if (y-1 >= 0 && !(maze[x][y-1])) {
           Serial.println(F("nodeW"));
           // the new location is valid and it has not been explored
-          Node n_new(x, y-1, 0, NULL, NULL);
+          struct Node n_new;
+          n_new.x = x;
+          n_new.y = y-1;
+          n_new.parent = NULL;
+          //Node n_new(x, y-1, 0, NULL, NULL, NULL);
           frontier.push(n_new);
         }
       }
@@ -216,127 +304,229 @@ void loop() { // try not using stackarray- use doubly linked list
 /*
     Uses greedy search to find the shortest path of explored tiles if stuck.
 */
-Node greedy(uint8_t loc_x, uint8_t loc_y) {
+struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
   //StackArray<Node> frontier_g;
   Serial.println(F("calculating path"));
   bool visited[rows][columns] = { }; // initialized with zeros
-  int heuristic = abs(x - loc_x) + abs(y - loc_y);
-  Node n(x, y, heuristic, NULL, NULL);
-  Node *first = &n;
-  Node *last = &n;
-  while (first != NULL) {
-    Node loc = findAndReturnMin(first);
-    if (&loc == first) {
-      first = loc.next;
-      first->parent = NULL;
-    } else {
-      loc.parent->next = loc.next;
-    }
-    if (&loc == last) {
-      last = loc.parent;
-      last->next = NULL;
-    }
-    visited[loc.x][loc.y] = true;
-    Serial.print(loc.x);
-    Serial.print(loc.y);
-    Serial.print(loc_x);
+  uint8_t heuristic = abs(x - loc_x) + abs(y - loc_y);
+  struct Node *rootNode;
+  struct Node *lastNode;
+  struct Node first_node;
+  addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
+  while (rootNode) {
+    struct Node *loc = findAndReturnMin(&rootNode);
+    Serial.println(loc->x);
+    Serial.println(loc->y);
+    Serial.println(loc_x);
     Serial.println(loc_y);
-    if (loc.x == loc_x && loc.y == loc_y) {
+    // remove this location from the search list
+    if (loc == rootNode) {
+      rootNode = loc->next;
+      rootNode->prev = NULL;
+    } else {
+      (loc->prev)->next = loc->next;
+    }
+    if (loc == lastNode) {
+      lastNode = loc->prev;
+      lastNode->next = NULL;
+    }
+    if (!rootNode) {
+      Serial.println(F("greedy search is null"));
+    }
+    visited[loc->x][loc->y] = true;
+    
+    if (loc->x == loc_x && loc->y == loc_y) {
       Serial.println(F("found loc"));
       return loc;
     }
 
     // for each action we can take, add the nodes to the frontier.
-    if (!(maze[loc.x][loc.y] & bm_wall_north)) {
+    if (!(maze[loc->x][loc->y] & bm_wall_north)) {
       // there's no wall to the north
-      if (loc.x - 1 >= 0 && !visited[loc.x - 1][loc.y]) {
+      if (loc->x - 1 >= 0 && !visited[loc->x - 1][loc->y]) {
         // the new location is valid and we have not visited it
-        if (maze[loc.x - 1][loc.y] > 0 || (loc.x - 1 == loc_x && loc.y == loc_y)) {
+        if (maze[loc->x - 1][loc->y] > 0 || (loc->x - 1 == loc_x && loc->y == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("N"));
-          int heuristic = abs(loc.x-1-loc_x) + abs(loc.y-loc_y);
-          Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL);
-          if (first == NULL) {
-            first = &n_new;
-          } else {
-            last->next = &n_new;
-          }
-          last = &n_new;
+          uint8_t heuristic = abs(loc->x-1-loc_x) + abs(loc->y-loc_y);
+          struct Node n_new;
+          addNode(&n_new, &(*loc), loc->x-1, loc->y, heuristic, &rootNode, &lastNode);
+//          if (!rootNode) {
+//            Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL, NULL);
+//            first = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          } else {
+//            Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
+//            last->next = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          }
         }
       }
     }
-    if (!(maze[loc.x][loc.y] & bm_wall_east)) {
+    if (!(maze[loc->x][loc->y] & bm_wall_east)) {
       // there's no wall to the east
-      if (loc.y + 1 < columns && !visited[loc.x][loc.y + 1] ) {
+      if (loc->y + 1 < columns && !visited[loc->x][loc->y + 1] ) {
         // the new location is valid and we have not visited it
-        if (maze[loc.x][loc.y + 1] > 0 || (loc.x == loc_x && loc.y + 1 == loc_y)) {
+        if (maze[loc->x][loc->y + 1] > 0 || (loc->x == loc_x && loc->y + 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("E"));
-          int heuristic = abs(loc.x-loc_x) + abs(loc.y+1-loc_y);
-          Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL);
-          Serial.print(n_new.x);
-          Serial.println(n_new.y);
-          if (first == NULL) {
-            first = &n_new;
-          } else {
-            last->next = &n_new;
-          }
-          last = &n_new;
+          uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y+1-loc_y);
+          struct Node n_new;
+          addNode(&n_new, &(*loc), loc->x, loc->y+1, heuristic, &rootNode, &lastNode);
+//          if (!first) {
+//            //Node n_parent(loc.x, loc.y, loc.cost, loc.parent, loc.next, loc.prev);
+//            Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL, NULL);
+//            first = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          } else {
+//            //Node n_parent(loc.x, loc.y, loc.cost, loc.parent, loc.next, loc.prev);
+//            Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
+//            last->next = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          }
         }
       }
     }
-    if (!(maze[loc.x][loc.y] & bm_wall_south)) {
+    if (!(maze[loc->x][loc->y] & bm_wall_south)) {
       // there's no wall to the south
-      if (loc.x + 1 < rows && !visited[loc.x + 1][loc.y]) {
+      if (loc->x + 1 < rows && !visited[loc->x + 1][loc->y]) {
         // the new location is valid and it has not been explored
-        if (maze[loc.x + 1][loc.y] > 0 || (loc.x + 1 == loc_x && loc.y == loc_y)) {
+        if (maze[loc->x + 1][loc->y] > 0 || (loc->x + 1 == loc_x && loc->y == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("S"));
-          int heuristic = abs(loc.x+1-loc_x) + abs(loc.y-loc_y);
-          Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL);
-          if (first == NULL) {
-            first = &n_new;
-          } else {
-            last->next = &n_new;
-          }
-          last = &n_new;
+          uint8_t heuristic = abs(loc->x+1-loc_x) + abs(loc->y-loc_y);
+          struct Node n_new;
+          addNode(&n_new, &(*loc), loc->x+1, loc->y, heuristic, &rootNode, &lastNode);
+//          if (first == NULL) {
+//            Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL, NULL);
+//            first = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          } else {
+//            Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
+//            last->next = &n_new;
+//            last = &n_new;
+//            Serial.print(last->x);
+//            Serial.println(last->y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          }
         }
       }
     }
-    if (!(maze[loc.x][loc.y] & bm_wall_west)) {
+    if (!(maze[loc->x][loc->y] & bm_wall_west)) {
       // there's no wall to the west
-      if (loc.y - 1 >= 0 && !visited[loc.x][loc.y - 1]) {
+      if (loc->y - 1 >= 0 && !visited[loc->x][loc->y - 1]) {
         // the new location is valid and it has not been explored
-        if (maze[loc.x][loc.y - 1] > 0 || (loc.x == loc_x && loc.y - 1 == loc_y)) {
+        if (maze[loc->x][loc->y - 1] > 0 || (loc->x == loc_x && loc->y - 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.print(F("W"));
-          int heuristic = abs(loc.x-loc_x) + abs(loc.y-1-loc_y);
-          Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL);
-          if (first == NULL) {
-            first = &n_new;
-          } else {
-            last->next = &n_new;
-          }
-          last = &n_new;
+          uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y-1-loc_y);
+          struct Node n_new;
+          addNode(&n_new, &(*loc), loc->x, loc->y-1, heuristic, &rootNode, &lastNode);
+//          if (first == NULL) {
+//            Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL, NULL);
+//            first = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          } else {
+//            Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
+//            last->next = &n_new;
+//            last = &n_new;
+//            Serial.print(n_new.x);
+//            Serial.println(n_new.y);
+//            Serial.print(n_new.parent->x);
+//            Serial.println(n_new.parent->y);
+//          }
         }
       }
     }
   }
 }
 
-/*
-   Finds and returns the node with the lowest cost. Assumes that the node passed in is not NULL.
-*/
-Node findAndReturnMin(Node *first) {
-  int min_cost = first->cost;
-  Node min_node = *first;
-  while (first != NULL) {
-    if (first->cost < min_cost) {
-      min_cost = first->cost;
-      min_node = *first;
-    }
-    first = first->next;
+/***
+ * Creates a new linked list node and adds it to the end of the given list (need a root node and a last node)
+ */
+void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCoor, uint8_t heuristic, struct Node **RootNode, struct Node **LastNode) {
+  struct Node *old, *p;
+  //If there is an input error, exit function
+  if(!RootNode || !LastNode|| !xCoor || !yCoor) return;
+  i->x = xCoor;  //Store data and name locations
+  i->y = yCoor;
+  if (heuristic) {
+    i->cost = heuristic;
   }
+  
+  if(!*LastNode) { //if empty list, this is the root element 
+     i->next = NULL;        //Setup information for element
+     i->prev = NULL;
+     i->parent = NULL;
+     *LastNode = i;        //Setup infomation for list
+     *RootNode = i;
+     return;
+  }
+
+  //At this point, if there is no Parent, do not make node- exit function
+  if(!ParentNode) return;
+
+   // I can prob just use lastNode to find last element?????? this is safe but slow
+   //Start search at top of list
+   p = *RootNode;
+   old = NULL;
+
+   while(p){ //find last element
+     old = p;
+     p = p->next; 
+   }
+
+   old->next = i;         //put on end
+   i->next = NULL;        //Setup information for element
+   i->prev = old;
+   i->parent = ParentNode;
+  
+   *LastNode = i;         //Setup information for list
+}
+
+/***
+ * Finds and returns a pointer to the node with the lowest cost. Assumes that the node passed in is not NULL.
+ */
+struct Node* findAndReturnMin(struct Node **RootNode) {
+  struct Node *n = *RootNode;
+  uint8_t min_cost = n->cost;
+  struct Node *min_node = *RootNode;
+  while (n) {
+    if (n->cost < min_cost) {
+      min_cost = n->cost;
+      min_node = n;
+    }
+    Serial.println(F("returnmin"));
+    Serial.println(n->x);
+    Serial.println(n->y);
+    n = n->next;
+  }
+  Serial.println(F("found min node"));
   return min_node;
 }
 
@@ -345,29 +535,31 @@ Node findAndReturnMin(Node *first) {
    Moves robot to the location described by the node. Obtains the path through the node's parent.
    Assumptions: There is an open path to the node, but it might encounter enemy robots.
 */
-void moveTo(Node node) {
-  if (x == node.x && y == node.y) {
+void moveTo(Node *node) {
+  if (x == node->x && y == node->y) {
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
     return;
   }
   Serial.println(F("moving"));
-  StackArray<Node> path;
-  Node *parent = node.parent;
- // while (parent != NULL) { // the path does not contain the starting (current) location.
-    Serial.println(node.x);
-    Serial.println(node.y);
-    path.push(node);
-    node = *parent;
-    parent = node.parent;
-    
-  //}
-  Serial.println(F("done"));
+  StackArray<struct Node> path;
+  Node *p = node->parent;
+  if (p) {
+    Serial.println(F("path exists"));
+  }
+  while (p) { // the path does not contain the starting (current) location.
+    Serial.print(node->x);
+    Serial.println(node->y);
+    path.push(*node);
+    node = p;
+    p = node->parent;
+  }
   while (!path.isEmpty()){
-    Node next = path.pop();
-    Serial.println(next.x);
+    struct Node next = path.pop();
+    Serial.print(next.x);
     Serial.println(next.y);
+    Serial.println(F("turning"));
     // turn to face the correct direction: the next node should be one tile away.
     int x_diff = next.x - x;
     int y_diff = next.y - y;
@@ -376,15 +568,17 @@ void moveTo(Node node) {
       if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
       else turnRight();
     }
-
+    Serial.println(F("moving forward"));
     // move to the next intersection
     forward();
-    linefollow(); // I changed this to return at the intersection
+    linefollow(); // I changed this to keep moving forward until intersection
     MotorLeft.write(90);
     MotorRight.write(90);
+    Serial.println(F("Arrived at destination"));
     x = next.x;
     y = next.y;
   }
+  Serial.println(F("done"));
 }
 
 /*
@@ -448,7 +642,7 @@ void explore() {
   }
 
   maze[x][y] |= bm_explored;
-  broadcast();
+  broadcast(); // keep broadcasting until successful
   explored++;
 }
 
@@ -464,11 +658,21 @@ void turnLeft() {
   delay(600); // move away from current line
   // added the following check for current status:
 
+  //    LightDataC = analogRead(LightCenter);
+  //    delay(1);
+  //    LightDataL = analogRead(LightLeft);
+  //    delay(1);
+  //    LightDataR = analogRead(LightRight);
+  //    delay(1);
+
   readMux();
 
   // end check;
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
+    //       LightDataC = analogRead(LightCenter);
+    //       LightDataL = analogRead(LightLeft);
+    //       LightDataR = analogRead(LightRight);
 
     readMux();
   }
@@ -485,11 +689,17 @@ void turnRight() {
   MotorRight.write(100);
   delay(600); // move away from current line
   // added the following check for current status:
+  //    LightDataC = analogRead(LightCenter);
+  //    LightDataL = analogRead(LightLeft);
+  //    LightDataR = analogRead(LightRight);
 
   readMux();
   // end check
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
+    //       LightDataC = analogRead(LightCenter);
+    //       LightDataL = analogRead(LightLeft);
+    //       LightDataR = analogRead(LightRight);
     readMux();
   }
   MotorLeft.write(90);
@@ -498,170 +708,78 @@ void turnRight() {
   return;
 }
 
+/***
+ * Follows the line until it hits an intersection.
+ */
 void linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
+  while(1) {
+    digitalWrite(mux_sel_0, HIGH);
+    digitalWrite(mux_sel_0, HIGH);
+    digitalWrite(mux_sel_0, LOW);
+    delay(20);
+    LightDataC = analogRead(A5);
 
-  readMux();
+    digitalWrite(mux_sel_0, HIGH);
+    digitalWrite(mux_sel_0, LOW);
+    digitalWrite(mux_sel_0, HIGH);
+    delay(20);
+    LightDataL = analogRead(A5);
 
-  bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
-  bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
-  bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
-
-
-
-  if (centerOnLine && !leftOnLine && !rightOnLine) {
-    // centered
-    Serial.println(F("Centered"));
-    return;
-  } else if (leftOnLine && rightOnLine) {
-    forward();
-    delay(650);
-    // wallfollow();
-    Serial.println(F("intersection"));
-    return;
-  } else if (centerOnLine && leftOnLine) {
-    // bot is veering right slightly, so we turn it left a bit
-    MotorRight.write(93);
-    MotorLeft.write(83);
-    Serial.println(F("Veering slightly right"));
-    delay(100);
-    return;
-  } else if (centerOnLine && rightOnLine) {
-    // bot is veering left slightly, so we turn it right a bit
-    MotorRight.write(95);
-    MotorLeft.write(80);
-    Serial.println(F("Veering slightly left"));
-    delay(100);
-    return;
-  } else if (leftOnLine) {
-    // bot is veering right a lot, so we turn it left more
-    Serial.println(F("A lot right"));
-    MotorRight.write(92);
-    MotorLeft.write(80);
-    delay(100);
-    return;
-  } else if (rightOnLine) {
-    // bot is veering left a lot, so we turn it right more
-    Serial.println(F("A lot left"));
-    MotorLeft.write(90);
-    MotorRight.write(100);
-    delay(100);
-    return;
-  } else {
-    Serial.println(F("other"));
-  }
-}
-
-void wallfollow() {
-  MotorLeft.write(90);
-  MotorRight.write(90);
-
-  readMux();
-
-  Serial.println(wallFront);
-  //Serial.println(wallRight);
-  //Serial.println(wallFront);
-  switch (current_dir) {
-    case N:
-      x--;
-      break;
-    case S:
-      x++;
-      break;
-    case E:
-      y++;
-      break;
-    case W:
-      y--;
-      break;
-  }
-  x %= 16;
-  y %= 16;
-  if (wallRight >= RIGHTTHRESHOLD) {
-    digitalWrite(rightWallLED, HIGH);
-    if (current_dir == N) {
-      maze[x][y] |= bm_wall_east;
-    } else if (current_dir == E) {
-      maze[x][y] |= bm_wall_south;
-    } else if (current_dir == S) {
-      maze[x][y] |= bm_wall_west;
-    } else if (current_dir == W) {
-      maze[x][y] |= bm_wall_north;
-    }
-  } else {
-    digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
-  }
-
-  if (wallFront >= FRONTTHRESHOLD) {
-    digitalWrite(frontWallLED, HIGH);
-    if (current_dir == N) {
-      maze[x][y] |= bm_wall_north;
-    } else if (current_dir == E) {
-      maze[x][y] |= bm_wall_east;
-    } else if (current_dir == S) {
-      maze[x][y] |= bm_wall_south;
-    } else if (current_dir == W) {
-      maze[x][y] |= bm_wall_west;
-    }
-  } else {
-    digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
-  }
-
-  if (maze[x][y] >= 0) {
-    // have not explored yet
-    maze[x][y] |= bm_explored;
-    broadcast(); // keep broadcasting until successful
-  }
-
-  if (wallFront <= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { //if greater than threshold there is a wall
-    // following the wall: we can go straight
-    return;
-  }
-  if (wallRight <= RIGHTTHRESHOLD) { // nothing on the right, so we can turn right
-    turnRight();
-    current_dir = (facing_direction) ((current_dir + 1) % 4);
-    return;
-  }
-  while (wallFront >= FRONTTHRESHOLD && wallRight >= RIGHTTHRESHOLD) { // blocked on both front and right
-    turnLeft();
-    if (current_dir - 1 < 0) current_dir = (facing_direction) 3;
-    else current_dir = (facing_direction) (current_dir - 1);
-
-    readMux();
-
-    if (wallRight >= RIGHTTHRESHOLD) {
-      digitalWrite(rightWallLED, HIGH);
-      if (current_dir == N) {
-        maze[x][y] |= bm_wall_east;
-      } else if (current_dir == E) {
-        maze[x][y] |= bm_wall_south;
-      } else if (current_dir == S) {
-        maze[x][y] |= bm_wall_west;
-      } else if (current_dir == W) {
-        maze[x][y] |= bm_wall_north;
-      }
+    digitalWrite(mux_sel_0, LOW);
+    digitalWrite(mux_sel_0, LOW);
+    digitalWrite(mux_sel_0, HIGH);
+    delay(20);
+    LightDataR = analogRead(A5);
+    
+    Serial.println("new data");
+    Serial.println(LightDataL);
+    Serial.println(LightDataC);
+    Serial.println(LightDataR);
+    
+    bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
+    bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
+    bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
+    
+  
+  
+    if (centerOnLine && !leftOnLine && !rightOnLine) {
+      // centered
+      Serial.println(F("Centered"));
+    } else if (leftOnLine && rightOnLine) {
+      forward();
+      delay(650);
+      Serial.println(F("intersection"));
+      return;
+    } else if (centerOnLine && leftOnLine) {
+      // bot is veering right slightly, so we turn it left a bit
+      MotorRight.write(93);
+      MotorLeft.write(83);
+      Serial.println(F("Veering slightly right"));
+      delay(100);
+    } else if (centerOnLine && rightOnLine) {
+      // bot is veering left slightly, so we turn it right a bit
+      MotorRight.write(95);
+      MotorLeft.write(80);
+      Serial.println(F("Veering slightly left"));
+      delay(100);
+    } else if (leftOnLine) {
+      // bot is veering right a lot, so we turn it left more
+      Serial.println(F("A lot right"));
+      MotorRight.write(92);
+      MotorLeft.write(80);
+      delay(100);
+    } else if (rightOnLine) {
+      // bot is veering left a lot, so we turn it right more
+      Serial.println(F("A lot left"));
+      MotorLeft.write(90);
+      MotorRight.write(100);
+      delay(100);
     } else {
-      digitalWrite(rightWallLED, LOW);   // turn the LED on (HIGH is the voltage level)
+      Serial.println(F("other"));
     }
-
-    if (wallFront >= FRONTTHRESHOLD) {
-      digitalWrite(frontWallLED, HIGH);
-      if (current_dir == N) {
-        maze[x][y] |= bm_wall_north;
-      } else if (current_dir == E) {
-        maze[x][y] |= bm_wall_east;
-      } else if (current_dir == S) {
-        maze[x][y] |= bm_wall_south;
-      } else if (current_dir == W) {
-        maze[x][y] |= bm_wall_west;
-      }
-    } else {
-      digitalWrite(frontWallLED, LOW);   // turn the LED off by making the voltage LOW
-    }
-    // broadcast();
   }
-  return;
 }
 
 void readMux() { // change this so we only read once based on the input mux select value
@@ -782,7 +900,8 @@ boolean readSignal() {
   Serial.println(fht_log_out[19]);
   for (int j = 17; j < 23; ++j) {
     if (fht_log_out[j] >= 60) {
-      //660 Hz signal detected
+      //We have detected another robot
+      // return settings to original
       return true;
     }
   }
