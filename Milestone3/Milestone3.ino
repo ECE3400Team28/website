@@ -23,7 +23,7 @@ int wallLeft;
 //const int mux = 7;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
-const int mux_sel_2 = 1;
+const int mux_sel_2 = 17;
 const int rightWallLED = 4;
 const int frontWallLED = 6;
 const int leftWallLED = 18;
@@ -31,9 +31,9 @@ const int leftWallLED = 18;
 const int FRONTTHRESHOLD = 250;
 const int RIGHTTHRESHOLD = 200;
 const int LEFTTHRESHOLD  = 280;
-const int LIGHT_CENTER_THRESHOLD = 450;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_CENTER_THRESHOLD = 550;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 const int LIGHT_RIGHT_THRESHOLD = 600;//540;
-const int LIGHT_LEFT_THRESHOLD = 600;//620;
+const int LIGHT_LEFT_THRESHOLD = 620;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -170,6 +170,15 @@ void setup() {
 }
 
 void loop() { // try not using stackarray- use doubly linked list
+//  while(1){
+//    readMux();
+//    Serial.println(F("center"));
+//    Serial.println(LightDataC);
+//    Serial.println(F("right"));
+//    Serial.println(LightDataR);
+//    Serial.println(F("left"));
+//    Serial.println(LightDataL);
+//  }
     StackArray<Node> frontier;
     Serial.println(F("start DFS"));
     struct Node n;
@@ -568,19 +577,22 @@ void moveTo(Node *node) {
     struct Node next = path.pop();
     Serial.print(next.x);
     Serial.println(next.y);
-    Serial.println(F("turning"));
     // turn to face the correct direction: the next node should be one tile away.
     int x_diff = next.x - x;
     int y_diff = next.y - y;
     facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
     while (current_dir != dir_to_face) {
+      Serial.println(F("turning"));
       if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
       else turnRight();
     }
     Serial.println(F("moving forward"));
     // move to the next intersection
     forward();
-    while (!linefollow()); // keeps moving forward until reaches intersection
+    while (!linefollow()) {
+      forward(); // keeps moving forward until reaches intersection
+    }
+    
     MotorLeft.write(90);
     MotorRight.write(90);
     Serial.println(F("Arrived at destination"));
@@ -665,24 +677,9 @@ void turnLeft() {
   MotorLeft.write(80);
   MotorRight.write(80);
   delay(600); // move away from current line
-  // added the following check for current status:
-
-  //    LightDataC = analogRead(LightCenter);
-  //    delay(1);
-  //    LightDataL = analogRead(LightLeft);
-  //    delay(1);
-  //    LightDataR = analogRead(LightRight);
-  //    delay(1);
-
   readMux();
-
-  // end check;
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
-    //       LightDataC = analogRead(LightCenter);
-    //       LightDataL = analogRead(LightLeft);
-    //       LightDataR = analogRead(LightRight);
-
     readMux();
   }
   MotorLeft.write(90);
@@ -697,18 +694,9 @@ void turnRight() {
   MotorLeft.write(100);
   MotorRight.write(100);
   delay(600); // move away from current line
-  // added the following check for current status:
-  //    LightDataC = analogRead(LightCenter);
-  //    LightDataL = analogRead(LightLeft);
-  //    LightDataR = analogRead(LightRight);
-
   readMux();
-  // end check
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
-    //       LightDataC = analogRead(LightCenter);
-    //       LightDataL = analogRead(LightLeft);
-    //       LightDataR = analogRead(LightRight);
     readMux();
   }
   MotorLeft.write(90);
@@ -723,23 +711,7 @@ void turnRight() {
 boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
-  digitalWrite(mux_sel_0, HIGH);
-  digitalWrite(mux_sel_0, HIGH);
-  digitalWrite(mux_sel_0, LOW);
-  delay(20);
-  LightDataC = analogRead(A5);
-
-  digitalWrite(mux_sel_0, HIGH);
-  digitalWrite(mux_sel_0, LOW);
-  digitalWrite(mux_sel_0, HIGH);
-  delay(20);
-  LightDataL = analogRead(A5);
-
-  digitalWrite(mux_sel_0, LOW);
-  digitalWrite(mux_sel_0, LOW);
-  digitalWrite(mux_sel_0, HIGH);
-  delay(20);
-  LightDataR = analogRead(A5);
+  readMux();
   
   Serial.println("new data");
   Serial.println(LightDataL);
