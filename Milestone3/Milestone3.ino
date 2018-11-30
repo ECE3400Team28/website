@@ -29,9 +29,9 @@ const int leftWallLED = 18;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_CENTER_THRESHOLD = 600;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
 const int LIGHT_RIGHT_THRESHOLD = 750;//540;
-const int LIGHT_LEFT_THRESHOLD = 750;//620;
+const int LIGHT_LEFT_THRESHOLD = 700;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -617,6 +617,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.print(F("W"));
           uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y-1-loc_y);
           struct Node n_new;
+          Serial.print(loc->x);
+          Serial.println(loc->y);
           uint8_t newX = loc->x;
           uint8_t newY = loc->y;
           addNode(&n_new, &(*loc), newX, newY-1, heuristic, &rootNode, &lastNode);
@@ -657,10 +659,17 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
 void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCoor, uint8_t heuristic, struct Node **RootNode, struct Node **LastNode) {
   struct Node *old, *p;
   //If there is an input error, exit function
-  if(!RootNode || !LastNode|| !xCoor || !yCoor) return;
+  if(!RootNode || !LastNode|| !xCoor || !yCoor) {
+    Serial.println(F("BADDD"));
+    return;
+  }
   i->x = xCoor;  //Store data and name locations
   i->y = yCoor;
+  Serial.println(i->x);
+  Serial.println(i->y);
   if (heuristic) {
+    Serial.print("Cost: ");
+    Serial.println(heuristic);
     i->cost = heuristic;
   }
   
@@ -670,11 +679,15 @@ void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCo
      i->parent = NULL;
      *LastNode = i;        //Setup infomation for list
      *RootNode = i;
+     Serial.println("the list was empty");
      return;
   }
 
-  //At this point, if there is no Parent, do not make node- exit function
-  if(!ParentNode) return;
+  //At this point, if there is no Parent, do not make node- exit function // SUUUUUUSSSSS
+  if(!ParentNode) {
+    Serial.println("there is no parent???");
+    return;
+  }
 
    // I can prob just use lastNode to find last element?????? this is safe but slow
    //Start search at top of list
