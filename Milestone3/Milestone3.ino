@@ -659,7 +659,7 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
 void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCoor, uint8_t heuristic, struct Node **RootNode, struct Node **LastNode) {
   struct Node *old, *p;
   //If there is an input error, exit function
-  if(!RootNode || !LastNode|| !xCoor || !yCoor) {
+  if(!RootNode || !LastNode) {
     Serial.println(F("BADDD"));
     return;
   }
@@ -667,25 +667,23 @@ void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCo
   i->y = yCoor;
   Serial.println(i->x);
   Serial.println(i->y);
-  if (heuristic) {
-    Serial.print("Cost: ");
-    Serial.println(heuristic);
-    i->cost = heuristic;
-  }
+  Serial.print(F("Cost: "));
+  Serial.println(heuristic);
+  i->cost = heuristic;
   
   if(!*LastNode) { //if empty list, this is the root element 
      i->next = NULL;        //Setup information for element
      i->prev = NULL;
      i->parent = NULL;
-     *LastNode = i;        //Setup infomation for list
+     *LastNode = i;        //Setup information for list
      *RootNode = i;
-     Serial.println("the list was empty");
+     Serial.println(F("the list was empty"));
      return;
   }
 
   //At this point, if there is no Parent, do not make node- exit function // SUUUUUUSSSSS
   if(!ParentNode) {
-    Serial.println("there is no parent???");
+    Serial.println(F("there is no parent???"));
     return;
   }
 
