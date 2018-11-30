@@ -8,7 +8,6 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include "printf.h"
-//#include "node.h"
 
 Servo MotorLeft;
 Servo MotorRight;
@@ -20,7 +19,6 @@ int wallFront;
 int wallLeft;
 
 //const int detectRobotLED = ??;
-//const int mux = 7;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
 const int mux_sel_2 = 17;
@@ -28,12 +26,12 @@ const int rightWallLED = 4;
 const int frontWallLED = 6;
 const int leftWallLED = 18;
 #define pin_Button   8
-const int FRONTTHRESHOLD = 250;
-const int RIGHTTHRESHOLD = 200;
-const int LEFTTHRESHOLD  = 280;
-const int LIGHT_CENTER_THRESHOLD = 550;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 600;//540;
-const int LIGHT_LEFT_THRESHOLD = 620;//620;
+const int FRONTTHRESHOLD = 150;
+const int RIGHTTHRESHOLD = 150;
+const int LEFTTHRESHOLD  = 150;
+const int LIGHT_CENTER_THRESHOLD = 750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 750;//540;
+const int LIGHT_LEFT_THRESHOLD = 750;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -77,18 +75,6 @@ uint8_t y = 0;
 const int rows = 9;
 const int columns = 9;
 int explored = 0;
-//uint8_t maze[9][9] = {
-// {bm_not_explored | bm_treasure_none | bm_wall_north | bm_wall_south | bm_wall_west, bm_not_explored | bm_treasure_b_sq | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_treasure_r_tr | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east},
-// {bm_not_explored | bm_wall_north | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_south | bm_wall_east},
-// {bm_not_explored | bm_wall_south | bm_wall_west, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_south, bm_not_explored | bm_wall_north | bm_wall_east | bm_wall_south},
-//};
-
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
 facing_direction current_dir = S;
@@ -192,7 +178,7 @@ void loop() { // try not using stackarray- use doubly linked list
       Serial.print(F("next loc: "));
       Serial.print(loc.x);
       Serial.println(loc.y);
-      if (abs(loc.x-x) <= 1 || abs(loc.y-y) <= 1) {
+      if (abs(loc.x-x) <= 1 && abs(loc.y-y) == 0 || abs(loc.x-x) == 0 && abs(loc.y-y) <= 1) {
         // we are one step away from the target location, don't need to greedy search
         Serial.println(F("one step away!"));
         if (loc.x == x && loc.y == y) {
@@ -254,56 +240,201 @@ void loop() { // try not using stackarray- use doubly linked list
       }
       
       // for each action we can take (move N/S/E/W), add the nodes to the frontier. **CHANGE THIS TO ADD NODES IN ORDER DEPENDING ON CURRENT DIR**
-      if (!(maze[x][y] & bm_wall_north)) {
-        // there's no wall to the north
-        if (x-1 >= 0 && !(maze[x-1][y])) {
-          Serial.println(F("nodeN"));
-          // the new location is valid and it has not been explored
-          struct Node n_new;
-          n_new.x = x-1;
-          n_new.y = y;
-          n_new.parent = NULL;
-          //Node n_new(x-1, y, 0, NULL, NULL, NULL);
-          frontier.push(n_new);
+      if (current_dir == S) {
+        if (!(maze[x][y] & bm_wall_north)) {
+          // there's no wall to the north
+          if (x-1 >= 0 && !(maze[x-1][y])) {
+            Serial.println(F("nodeN"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x-1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
         }
-      }
-      if (!(maze[x][y] & bm_wall_east)) {
-        // there's no wall to the east
-        if (y+1 < columns && !(maze[x][y+1])) {
-          Serial.println(F("nodeE"));
-          // the new location is valid and it has not been explored 
-          struct Node n_new;
-          n_new.x = x;
-          n_new.y = y+1;
-          n_new.parent = NULL;
-          //Node n_new(x, y+1, 0, NULL, NULL, NULL);
-          frontier.push(n_new);
+        if (!(maze[x][y] & bm_wall_east)) {
+          // there's no wall to the east
+          if (y+1 < columns && !(maze[x][y+1])) {
+            Serial.println(F("nodeE"));
+            // the new location is valid and it has not been explored 
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y+1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
         }
-      }
-      if (!(maze[x][y] & bm_wall_south)) {
-        // there's no wall to the south
-        if (x+1 < rows && !(maze[x+1][y])) {
-          Serial.println(F("nodeS"));
-          // the new location is valid and it has not been explored
-          struct Node n_new;
-          n_new.x = x+1;
-          n_new.y = y;
-          n_new.parent = NULL;
-          //Node n_new(x+1, y, 0, NULL, NULL, NULL);
-          frontier.push(n_new);
+        if (!(maze[x][y] & bm_wall_west)) {
+          // there's no wall to the west
+          if (y-1 >= 0 && !(maze[x][y-1])) {
+            Serial.println(F("nodeW"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y-1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
         }
-      }
-      if (!(maze[x][y] & bm_wall_west)) {
-        // there's no wall to the west
-        if (y-1 >= 0 && !(maze[x][y-1])) {
-          Serial.println(F("nodeW"));
-          // the new location is valid and it has not been explored
-          struct Node n_new;
-          n_new.x = x;
-          n_new.y = y-1;
-          n_new.parent = NULL;
-          //Node n_new(x, y-1, 0, NULL, NULL, NULL);
-          frontier.push(n_new);
+        if (!(maze[x][y] & bm_wall_south)) {
+          // there's no wall to the south
+          if (x+1 < rows && !(maze[x+1][y])) {
+            Serial.println(F("nodeS"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x+1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+      } else if (current_dir == N) {
+        if (!(maze[x][y] & bm_wall_south)) {
+          // there's no wall to the south
+          if (x+1 < rows && !(maze[x+1][y])) {
+            Serial.println(F("nodeS"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x+1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_west)) {
+          // there's no wall to the west
+          if (y-1 >= 0 && !(maze[x][y-1])) {
+            Serial.println(F("nodeW"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y-1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_east)) {
+          // there's no wall to the east
+          if (y+1 < columns && !(maze[x][y+1])) {
+            Serial.println(F("nodeE"));
+            // the new location is valid and it has not been explored 
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y+1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_north)) {
+          // there's no wall to the north
+          if (x-1 >= 0 && !(maze[x-1][y])) {
+            Serial.println(F("nodeN"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x-1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+      } else if (current_dir == E) {
+        if (!(maze[x][y] & bm_wall_west)) {
+          // there's no wall to the west
+          if (y-1 >= 0 && !(maze[x][y-1])) {
+            Serial.println(F("nodeW"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y-1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_north)) {
+          // there's no wall to the north
+          if (x-1 >= 0 && !(maze[x-1][y])) {
+            Serial.println(F("nodeN"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x-1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_south)) {
+          // there's no wall to the south
+          if (x+1 < rows && !(maze[x+1][y])) {
+            Serial.println(F("nodeS"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x+1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_east)) {
+          // there's no wall to the east
+          if (y+1 < columns && !(maze[x][y+1])) {
+            Serial.println(F("nodeE"));
+            // the new location is valid and it has not been explored 
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y+1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        } 
+      } else if (current_dir == W) {
+        if (!(maze[x][y] & bm_wall_east)) {
+          // there's no wall to the east
+          if (y+1 < columns && !(maze[x][y+1])) {
+            Serial.println(F("nodeE"));
+            // the new location is valid and it has not been explored 
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y+1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_south)) {
+          // there's no wall to the south
+          if (x+1 < rows && !(maze[x+1][y])) {
+            Serial.println(F("nodeS"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x+1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_north)) {
+          // there's no wall to the north
+          if (x-1 >= 0 && !(maze[x-1][y])) {
+            Serial.println(F("nodeN"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x-1;
+            n_new.y = y;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
+        }
+        if (!(maze[x][y] & bm_wall_west)) {
+          // there's no wall to the west
+          if (y-1 >= 0 && !(maze[x][y-1])) {
+            Serial.println(F("nodeW"));
+            // the new location is valid and it has not been explored
+            struct Node n_new;
+            n_new.x = x;
+            n_new.y = y-1;
+            n_new.parent = NULL;
+            frontier.push(n_new);
+          }
         }
       }
     }
@@ -327,8 +458,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
   Serial.println(F("calculating path"));
   bool visited[rows][columns] = { }; // initialized with zeros
   uint8_t heuristic = abs(x - loc_x) + abs(y - loc_y);
-  struct Node *rootNode;
-  struct Node *lastNode;
+  struct Node *rootNode = NULL;
+  struct Node *lastNode = NULL;
   struct Node first_node;
   addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
   while (rootNode) {
@@ -338,17 +469,19 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
     Serial.println(loc_x);
     Serial.println(loc_y);
     // remove this location from the search list
-    if (loc == rootNode) {
+    if (loc == rootNode && loc == lastNode) {
+      rootNode = NULL;
+      lastNode = NULL;
+    } else if (loc == rootNode) {
       rootNode = loc->next;
       rootNode->prev = NULL;
+    } else if  (loc == lastNode) {
+      lastNode = loc->prev;
+      lastNode->next = NULL;
     } else {
       (loc->prev)->next = loc->next;
     }
-    if (loc == lastNode) {
-      lastNode = loc->prev;
-      lastNode->next = NULL;
-    }
-    if (!rootNode) {
+    if (!rootNode && !lastNode) {
       Serial.println(F("greedy search is null"));
     }
     visited[loc->x][loc->y] = true;
@@ -369,6 +502,14 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(loc->x-1-loc_x) + abs(loc->y-loc_y);
           struct Node n_new;
           addNode(&n_new, &(*loc), loc->x-1, loc->y, heuristic, &rootNode, &lastNode);
+          Serial.print(n_new.x);
+          Serial.println(n_new.y);
+          if (rootNode == NULL) {
+            Serial.println("yikes");
+            while(1){
+              
+            }
+          }
 //          if (!rootNode) {
 //            Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL, NULL);
 //            first = &n_new;
@@ -399,6 +540,14 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y+1-loc_y);
           struct Node n_new;
           addNode(&n_new, &(*loc), loc->x, loc->y+1, heuristic, &rootNode, &lastNode);
+          Serial.print(n_new.x);
+          Serial.println(n_new.y);
+          if (rootNode == NULL) {
+            Serial.println("yikes");
+            while(1){
+              
+            }
+          }
 //          if (!first) {
 //            //Node n_parent(loc.x, loc.y, loc.cost, loc.parent, loc.next, loc.prev);
 //            Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL, NULL);
@@ -431,6 +580,14 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(loc->x+1-loc_x) + abs(loc->y-loc_y);
           struct Node n_new;
           addNode(&n_new, &(*loc), loc->x+1, loc->y, heuristic, &rootNode, &lastNode);
+          Serial.print(n_new.x);
+          Serial.println(n_new.y);
+          if (rootNode == NULL) {
+            Serial.println("yikes");
+            while(1){
+              
+            }
+          }
 //          if (first == NULL) {
 //            Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL, NULL);
 //            first = &n_new;
@@ -460,7 +617,17 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.print(F("W"));
           uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y-1-loc_y);
           struct Node n_new;
-          addNode(&n_new, &(*loc), loc->x, loc->y-1, heuristic, &rootNode, &lastNode);
+          uint8_t newX = loc->x;
+          uint8_t newY = loc->y;
+          addNode(&n_new, &(*loc), newX, newY-1, heuristic, &rootNode, &lastNode);
+          Serial.print(n_new.x);
+          Serial.println(n_new.y);
+          if (rootNode == NULL) {
+            Serial.println("yikes");
+            while(1){
+              
+            }
+          }
 //          if (first == NULL) {
 //            Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL, NULL);
 //            first = &n_new;
@@ -748,7 +915,7 @@ boolean linefollow() {
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
     Serial.println(F("A lot right"));
-    MotorRight.write(92);
+    MotorRight.write(90); //edit
     MotorLeft.write(80);
     delay(100);
     return false;
