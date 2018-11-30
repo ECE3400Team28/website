@@ -488,7 +488,7 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
     
     if (loc->x == loc_x && loc->y == loc_y) {
       Serial.println(F("found loc"));
-      return loc;
+      return &(*loc);
     }
 
     // for each action we can take, add the nodes to the frontier.
@@ -506,27 +506,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(n_new.y);
           if (rootNode == NULL) {
             Serial.println("yikes");
-            while(1){
-              
-            }
+            while(1){}
           }
-//          if (!rootNode) {
-//            Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL, NULL);
-//            first = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          } else {
-//            Node n_new(loc.x-1, loc.y, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
-//            last->next = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          }
         }
       }
     }
@@ -544,29 +525,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(n_new.y);
           if (rootNode == NULL) {
             Serial.println("yikes");
-            while(1){
-              
-            }
+            while(1){}
           }
-//          if (!first) {
-//            //Node n_parent(loc.x, loc.y, loc.cost, loc.parent, loc.next, loc.prev);
-//            Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL, NULL);
-//            first = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          } else {
-//            //Node n_parent(loc.x, loc.y, loc.cost, loc.parent, loc.next, loc.prev);
-//            Node n_new(loc.x, loc.y+1, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
-//            last->next = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          }
         }
       }
     }
@@ -584,27 +544,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(n_new.y);
           if (rootNode == NULL) {
             Serial.println("yikes");
-            while(1){
-              
-            }
+            while(1){}
           }
-//          if (first == NULL) {
-//            Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL, NULL);
-//            first = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          } else {
-//            Node n_new(loc.x+1, loc.y, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
-//            last->next = &n_new;
-//            last = &n_new;
-//            Serial.print(last->x);
-//            Serial.println(last->y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          }
         }
       }
     }
@@ -626,27 +567,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(n_new.y);
           if (rootNode == NULL) {
             Serial.println("yikes");
-            while(1){
-              
-            }
+            while(1){}
           }
-//          if (first == NULL) {
-//            Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL, NULL);
-//            first = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          } else {
-//            Node n_new(loc.x, loc.y-1, heuristic, &loc, NULL, &*last); // last might be wrong because last changes- want last, but no changing!
-//            last->next = &n_new;
-//            last = &n_new;
-//            Serial.print(n_new.x);
-//            Serial.println(n_new.y);
-//            Serial.print(n_new.parent->x);
-//            Serial.println(n_new.parent->y);
-//          }
         }
       }
     }
@@ -731,8 +653,9 @@ struct Node* findAndReturnMin(struct Node **RootNode) {
    Moves robot to the location described by the node. Obtains the path through the node's parent.
    Assumptions: There is an open path to the node, but it might encounter enemy robots.
 */
-void moveTo(Node *node) {
+void moveTo(struct Node *node) {
   if (x == node->x && y == node->y) {
+    Serial.println(F("made it to the location that the greedy search chose"));
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -740,12 +663,12 @@ void moveTo(Node *node) {
   }
   Serial.println(F("moving"));
   StackArray<struct Node> path;
-  Node *p = node->parent;
+  struct Node *p = node->parent;
   if (p) {
     Serial.println(F("path exists"));
   }
   while (p) { // the path does not contain the starting (current) location.
-    Serial.print(node->x);
+    Serial.println(node->x);
     Serial.println(node->y);
     path.push(*node);
     node = p;
