@@ -1,5 +1,5 @@
 Assembler report for DE0_NANO
-Mon Nov 26 19:27:38 2018
+Fri Nov 30 16:13:41 2018
 Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 
 
@@ -38,7 +38,7 @@ agreement for further details.
 +---------------------------------------------------------------+
 ; Assembler Summary                                             ;
 +-----------------------+---------------------------------------+
-; Assembler Status      ; Successful - Mon Nov 26 19:27:38 2018 ;
+; Assembler Status      ; Successful - Fri Nov 30 16:13:41 2018 ;
 ; Revision Name         ; DE0_NANO                              ;
 ; Top-level Entity Name ; DE0_NANO                              ;
 ; Family                ; Cyclone IV E                          ;
@@ -67,8 +67,8 @@ agreement for further details.
 +----------------+-------------------------------------------+
 ; Option         ; Setting                                   ;
 +----------------+-------------------------------------------+
-; JTAG usercode  ; 0x00363FE7                                ;
-; Checksum       ; 0x00363FE7                                ;
+; JTAG usercode  ; 0x00353A21                                ;
+; Checksum       ; 0x00353A21                                ;
 +----------------+-------------------------------------------+
 
 
@@ -78,7 +78,7 @@ agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus Prime Assembler
     Info: Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
-    Info: Processing started: Mon Nov 26 19:27:36 2018
+    Info: Processing started: Fri Nov 30 16:13:39 2018
 Info: Command: quartus_asm --read_settings_files=off --write_settings_files=off DE0_NANO -c DE0_NANO
 Warning (125092): Tcl Script File DE_NANO_SOPC.qip not found
     Info (125063): set_global_assignment -name QIP_FILE DE_NANO_SOPC.qip
@@ -87,8 +87,8 @@ Info (115031): Writing out detailed assembly data for power analysis
 Info (115030): Assembler is generating device programming files
 Info: Quartus Prime Assembler was successful. 0 errors, 2 warnings
     Info: Peak virtual memory: 576 megabytes
-    Info: Processing ended: Mon Nov 26 19:27:39 2018
-    Info: Elapsed time: 00:00:03
+    Info: Processing ended: Fri Nov 30 16:13:41 2018
+    Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:01
 
 

@@ -1,5 +1,5 @@
 Analysis & Synthesis report for DE0_NANO
-Mon Nov 26 19:26:58 2018
+Fri Nov 30 16:13:09 2018
 Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
 
 
@@ -15,23 +15,24 @@ Quartus Prime Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
   7. Analysis & Synthesis Resource Utilization by Entity
   8. Analysis & Synthesis RAM Summary
   9. Analysis & Synthesis IP Cores Summary
- 10. Registers Removed During Synthesis
- 11. Removed Registers Triggering Further Register Optimizations
- 12. General Register Statistics
- 13. Inverted Register Statistics
- 14. Registers Packed Into Inferred Megafunctions
- 15. Multiplexer Restructuring Statistics (Restructuring Performed)
- 16. Source assignments for Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated
- 17. Parameter Settings for User Entity Instance: PLL:PLL_inst|altpll:altpll_component
- 18. Parameter Settings for Inferred Entity Instance: Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0
- 19. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult0
- 20. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult1
- 21. altpll Parameter Settings by Entity Instance
- 22. altsyncram Parameter Settings by Entity Instance
- 23. lpm_mult Parameter Settings by Entity Instance
- 24. Post-Synthesis Netlist Statistics for Top Partition
- 25. Elapsed Time Per Partition
- 26. Analysis & Synthesis Messages
+ 10. State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT_C
+ 11. Registers Removed During Synthesis
+ 12. Removed Registers Triggering Further Register Optimizations
+ 13. General Register Statistics
+ 14. Inverted Register Statistics
+ 15. Registers Packed Into Inferred Megafunctions
+ 16. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 17. Source assignments for Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated
+ 18. Parameter Settings for User Entity Instance: PLL:PLL_inst|altpll:altpll_component
+ 19. Parameter Settings for Inferred Entity Instance: Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0
+ 20. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult0
+ 21. Parameter Settings for Inferred Entity Instance: lpm_mult:Mult1
+ 22. altpll Parameter Settings by Entity Instance
+ 23. altsyncram Parameter Settings by Entity Instance
+ 24. lpm_mult Parameter Settings by Entity Instance
+ 25. Post-Synthesis Netlist Statistics for Top Partition
+ 26. Elapsed Time Per Partition
+ 27. Analysis & Synthesis Messages
 
 
 
@@ -58,15 +59,15 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +------------------------------------+---------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Mon Nov 26 19:26:57 2018       ;
+; Analysis & Synthesis Status        ; Successful - Fri Nov 30 16:13:09 2018       ;
 ; Quartus Prime Version              ; 17.0.0 Build 595 04/25/2017 SJ Lite Edition ;
 ; Revision Name                      ; DE0_NANO                                    ;
 ; Top-level Entity Name              ; DE0_NANO                                    ;
 ; Family                             ; Cyclone IV E                                ;
-; Total logic elements               ; 3,602                                       ;
-;     Total combinational functions  ; 3,574                                       ;
-;     Dedicated logic registers      ; 1,420                                       ;
-; Total registers                    ; 1420                                        ;
+; Total logic elements               ; 3,410                                       ;
+;     Total combinational functions  ; 3,382                                       ;
+;     Dedicated logic registers      ; 1,346                                       ;
+; Total registers                    ; 1346                                        ;
 ; Total pins                         ; 51                                          ;
 ; Total virtual pins                 ; 0                                           ;
 ; Total memory bits                  ; 202,752                                     ;
@@ -238,20 +239,20 @@ agreement for further details.
 +---------------------------------------------+---------------------------------------------------------------------------------+
 ; Resource                                    ; Usage                                                                           ;
 +---------------------------------------------+---------------------------------------------------------------------------------+
-; Estimated Total logic elements              ; 3,602                                                                           ;
+; Estimated Total logic elements              ; 3,410                                                                           ;
 ;                                             ;                                                                                 ;
-; Total combinational functions               ; 3574                                                                            ;
+; Total combinational functions               ; 3382                                                                            ;
 ; Logic element usage by number of LUT inputs ;                                                                                 ;
-;     -- 4 input functions                    ; 1831                                                                            ;
-;     -- 3 input functions                    ; 1403                                                                            ;
-;     -- <=2 input functions                  ; 340                                                                             ;
+;     -- 4 input functions                    ; 2575                                                                            ;
+;     -- 3 input functions                    ; 460                                                                             ;
+;     -- <=2 input functions                  ; 347                                                                             ;
 ;                                             ;                                                                                 ;
 ; Logic elements by mode                      ;                                                                                 ;
-;     -- normal mode                          ; 3106                                                                            ;
-;     -- arithmetic mode                      ; 468                                                                             ;
+;     -- normal mode                          ; 3022                                                                            ;
+;     -- arithmetic mode                      ; 360                                                                             ;
 ;                                             ;                                                                                 ;
-; Total registers                             ; 1420                                                                            ;
-;     -- Dedicated logic registers            ; 1420                                                                            ;
+; Total registers                             ; 1346                                                                            ;
+;     -- Dedicated logic registers            ; 1346                                                                            ;
 ;     -- I/O registers                        ; 0                                                                               ;
 ;                                             ;                                                                                 ;
 ; I/O pins                                    ; 51                                                                              ;
@@ -263,9 +264,9 @@ agreement for further details.
 ;     -- PLLs                                 ; 1                                                                               ;
 ;                                             ;                                                                                 ;
 ; Maximum fan-out node                        ; PLL:PLL_inst|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[0] ;
-; Maximum fan-out                             ; 1410                                                                            ;
-; Total fan-out                               ; 16246                                                                           ;
-; Average fan-out                             ; 3.17                                                                            ;
+; Maximum fan-out                             ; 1336                                                                            ;
+; Total fan-out                               ; 16218                                                                           ;
+; Average fan-out                             ; 3.33                                                                            ;
 +---------------------------------------------+---------------------------------------------------------------------------------+
 
 
@@ -274,18 +275,18 @@ agreement for further details.
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
 ; Compilation Hierarchy Node                     ; Combinational ALUTs ; Dedicated Logic Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                              ; Entity Name       ; Library Name ;
 +------------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+----------------------------------------------------------------------------------------------------------------------------------+-------------------+--------------+
-; |DE0_NANO                                      ; 3574 (57)           ; 1420 (46)                 ; 202752      ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
-;    |Dual_Port_RAM_M9K:mem|                     ; 31 (0)              ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem                                                                                                  ; Dual_Port_RAM_M9K ; work         ;
-;       |altsyncram:mem_rtl_0|                   ; 31 (0)              ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0                                                                             ; altsyncram        ; work         ;
-;          |altsyncram_j5f1:auto_generated|      ; 31 (0)              ; 2 (2)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated                                              ; altsyncram_j5f1   ; work         ;
+; |DE0_NANO                                      ; 3382 (56)           ; 1346 (46)                 ; 202752      ; 0            ; 0       ; 0         ; 51   ; 0            ; |DE0_NANO                                                                                                                        ; DE0_NANO          ; work         ;
+;    |Dual_Port_RAM_M9K:mem|                     ; 26 (0)              ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem                                                                                                  ; Dual_Port_RAM_M9K ; work         ;
+;       |altsyncram:mem_rtl_0|                   ; 26 (0)              ; 2 (0)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0                                                                             ; altsyncram        ; work         ;
+;          |altsyncram_j5f1:auto_generated|      ; 26 (0)              ; 2 (2)                     ; 202752      ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated                                              ; altsyncram_j5f1   ; work         ;
 ;             |decode_f8a:rden_decode_b|         ; 4 (4)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated|decode_f8a:rden_decode_b                     ; decode_f8a        ; work         ;
 ;             |decode_msa:decode2|               ; 4 (4)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated|decode_msa:decode2                           ; decode_msa        ; work         ;
-;             |mux_6nb:mux3|                     ; 23 (23)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated|mux_6nb:mux3                                 ; mux_6nb           ; work         ;
-;    |IMAGE_PROCESSOR:proc|                      ; 3394 (3394)         ; 1352 (1352)               ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|IMAGE_PROCESSOR:proc                                                                                                   ; IMAGE_PROCESSOR   ; work         ;
+;             |mux_6nb:mux3|                     ; 18 (18)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|Dual_Port_RAM_M9K:mem|altsyncram:mem_rtl_0|altsyncram_j5f1:auto_generated|mux_6nb:mux3                                 ; mux_6nb           ; work         ;
+;    |IMAGE_PROCESSOR:proc|                      ; 3209 (3209)         ; 1278 (1278)               ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|IMAGE_PROCESSOR:proc                                                                                                   ; IMAGE_PROCESSOR   ; work         ;
 ;    |PLL:PLL_inst|                              ; 0 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|PLL:PLL_inst                                                                                                           ; PLL               ; work         ;
 ;       |altpll:altpll_component|                ; 0 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|PLL:PLL_inst|altpll:altpll_component                                                                                   ; altpll            ; work         ;
 ;          |PLL_altpll:auto_generated|           ; 0 (0)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|PLL:PLL_inst|altpll:altpll_component|PLL_altpll:auto_generated                                                         ; PLL_altpll        ; work         ;
-;    |VGA_DRIVER:driver|                         ; 42 (42)             ; 20 (20)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|VGA_DRIVER:driver                                                                                                      ; VGA_DRIVER        ; work         ;
+;    |VGA_DRIVER:driver|                         ; 41 (41)             ; 20 (20)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|VGA_DRIVER:driver                                                                                                      ; VGA_DRIVER        ; work         ;
 ;    |lpm_mult:Mult0|                            ; 25 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0                                                                                                         ; lpm_mult          ; work         ;
 ;       |multcore:mult_core|                     ; 25 (15)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core                                                                                      ; multcore          ; work         ;
 ;          |mpar_add:padder|                     ; 10 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE0_NANO|lpm_mult:Mult0|multcore:mult_core|mpar_add:padder                                                                      ; mpar_add          ; work         ;
@@ -324,20 +325,37 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +--------+--------------+---------+--------------+--------------+------------------------+-----------------+
 
 
-+------------------------------------------------------------------------------------------+
-; Registers Removed During Synthesis                                                       ;
-+----------------------------------------+-------------------------------------------------+
-; Register name                          ; Reason for Removal                              ;
-+----------------------------------------+-------------------------------------------------+
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[3,4]  ; Stuck at GND due to stuck port data_in          ;
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_C[2..4] ; Stuck at GND due to stuck port data_in          ;
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[1,2]  ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_E[0] ;
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[7]    ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_E[6] ;
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_C[1]    ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_C[0] ;
-; IMAGE_PROCESSOR:proc|PIXEL_OUT_C[6]    ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_C[5] ;
-; Y_ADDR[11..14]                         ; Lost fanout                                     ;
-; Total Number of Removed Registers = 14 ;                                                 ;
-+----------------------------------------+-------------------------------------------------+
+Encoding Type:  One-Hot
++------------------------------------------------------------------------------------------------------------------+
+; State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT_C                                                       ;
++----------------------+----------------------+----------------------+----------------------+----------------------+
+; Name                 ; PIXEL_OUT_C.01100000 ; PIXEL_OUT_C.00000000 ; PIXEL_OUT_C.11100000 ; PIXEL_OUT_C.00000011 ;
++----------------------+----------------------+----------------------+----------------------+----------------------+
+; PIXEL_OUT_C.00000000 ; 0                    ; 0                    ; 0                    ; 0                    ;
+; PIXEL_OUT_C.00000011 ; 0                    ; 1                    ; 0                    ; 1                    ;
+; PIXEL_OUT_C.01100000 ; 1                    ; 1                    ; 0                    ; 0                    ;
+; PIXEL_OUT_C.11100000 ; 0                    ; 1                    ; 1                    ; 0                    ;
++----------------------+----------------------+----------------------+----------------------+----------------------+
+
+
++---------------------------------------------------------------------------------------------+
+; Registers Removed During Synthesis                                                          ;
++-------------------------------------------+-------------------------------------------------+
+; Register name                             ; Reason for Removal                              ;
++-------------------------------------------+-------------------------------------------------+
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[3,4]     ; Stuck at GND due to stuck port data_in          ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[1,2]     ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_E[0] ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_E[7]       ; Merged with IMAGE_PROCESSOR:proc|PIXEL_OUT_E[6] ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C.01100000 ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~3        ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~4        ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~5        ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~6        ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~7        ; Lost fanout                                     ;
+; IMAGE_PROCESSOR:proc|PIXEL_OUT_C~8        ; Lost fanout                                     ;
+; Y_ADDR[11..14]                            ; Lost fanout                                     ;
+; Total Number of Removed Registers = 16    ;                                                 ;
++-------------------------------------------+-------------------------------------------------+
 
 
 +-----------------------------------------------------------------------------+
@@ -354,12 +372,12 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 1420  ;
-; Number of registers using Synchronous Clear  ; 49    ;
+; Total registers                              ; 1346  ;
+; Number of registers using Synchronous Clear  ; 56    ;
 ; Number of registers using Synchronous Load   ; 5     ;
 ; Number of registers using Asynchronous Clear ; 0     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 185   ;
+; Number of registers using Clock Enable       ; 133   ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
@@ -383,40 +401,35 @@ Note: For table entries with two numbers listed, the numbers in parentheses indi
 +-----------------------------------------+---------------------------------+------+
 
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                               ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
-; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                     ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
-; 3:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|pixel_count[8]     ;
-; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|blue_cnt[3]     ;
-; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|red_cnt[3]      ;
-; 3:1                ; 5 bits    ; 10 LEs        ; 10 LEs               ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT[7]    ;
-; 4:1                ; 15 bits   ; 30 LEs        ; 15 LEs               ; 15 LEs                 ; Yes        ; |DE0_NANO|X_ADDR[0]                            ;
-; 4:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT_E[0]  ;
-; 4:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_d_b[2] ;
-; 4:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_u_b[3] ;
-; 4:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_d_r[1] ;
-; 4:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_u_r[3] ;
-; 3:1                ; 15 bits   ; 30 LEs        ; 15 LEs               ; 15 LEs                 ; Yes        ; |DE0_NANO|Y_ADDR[11]                           ;
-; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[6]      ;
-; 3:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux9            ;
-; 3:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux6            ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|VGA_DRIVER:driver|PIXEL_COLOR_OUT[5] ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_d_b    ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_u_b    ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_d_r    ;
-; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|num_diag_u_r    ;
-; 4:1                ; 60 bits   ; 120 LEs       ; 120 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux3            ;
-; 4:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux9            ;
-; 7:1                ; 6 bits    ; 24 LEs        ; 24 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux6            ;
-; 8:1                ; 12 bits   ; 60 LEs        ; 60 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux15           ;
-; 14:1               ; 6 bits    ; 54 LEs        ; 54 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux12           ;
-; 32:1               ; 12 bits   ; 252 LEs       ; 252 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux6            ;
-; 28:1               ; 6 bits    ; 108 LEs       ; 108 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux16           ;
-; 38:1               ; 6 bits    ; 150 LEs       ; 150 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux5            ;
-; 42:1               ; 6 bits    ; 168 LEs       ; 168 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux0            ;
-+--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                      ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-------------------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                            ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-------------------------------------------------------+
+; 3:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|pixel_count[9]            ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|blue_cnt[3]            ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|red_cnt[3]             ;
+; 3:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|curr_num_colored[0]    ;
+; 3:1                ; 40 bits   ; 80 LEs        ; 40 LEs               ; 40 LEs                 ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|prev_num_colored[2][6] ;
+; 3:1                ; 5 bits    ; 10 LEs        ; 10 LEs               ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT[6]           ;
+; 4:1                ; 15 bits   ; 30 LEs        ; 15 LEs               ; 15 LEs                 ; Yes        ; |DE0_NANO|X_ADDR[3]                                   ;
+; 4:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT_E[0]         ;
+; 7:1                ; 2 bits    ; 8 LEs         ; 8 LEs                ; 0 LEs                  ; Yes        ; |DE0_NANO|IMAGE_PROCESSOR:proc|RESULT[0]              ;
+; 3:1                ; 15 bits   ; 30 LEs        ; 15 LEs               ; 15 LEs                 ; Yes        ; |DE0_NANO|Y_ADDR[7]                                   ;
+; 4:1                ; 10 bits   ; 20 LEs        ; 10 LEs               ; 10 LEs                 ; Yes        ; |DE0_NANO|VGA_DRIVER:driver|line_count[2]             ;
+; 3:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux0                   ;
+; 3:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux15                  ;
+; 3:1                ; 8 bits    ; 16 LEs        ; 16 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|VGA_DRIVER:driver|PIXEL_COLOR_OUT[2]        ;
+; 4:1                ; 60 bits   ; 120 LEs       ; 120 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux3                   ;
+; 4:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux12                  ;
+; 7:1                ; 6 bits    ; 24 LEs        ; 24 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux15                  ;
+; 8:1                ; 12 bits   ; 60 LEs        ; 60 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux0                   ;
+; 14:1               ; 6 bits    ; 54 LEs        ; 54 LEs               ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux9                   ;
+; 32:1               ; 12 bits   ; 252 LEs       ; 252 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux12                  ;
+; 28:1               ; 6 bits    ; 108 LEs       ; 108 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux10                  ;
+; 38:1               ; 6 bits    ; 150 LEs       ; 150 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux14                  ;
+; 42:1               ; 6 bits    ; 168 LEs       ; 168 LEs              ; 0 LEs                  ; No         ; |DE0_NANO|IMAGE_PROCESSOR:proc|Mux6                   ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-------------------------------------------------------+
 
 
 +--------------------------------------------------------------------------------------------------+
@@ -1007,27 +1020,27 @@ Note: In order to hide this table in the UI and the text report file, please set
 ; Type                  ; Count                       ;
 +-----------------------+-----------------------------+
 ; boundary_port         ; 51                          ;
-; cycloneiii_ff         ; 1420                        ;
-;     ENA               ; 164                         ;
+; cycloneiii_ff         ; 1346                        ;
+;     ENA               ; 112                         ;
 ;     ENA SCLR          ; 21                          ;
-;     SCLR              ; 28                          ;
+;     SCLR              ; 35                          ;
 ;     SLD               ; 5                           ;
-;     plain             ; 1202                        ;
-; cycloneiii_lcell_comb ; 3575                        ;
-;     arith             ; 468                         ;
-;         2 data inputs ; 246                         ;
-;         3 data inputs ; 222                         ;
-;     normal            ; 3107                        ;
-;         0 data inputs ; 2                           ;
-;         1 data inputs ; 30                          ;
-;         2 data inputs ; 63                          ;
-;         3 data inputs ; 1181                        ;
-;         4 data inputs ; 1831                        ;
+;     plain             ; 1173                        ;
+; cycloneiii_lcell_comb ; 3383                        ;
+;     arith             ; 360                         ;
+;         2 data inputs ; 168                         ;
+;         3 data inputs ; 192                         ;
+;     normal            ; 3023                        ;
+;         0 data inputs ; 5                           ;
+;         1 data inputs ; 20                          ;
+;         2 data inputs ; 155                         ;
+;         3 data inputs ; 268                         ;
+;         4 data inputs ; 2575                        ;
 ; cycloneiii_pll        ; 1                           ;
 ; cycloneiii_ram_block  ; 32                          ;
 ;                       ;                             ;
-; Max LUT depth         ; 26.30                       ;
-; Average LUT depth     ; 17.29                       ;
+; Max LUT depth         ; 20.00                       ;
+; Average LUT depth     ; 12.40                       ;
 +-----------------------+-----------------------------+
 
 
@@ -1036,7 +1049,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:14     ;
+; Top            ; 00:00:12     ;
 +----------------+--------------+
 
 
@@ -1046,7 +1059,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 17.0.0 Build 595 04/25/2017 SJ Lite Edition
-    Info: Processing started: Mon Nov 26 19:26:26 2018
+    Info: Processing started: Fri Nov 30 16:12:41 2018
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off DE0_NANO -c DE0_NANO
 Warning (125092): Tcl Script File DE_NANO_SOPC.qip not found
     Info (125063): set_global_assignment -name QIP_FILE DE_NANO_SOPC.qip
@@ -1154,6 +1167,9 @@ Info (12128): Elaborating entity "VGA_DRIVER" for hierarchy "VGA_DRIVER:driver" 
 Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(71): truncated value with size 32 to match size of target (10) File: F:/ECE3400/TeamFPGA/VGA_DRIVER.v Line: 71
 Warning (10230): Verilog HDL assignment warning at VGA_DRIVER.v(75): truncated value with size 32 to match size of target (10) File: F:/ECE3400/TeamFPGA/VGA_DRIVER.v Line: 75
 Info (12128): Elaborating entity "IMAGE_PROCESSOR" for hierarchy "IMAGE_PROCESSOR:proc" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 140
+Warning (10230): Verilog HDL assignment warning at IMAGE_PROCESSOR.v(132): truncated value with size 32 to match size of target (8) File: F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v Line: 132
+Warning (10230): Verilog HDL assignment warning at IMAGE_PROCESSOR.v(134): truncated value with size 32 to match size of target (8) File: F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v Line: 134
+Warning (10230): Verilog HDL assignment warning at IMAGE_PROCESSOR.v(136): truncated value with size 32 to match size of target (8) File: F:/ECE3400/TeamFPGA/IMAGE_PROCESSOR.v Line: 136
 Warning (276027): Inferred dual-clock RAM node "Dual_Port_RAM_M9K:mem|mem_rtl_0" from synchronous design logic.  The read-during-write behavior of a dual-clock RAM is undefined and may not match the behavior of the original design.
 Info (19000): Inferred 1 megafunctions from design logic
     Info (276029): Inferred altsyncram megafunction from the following design logic: "Dual_Port_RAM_M9K:mem|mem_rtl_0" 
@@ -1258,7 +1274,7 @@ Warning (13024): Output pins are stuck at VCC or GND
     Warning (13410): Pin "GPIO_0_D[26]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
     Warning (13410): Pin "GPIO_0_D[27]" is stuck at GND File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 28
 Info (286030): Timing-Driven Synthesis is running
-Info (17049): 4 registers lost all their fanouts during netlist optimizations.
+Info (17049): 11 registers lost all their fanouts during netlist optimizations.
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 1 node(s), including 0 DDIO, 1 PLL, 0 transceiver and 0 LCELL
 Warning (21074): Design contains 6 input pin(s) that do not drive logic
@@ -1268,16 +1284,16 @@ Warning (21074): Design contains 6 input pin(s) that do not drive logic
     Warning (15610): No output dependent on input pin "GPIO_1_D[24]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 30
     Warning (15610): No output dependent on input pin "GPIO_1_D[28]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 30
     Warning (15610): No output dependent on input pin "KEY[1]" File: F:/ECE3400/TeamFPGA/DE0_NANO.v Line: 31
-Info (21057): Implemented 4537 device resources after synthesis - the final resource count might be different
+Info (21057): Implemented 4274 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 17 input pins
     Info (21059): Implemented 34 output pins
-    Info (21061): Implemented 4453 logic cells
+    Info (21061): Implemented 4190 logic cells
     Info (21064): Implemented 32 RAM segments
     Info (21065): Implemented 1 PLLs
-Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 48 warnings
-    Info: Peak virtual memory: 699 megabytes
-    Info: Processing ended: Mon Nov 26 19:26:58 2018
-    Info: Elapsed time: 00:00:32
-    Info: Total CPU time (on all processors): 00:00:39
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 51 warnings
+    Info: Peak virtual memory: 696 megabytes
+    Info: Processing ended: Fri Nov 30 16:13:10 2018
+    Info: Elapsed time: 00:00:29
+    Info: Total CPU time (on all processors): 00:00:32
 
 
