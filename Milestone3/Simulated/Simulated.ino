@@ -105,10 +105,10 @@ void setup() {
   // remove wall sensors from 5v line to prevent weird interference
 
   // wait for either microphone 660Hz or button input
-  while (!readSignal() && !digitalRead(pin_Button) == HIGH) {
-    Serial.println(F("no input"));
-    delay(10);
-  }
+//  while (!readSignal() && !digitalRead(pin_Button) == HIGH) {
+//    Serial.println(F("no input"));
+//    delay(10);
+//  }
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
   int PWM2 = 3;
@@ -263,6 +263,7 @@ void loop() { // try not using stackarray- use doubly linked list
           moveTo(&next);
         } else {
           // the location is one away, but there is a wall so I have to run algorithm to find best path
+          Serial.println(F("need to go around wall"));
           Serial.println(F("need more than one step to reach it!"));
           greedy(loc.x, loc.y);
         }
@@ -674,8 +675,11 @@ void moveTo(struct Node *node) {
 //    struct Node next = path.pop();
 //    Serial.println(next.x);
 //    Serial.println(next.y);
+    Serial.print(F("Now moving to: "));
     uint8_t nextX = real_path.pop();
     uint8_t nextY = real_path.pop();
+    Serial.print(nextX);
+    Serial.println(nextY);
     // turn to face the correct direction: the next node should be one tile away.
     int x_diff = nextX - x;
     int y_diff = nextY - y; 

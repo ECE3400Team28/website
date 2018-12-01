@@ -457,8 +457,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
     const uint8_t locY = loc->y;
     loc->path.push(locX);
     loc->path.push(locY);
-//    Serial.println(locX);
-//    Serial.println(locY);
+    Serial.println(locX);
+    Serial.println(locY);
 //    Serial.println(F("parent: "));
 //    //Serial.println(loc->parent, HEX);
 //    Serial.println(loc->parent->x);
@@ -556,7 +556,7 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
         // the new location is valid and it has not been explored
         if (maze[locX][locY - 1] > 0 || (locX == loc_x && locY - 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
-          Serial.print(F("W"));
+          Serial.println(F("W"));
           uint8_t heuristic = abs(locX-loc_x) + abs(locY-1-loc_y);
           struct Node n_new;
           n_new.path = loc->path;
