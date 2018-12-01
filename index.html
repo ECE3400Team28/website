@@ -1180,7 +1180,11 @@ if ( radio.available() )
               
               <h3 class="text-secondary text-left mb-3">Goal</h3>
               <p class="mb-3 text-left">
-                At this point, we want to begin being able to detect visual treasures. Specifically, we need to be able to distinguish normal white walls from specific colored shapes attached to the walls. The treasures can be either blue or red, and can be any of a square, triangle, or diamond. In order to do this, we add a camera (the OV7670). The camera outputs data to an FPGA (the DE0-NANO), which then processes the image in real time in order to determine the presence or absence of any treasures, as well as what color they are. For debugging purposes, we also connected the FPGA to a VGA adaptor and monitor. A datasheet for the OV7670 camera can be found <a href="http://web.mit.edu/6.111/www/f2016/tools/OV7670_2006.pdf">here.</a> 
+                At this point, we want to begin being able to detect visual treasures. Specifically, we need to be able to distinguish normal white walls from specific colored shapes attached to the walls. The treasures can be either blue or red, and can be any of a square, triangle, or diamond. In order to do this, we add a camera (the OV7670). The camera outputs data to an FPGA (the DE0-NANO), which then processes the image in real time in order to determine the presence or absence of any treasures, as well as what color they are. For debugging purposes, we also connected the FPGA to a VGA adaptor and monitor. A datasheet for the OV7670 camera can be found <a href="http://web.mit.edu/6.111/www/f2016/tools/OV7670_2006.pdf">here.</a>  Note that since we deal with a field-programmable gate array, we now need to assign these register conenections in a hardware description language. We chose to write in Verilog compiled in Altera's Quartus Prime Lite softare.  
+              </p>
+              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/Treasures.png" alt="The six treasure types">
+              <p class="mb-3 text-left">
+                Above is the visual of the specific types of treasures we wish to detect and differentiate. The graphic was borrowed from the ECE 3400 Fall 2018 course website.
               </p>
 
               <hr class="mb-5">
@@ -1656,8 +1660,122 @@ void wallfollow(){
               <h2 class="text-secondary text-uppercase mb-0">Milestone 4</h2>
               <hr class="star-dark mb-5">
               <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
-              <p class="mb-3">Hey! Thanks for checking out our work. Unfortunately, we're still working on this part of our robot, but we'll add documentation for this milestone as soon as we finish. Please check back in a few weeks!</p>
-              <p class="mb-5">In the meantime, you can take a look at the assignment that we are trying to complete <a href="https://cei-lab.github.io/ece3400-2018/Grading/Milestone_score.html">here</a>.</p>
+
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                The goal of Milestone 4 was to add shape detection functionality to the robot, adding upon the progress made in Lab 4. In order to do this, we employed a number of different techniques, before settling upon generally using edge detection in order to determine the shape of the treasure. We use the same OV7670 and DE0-NANO from Lab 4, but with an updated communication protocol and different software.
+              </p>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">The Switch to 444</h4>
+              <p class="mb-3 text-left">
+                As we continued to interface with the OV7670, we found that the camera tended to have streaking effects and visual artifacts. Although these were mitigable by image processing techniques, occasionally red shapes would appear entirely blue and vice versa, rendering our color detection algorithms useless. It is possible that the high speed (up to 24MHz) signals were above the actual Arduino or camera specifications and led to undefined behavior.
+              </p>
+              <p class="mb-3 text-left">
+                  We found that switching our color data format from RGB 565 to RGB 444, in which each color field contains 4 bits of information, kept the same amount of color data once downsampled, but lead the much more stable and accurate color information. A snippet from the new downsampling algorithm is below.
+              </p>
+              <pre class="mb-1 text-left"><code>
+if (CAM_COUNT == 1'b0)begin
+  W_EN = 1'b0; // on the first cycle of a pixel - do not write!
+  data[7:0] = CAM_DATA; // shift data from camera into LSByte
+  CAM_COUNT = 1'b1; // next, we take in the MSByte data
+  X_ADDR = X_ADDR;
+end
+else begin
+  data[15:8] = CAM_DATA; // shift data from camera into MSByte
+  CAM_COUNT = 1'b0; // next, go to LSByte
+
+  downsampled[7:5] = data[11:9]; // downsample
+  downsampled[4:2] = data[7:5]; // data takes form X R G B
+  downsampled[1:0] = data[3:2]; // where each is 4 bits
+
+  X_ADDR = X_ADDR + 1; // we now go to next address
+  W_EN = 1'b1; // write downsampled to RAM
+end
+              </code></pre>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Additional Color History</h4>
+              <p class="mb-3 text-left">
+                  Reliably determining shape requires some form of comparative information - is there an edge at a particular location? Does the shape get wider or narrower as you move down across an image? To achieve accurate edge detection, we store pixel data for the current row as well as two previous rows of the image. In particular, we store whether or not we believed that a particular pixel was blue or red. This allows to determine the presence of the edge of a shape, as well as what direction the edge is in. 
+              </p>
+              <p class="mb-5 text-left">
+                  Since we store data from the previous three rows, we are able to search for matches with a 3x3 pixel pattern which represent an edge. In particular, we found that comparing with four particular patterns were useful in determining treasure shape. As seen in the snippet below, we look for approximately diagonal edge patterns in the pixels. A similar code snippet would check for red diagonal patterns.
+              </p>
+              <pre class="mb-1 text-left"><code>
+// blue_recent contains 3x3 grid of pixel color data
+case (blue_recent)
+  9'b111_110_100: begin
+    // upper left
+    num_diag_u_b = num_diag_u_b + 12'd1;
+  end
+  9'b111_011_001: begin
+    // upper right
+    num_diag_u_b = num_diag_u_b + 12'd1;
+  end
+  9'b001_011_111: begin
+    // bottom right
+    num_diag_d_b = num_diag_d_b + 12'd1;
+  end
+  9'b100_110_111: begin
+    // bottom left
+    num_diag_d_b = num_diag_d_b + 12'd1;
+  end
+endcase
+              </code></pre>
+
+              <p class="mb-5 text-left">
+                  We then utilize this edge detection to differentiate between the shape types. In particular, slanted edges are a strong indicator of triangles and diamonds. As the diagram below indicates, triangles tend to have edge patterns with the colored pixels in the lower half, whereas diamonds are an even mix of upper and lower diagonals, and squares have very few of either. A predefined threshold would then separate noise from meaningful indicators of the presence of a triangle or diamond.
+              </p>
+              <img class="img-fluid mb-5" style="max-height:300px" src="img/Milestone4Photos/edgedetect.jpg" alt="Showcasing square, triangle, diamond edge patterns">
+              <p class="mb-5 text-left">
+                  We also found that while our color and shape detection usually remained accurate, there were still frequent blips on the information received by the Arduino. We combatted this by adding simple low-pass filters over many of the counting signals inside of the image processor module. This averaging spreads out the effect of outlier frames and reducing the chance that the Arduino will randomly sample an output which does not accurately represent the shape that the FPGA tends to believe the shape is. One example assignment for a low pass filter is below.
+              </p>
+              <pre class="mb-1 text-left"><code>
+
+num_diag_u_r_p = (num_diag_u_r_p - (num_diag_u_r_p >> 3) ) + (num_diag_u_r >> 3);
+ 
+Updated Arduino Communication
+With the addition of treasure data, we now required a more advanced form of communication with the Arduino. We found that since we already had a 3-bit encoding for treasure data which was present in our Arduino GUI updating code and maze information storage, that it was natural to extend this to also be the format that the FPGA to Arduino communication took place. Instead of a pair of wires, now three wires run from the FPGA to the Arduino, each one being a bit in the three-bit treasure representation established in Lab 3. Below is the code running on the robot Arduino which reads the FPGA communication pins to determine treasure information.
+ 
+  int FPGA_read = 0;
+ 
+  FPGA_read += (digitalRead(FPGA_PIN_2) << 2);
+  FPGA_read += (digitalRead(FPGA_PIN_1) << 1);
+  FPGA_read += (digitalRead(FPGA_PIN_0) << 0);
+  Serial.print(F("Received "));
+  Serial.println(FPGA_read, BIN);
+ 
+  switch (FPGA_read) {
+    case 0:
+      break;
+    case 1:
+      Serial.println(F("blue square"));
+      break;
+    case 2:
+      Serial.println(F("red square"));
+      break;
+    case 3:
+      Serial.println(F("blue dia"));
+      break;
+    case 4:
+      Serial.println(F("red dia"));
+      break;
+    case 5:
+      Serial.println(F("blue tr"));
+      break;
+    case 6:
+      Serial.println(F("red tr"));
+      break;
+    default:
+      Serial.println(F("Unknown"));
+      break;
+  }
+</code></pre>
+              <hr class="mb-5">
+              <p class="mb-3">
+                Two videos below showcase the robust color and shape detection. The first runs through all six types of treasures present in the final maze, and the second displays the FPGA's ability to differentiate between having a treasure and not having a treasure.
+              </p>
+
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
                 Close Project</a>
