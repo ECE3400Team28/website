@@ -188,11 +188,11 @@ void addNewNodeToStack(uint8_t dir) {
       n_new.y = y;
       break;
   }
-  n_new.parent = NULL;
-  StackArray<uint8_t> p;
-  p.push(y);
-  p.push(x);
-  n_new.path = p;
+//  n_new.parent = NULL;
+//  StackArray<uint8_t> p;
+//  p.push(y);
+//  p.push(x);
+//  n_new.path = p;
   frontier.push(n_new);
 }
 
@@ -210,9 +210,9 @@ void loop() { // try not using stackarray- use doubly linked list
     struct Node n;
     n.x = x;
     n.y = y;
-    n.parent = NULL;
-    n.path.push(y);
-    n.path.push(x);
+//    n.parent = NULL;
+//    n.path.push(y);
+//    n.path.push(x);
     //Node n(x, y, 0, NULL, NULL, NULL);
     frontier.push(n);
     
@@ -227,47 +227,48 @@ void loop() { // try not using stackarray- use doubly linked list
         if (loc.x == x && loc.y == y) {
           //we are here
           Serial.println(F("already here"));
-          moveTo(&loc); // doesn't do anything but added it for consistency
+          moveOne(loc.x, loc.y); // doesn't do anything but added it for consistency
         } else if (loc.x < x && !(maze[x][y] & bm_wall_north)) {
           // the location is north, and there's no wall, so I can move
           Serial.println(F("moving north"));
-          struct Node next;
-          next.x = x-1;
-          next.y = y;
-          next.parent = &loc;
-          next.path.push(y);
-          next.path.push(x-1);
-          moveTo(&next);
+//          struct Node next;
+//          next.x = x-1;
+//          next.y = y;
+//          next.parent = &loc;
+//          next.path.push(y);
+//          next.path.push(x-1);
+//          moveTo(&next);
+          moveOne(x-1, y);
         } else if (loc.x > x && !(maze[x][y] & bm_wall_south)) {
           // the location is south, and there's no wall, so I can move
           Serial.println(F("moving south"));
-          struct Node next;
-          next.x = x+1;
-          next.y = y;
-          next.parent = &loc;
-          next.path.push(y);
-          next.path.push(x+1);
-          moveTo(&next);
+//          struct Node next;
+//          next.x = x+1;
+//          next.y = y;
+//          next.parent = &loc;
+//          next.path.push(y);
+//          next.path.push(x+1);
+          moveOne(x+1, y);
         } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
           // the location is west, and there's no wall, so I can move
           Serial.println(F("moving west"));
-          struct Node next;
-          next.x = x;
-          next.y = y-1;
-          next.parent = &loc;
-          next.path.push(y-1);
-          next.path.push(x);
-          moveTo(&next);
+//          struct Node next;
+//          next.x = x;
+//          next.y = y-1;
+//          next.parent = &loc;
+//          next.path.push(y-1);
+//          next.path.push(x);
+          moveOne(x, y-1);
         } else if (loc.y > y && !(maze[x][y] & bm_wall_east)) {
           // the location is east, and there's no wall, so I can move
           Serial.println(F("moving east"));
-          struct Node next;
-          next.x = x;
-          next.y = y+1;
-          next.parent = &loc;
-          next.path.push(y+1);
-          next.path.push(x);
-          moveTo(&next);
+//          struct Node next;
+//          next.x = x;
+//          next.y = y+1;
+//          next.parent = &loc;
+//          next.path.push(y+1);
+//          next.path.push(x);
+          moveOne(x, y+1);
         } else {
           // the location is one away, but there is a wall so I have to run algorithm to find best path
           Serial.println(F("need more than one step to reach it!"));
@@ -705,6 +706,38 @@ void moveTo(struct Node *node) {
     x = nextX;
     y = nextY;
   }
+  Serial.println(F("done"));
+}
+
+void moveOne(uint8_t xCoor, uint8_t yCoor) {
+  // turn to face the correct direction: the next node should be one tile away.
+  if (xCoor == x && yCoor == y) {
+    Serial.println("already here");
+    // we are already at the location
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    return;
+  }
+  int x_diff = xCoor - x;
+  int y_diff = yCoor - y; 
+  facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
+  while (current_dir != dir_to_face) {
+    Serial.println(F("turning"));
+    if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
+    else turnRight();
+  }
+  Serial.println(F("moving forward"));
+  // move to the next intersection
+  forward();
+  while (!linefollow()) {
+    forward(); // keeps moving forward until reaches intersection
+  }
+  
+  MotorLeft.write(90);
+  MotorRight.write(90);
+  Serial.println(F("Arrived at destination"));
+  x = xCoor;
+  y = yCoor;
   Serial.println(F("done"));
 }
 
