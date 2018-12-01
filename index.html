@@ -1175,13 +1175,96 @@ if ( radio.available() )
         <div class="container text-center">
           <div class="row">
             <div class="col-lg-8 mx-auto">
-              <h2 class="text-secondary text-uppercase mb-0">Lab 4</h2>
+              <h2 class="text-secondary text-uppercase mb-0">Lab 4: FPGA and Vision</h2>
               <hr class="star-dark mb-5">
+              
+              <h3 class="text-secondary text-left mb-3">Goal</h3>
+              <p class="mb-3 text-left">
+                At this point, we want to begin being able to detect visual treasures. Specifically, we need to be able to distinguish normal white walls from specific colored shapes attached to the walls. The treasures can be either blue or red, and can be any of a square, triangle, or diamond. In order to do this, we add a camera (the OV7670). The camera outputs data to an FPGA (the DE0-NANO), which then processes the image in real time in order to determine the presence or absence of any treasures, as well as what color they are. For debugging purposes, we also connected the FPGA to a VGA adaptor and monitor. A datasheet for the OV7670 camera can be found <a href="http://web.mit.edu/6.111/www/f2016/tools/OV7670_2006.pdf">here.</a> 
+              </p>
+
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">Choosing our Parameters</h3>
+              <p class="mb-3 text-left">
+                Before we start, we want to get an idea of what types of images we can store and process in real time, since we need to be able to quickly determine whether or not there is a treasure while still navigating through a maze. The DE0-Nano has 594 Kbits of embedded memory, and each entry in the RAM must have a size of 8 or 9 bits. Assuming 8-bit entries, that leads to a maximum buffer size of 74250 entries.
+              </p>
+              <p class="mb-3 text-left">
+                To start, we wanted to get data quickly from the camera while maintaining the most color accuracy possible, so we receive RGB 565 data from the camera. The format for RGB 565 is below, with the MSByte being sent first by the camera, followed by the LSByte.
+              </p>
+              <p class="mb-3 text-left">
+                Note however that VGA cables require data in a RGB 332 format, which is shown above. This means that we must downsample the given camera data. That is, in order to keep the most important data from the RGB 565 information but fit it into a single bit, we only keep the most significant bits of each of the red, green, and blue channel to feed to the monitor for display.
+              </p>
+              <p class="mb-3 text-left">
+                Since we want to be able to take advantage of large-scale features of the image, and have less use for specific details, we choose to maintain a fairly small image size: we chose to use the smallest supported resolution of QCIF at 176x144 pixels. Many of the other settings were discovered through a series of trial-and-error experiments.
+              </p>
+              <hr class="mb-5">
+
+              <h3 class="text-secondary mb-1">Team Camera</h3>
+              <h4 class="text-secondary mb-3">Kevin Ying and Liliet Sosa</h4>
+              <p class="mb-3 text-left">
+                The camera team's goal was to communicate to the camera in order to adjust settings to the parameters determined above. The camera team also needed to have some fake-treasure data arising from the FPGA which would test the capability of FPGA to Arduino communication. The details of this communication are detailed in the final integration section of this page.
+              </p>
+              <p class="mb-3 text-left">
+                To communicate with the camera, we use the Inter-Integrated Circuit protocol, also called I2C or the two-wire interface I2C. To do this, we use the dedicated I2C pins on the Arduino Uno, the SCL for clock and SDA for data. There are a number of intricacies to I2C, but the essentials of a transmission with most peripherals, including the OV7670, is as follows. The master device, in our case the Uno, sets the clock speed and sets or clears the SCL line at that rate. Transactions begin with the I2C address of the slave device the Uno is communicating with, followed by either a read command (the register wanting to be read) or a write command (the register, followed by the data desired). The slave then acknowledges writes to ensure that the data was written correctly, or sends back a response to reads.
+              </p>
+              <p class="mb-3 text-left">
+                For the OV7670, the registers we can read and write determine important details of the camera operation, including the clock source, the output format, and gain and white balancing settings. In particular, we took care to write to the following registers:
+              </p>
+              <ul class="mb-3 text-left">
+                <li>0x11, to ensure that we used an external clock generated by the FPGA</li>
+                <li>0x12, to reset all registers to default values at the start of operation, as well as determine the QCIF and RGB565 format</li>
+                <li>0x14, to freeze the automatic gain at a reasonable level, determined at the initial programming of the camera, in order to avoid unpredictable gain adjustments.</li>
+                <li>0x40 and 0x42, in order to first test our FPGA and VGA interface with a color bar test</li>
+              </ul>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/lfoqNJq3ZcA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <p class="mb-3 text-left">
+                Above is a video of the Uno communicating with the OV7670, reading a list of registers, writing to a subset of them, and then reading the same list of registers in order to confirm that the changes desired were implemented correctly. A complete list of the registers written to can be found in the code. For more information about the register specifics, see the datasheet linked above. 
+              </p>
+
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-3">FPGA Clock Generation</h3>
+              <p class="mb-3 text-left">
+                Another critical part of communicating with the camera was the generation of a 24 megahertz clock signal. In order to do this we use a phase locked loop generated by the fpga. We then use the output of the fpga as an input to the camera. More details can be found at the lab website.  
+              </p>
+
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">Team FPGA</h3>
+              <h4 class="text-secondary mb-3">Anthony Viego and Glenna Zhang</h4>
+              <p class="mb-3 text-left">
+                This team's goal was to be able to store data coming in from the camera or some other source, and then display it onto a monitor through VGA.
+              </p>
+              <p class="mb-3 text-left">
+                To do this, we generated 25 and 50 megahertz signals using PLL in order to store and read data from the generated RAM at high rates. Since the camera pixel color data came over two bytes but the camera pins only supported eight bits in parallel, we needed to track whether we were reading in the most significant byte or least significant byte of each pixel and downsample specific bits of that color data accordingly before it was stored in RAM. Note that the camera also outputs synchronization signals, vsync and href, which help the fpga find the start and end of a row or frame,  but we found the signals tended to be noisy so we required a transmission to be fairly clean by tracking the readings over several cycles and requiring a specific pattern.
+              </p>
+              
+              <hr class="mb-5">
+              <h3 class="text-secondary mb-1">FPGA and Camera Integration</h3>
+              <h4 class="text-secondary mb-3">A Joint Effort</h4>
+              <p class="mb-3 text-left">
+                The FPGA reads from the stored camera data on each clock cycle and outputs it to VGA alongside other signals determined by the horizontal and vertical positions of the pixels being displayed. We started by manually writing to the FPGA memory in the program, followed by testing communication with the camera and the use of downsampling by displaying a color bar test from the camera, which can be seen below. Note that we used a solid blue color background in order to differentiate the smaller camera/memory output from the static background display pixels.
+              </p>
+              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/colorbar.jpg" alt="Color bar test output on monitor">
+              <p class="mb-3 text-left">
+                One we were confident in our downsampling and camera stability, we were able to capture life-like images on the screen from the camera, after more experimentation with color and gain settings. An example can be seen below.
+              </p>
+              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/kevinface.jpg" alt="Kevin face test output on monitor">
+              <p class="mb-3 text-left">
+                To then tell whether an image being read from memory contained a red or blue treasure, we generated estimates of whether each pixel was either red blue or neither based off of simple thresholding of pixel values. For instance, blue treasures tended to appear dark blue or black to our camera, so we required that the red, blue, and green bits all be fairly low to label a pixel blue. On the other hand, red pixels had a lower bound threshold for the red values, as well as other bands for the blue and green values. These bounds were experimentally determined in order to maximize the chance that treasures could be separated from their backgrounds and each other in a variety of different lighting conditions. 
+              </p>
+              <p class="mb-3 text-left">
+                To more easily debug which pixels were believed were to be red, blue, or otherwise, we modified to VGA output to display a solid red pixel for red-thresholded pixels, blue for blue-thresholded, and black for other. We also found that sometimes, white pixels were being thresholded as red, so we generated a third category in order to show pixels the FPGA believed to be white, and therefore should not be counted as red. A video of camera footage post-processing can be seen below.
+              </p>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/51e3VvY_uiE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <p class="mb-3 text-left">
+                We then counted the number of red or blue pixels in a single frame. If the number of red pixels, for example, exceeded another experimentally determined threshold, we would say that the image most likely contains a red treasure. This information was then communicated to the Arduino a pair of output pins which were connected to Arduino GPIO pins. We demonstrate the color detection capabilities with a program which simply writes all of the necessary registers on the camera, and then constantly polls the FPGA-to-Arduino pins in order to determine what the FPGA believes the current state of the presence of treasures is. A video of this code in action can be found below. Since we continued to multiplex analog signals, we were able to utilize a pin-heavy parallel communication protocol.
+              </p>
+              <img class="img-fluid mb-5" style="max-height:300px" src="img/Lab4Photos/fpga2camera.jpg" alt="Schematic of FPGA to Camera Communication">
+              <p class="mb-3 text-left">
+                Note that some of the code on the GitHub has been updated to include parts of our shape recognition algorithm, part of Milestone 4. Although some of the details have changed, the majority of the colored section code remains the same - the FPGA still counts the number of red or blue pixels in an image in order to different the dominant color and if there is a treasure or not. A video of the demonstration communicating with the Arduino and outputting results to the computer through its Serial port is below.
+              </p>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/bFCsnk18t3w" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-              <p class="mb-3">Hey! Thanks for checking out our work. Unfortunately, we're still working on this part of our robot, but we'll add documentation for this milestone as soon as we finish. Please check back in a few weeks!</p>
-              <p class="mb-5">In the meantime, you can take a look at the assignment that we are trying to complete <a href="https://cei-lab.github.io/ece3400-2018/lab4.html">here</a>.</p>
+              <p class="mb-5 text-left">For more information, please take a look at the assignment page  <a href="https://cei-lab.github.io/ece3400-2018/lab4.html">here</a>.</p>
+
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
                 Close Project</a>
