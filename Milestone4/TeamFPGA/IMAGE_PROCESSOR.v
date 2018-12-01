@@ -61,6 +61,15 @@ reg [11:0]              num_diag_d_b;
 reg [11:0]              num_diag_u_b_p;
 reg [11:0]              num_diag_d_b_p;
 
+// edge detection
+reg [7:0]     curr_num_colored;
+reg [7:0]     prev_num_colored [4:0];
+reg [11:0]     num_colored_avg_1;
+reg [11:0]     num_colored_avg_2;
+reg [7:0]     num_increase;
+reg [7:0]     num_decrease;
+reg [7:0]     num_stable;
+
 // color counting
 reg [23:0] blue_cnt;
 reg [23:0] red_cnt;
@@ -71,12 +80,21 @@ reg [23:0] red_cnt_p;
 localparam R_CNT_THRESHOLD = 24'd6000;
 localparam B_CNT_THRESHOLD = 24'd6000;
 
+// combined color and shape ensemble voting
+// tournament predictor
+reg [1:0]  edge_color; // 1 -red 2- blue
+reg [1:0]  edge_shape; // 1 - sq 2- tri 3- dia
+reg [1:0]  width_color;
+reg [1:0]  width_shape;
+reg [1:0]  cons_shape;
+
 reg [23:0]              total_brightness;
 reg [23:0]              total_brightness_p;
 wire 							is_bright;
-localparam BRIGHT_THRESHOLD = 24'd240000;
+localparam BRIGHT_THRESHOLD = 24'd360000;
 
-assign is_bright = time_ctr[25] && (total_brightness_p > BRIGHT_THRESHOLD);
+//assign is_bright = time_ctr[23] && (total_brightness_p > BRIGHT_THRESHOLD);
+assign is_bright = 1'b0;
 
 output reg [2:0] RESULT;
 output reg [7:0] PIXEL_OUT;
@@ -84,13 +102,13 @@ output reg [7:0] PIXEL_OUT;
 reg [7:0] PIXEL_OUT_E;
 reg [7:0] PIXEL_OUT_C;
 
-reg [25:0] time_ctr;
+reg [23:0] time_ctr;
 reg [1:0]  curr_output_sel;
 
 // change what output comes out to VGA every few seconds
 always @(posedge CLK) begin
-	time_ctr = time_ctr + 26'b1;
-	if (time_ctr == 26'd0) begin
+	time_ctr = time_ctr + 24'b1;
+	if (time_ctr == 24'd0) begin
 		curr_output_sel = curr_output_sel + 2'b1;
 	end
 	if (curr_output_sel[1] == 1'b1) begin
@@ -114,6 +132,24 @@ always @(posedge CLK) begin
 		prevPixR = currPixR;
 		currPixB = {`SCREEN_WIDTH{1'b0}};
 		currPixR = {`SCREEN_WIDTH{1'b0}};
+		
+		num_colored_avg_1 = prev_num_colored[4] + prev_num_colored[3] + prev_num_colored[2];
+		num_colored_avg_2 = prev_num_colored[1] + prev_num_colored[0] + curr_num_colored;
+		
+		if ((num_colored_avg_2 > num_colored_avg_1 + 5) && curr_num_colored > 5) begin
+			num_increase = num_increase + 1;
+		end else if ((num_colored_avg_1 > num_colored_avg_2 + 5) && curr_num_colored > 5) begin
+			num_decrease = num_decrease + 1;
+		end else if (num_colored_avg_1 > 25 && num_colored_avg_2 > 25) begin
+			num_stable = num_stable + 1;
+		end
+		
+		prev_num_colored[4] = prev_num_colored[3];
+		prev_num_colored[3] = prev_num_colored[2];
+		prev_num_colored[2] = prev_num_colored[1];
+		prev_num_colored[1] = prev_num_colored[0];
+		prev_num_colored[0] = curr_num_colored;
+		curr_num_colored = 0;
 	end
 //	if (VGA_PIXEL_X < `SCREEN_WIDTH && VGA_PIXEL_Y < `SCREEN_HEIGHT) begin
 	if (VGA_PIXEL_X > `SCREEN_WIDTH/5 && VGA_PIXEL_X < `SCREEN_WIDTH && VGA_PIXEL_Y < `SCREEN_HEIGHT) begin
@@ -122,7 +158,7 @@ always @(posedge CLK) begin
 //		if (PIXEL_IN[1:0] < 2'b10 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[7:5] < 3'b101) begin
 //		if (PIXEL_IN[1:0] <= 2'b01 && PIXEL_IN[4:2] < time_ctr[25:23] && PIXEL_IN[7:5] < time_ctr[25:23]) begin
 //		if (PIXEL_IN[1:0] <= 2'b10 && PIXEL_IN[4:2] < 3'b010 && PIXEL_IN[7:5] < 3'b010) begin
-		if (PIXEL_IN[1:0] <= 2'b10+is_bright && PIXEL_IN[4:2] < 3'b010+is_bright && PIXEL_IN[7:5] < 3'b010+is_bright) begin
+		if (PIXEL_IN[1:0] <= 2'b10+is_bright && PIXEL_IN[4:2] < 3'b010 && PIXEL_IN[7:5] < 3'b010+is_bright) begin
 			// all pixels dark - what tends to be blue
 			blue_cnt = blue_cnt + 24'b1;
 			currPixB[VGA_PIXEL_X] = 1'b1;
@@ -132,8 +168,8 @@ always @(posedge CLK) begin
 //		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= 3'b100 && PIXEL_IN[1:0] <= 2'b10) begin
 //		if (PIXEL_IN[7:5] >= time_ctr[25:23] && PIXEL_IN[4:2] <= (3'd7 - time_ctr[25:23]) && PIXEL_IN[1:0] <= 2'b10) begin
 //		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= (3'd7 - time_ctr[25:23]) && PIXEL_IN[1:0] <= 2'b10) begin
-//		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= 3'b010 && PIXEL_IN[1:0] <= 2'b10) begin
-		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= 3'b010+is_bright && PIXEL_IN[1:0] <= 2'b10+is_bright) begin
+//		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= 3'b010+is_bright && PIXEL_IN[1:0] <= 2'b10) begin
+		if (PIXEL_IN[7:5] >= 3'b011 && PIXEL_IN[4:2] <= 3'b010 && PIXEL_IN[1:0] <= 2'b10) begin
 			// anything somewhat red
 			red_cnt = red_cnt + 24'b1;
 			currPixR[VGA_PIXEL_X] = 1'b1;
@@ -147,6 +183,11 @@ always @(posedge CLK) begin
 //			PIXEL_OUT_C = 8'b111_111_11;
 //		end
 //		if (PIXEL_IN[1:0] < 2'b10) null_cnt = null_cnt + 24'b1;
+
+		if (PIXEL_OUT_C != 8'B000_000_00) begin
+			curr_num_colored = curr_num_colored + 8'b1;
+		end
+		
 		
 		if ((VGA_PIXEL_X > 1) && (VGA_PIXEL_X < `SCREEN_WIDTH-2) && (VGA_PIXEL_Y > 1) && (VGA_PIXEL_Y < `SCREEN_HEIGHT-2)) begin
 			// for the pixels in the center
@@ -229,50 +270,130 @@ always @(posedge CLK) begin
 //		num_diag_u_p = (num_diag_u_p - (num_diag_u_p >> 4) ) + (num_diag_u >> 4);
 //		num_diag_d_p = (num_diag_d_p - (num_diag_d_p >> 4) ) + (num_diag_d >> 4);
 
-		num_diag_u_r_p = (num_diag_u_r_p - (num_diag_u_r_p >> 4) ) + (num_diag_u_r >> 4);
-		num_diag_u_b_p = (num_diag_u_b_p - (num_diag_u_b_p >> 4) ) + (num_diag_u_b >> 4);
-		num_diag_d_r_p = (num_diag_d_r_p - (num_diag_d_r_p >> 4) ) + (num_diag_d_r >> 4);
-		num_diag_d_b_p = (num_diag_d_b_p - (num_diag_d_b_p >> 4) ) + (num_diag_d_b >> 4);
+		num_diag_u_r_p = (num_diag_u_r_p - (num_diag_u_r_p >> 3) ) + (num_diag_u_r >> 3);
+		num_diag_u_b_p = (num_diag_u_b_p - (num_diag_u_b_p >> 3) ) + (num_diag_u_b >> 3);
+		num_diag_d_r_p = (num_diag_d_r_p - (num_diag_d_r_p >> 3) ) + (num_diag_d_r >> 3);
+		num_diag_d_b_p = (num_diag_d_b_p - (num_diag_d_b_p >> 3) ) + (num_diag_d_b >> 3);
 		
 		total_brightness_p = total_brightness_p - (total_brightness_p >> 4) + (total_brightness >> 4);
 		
 		RESULT = 3'b000;
-		if (blue_cnt_p > B_CNT_THRESHOLD) RESULT = 3'b001;
-		if (num_diag_d_b_p > TRI_THRESHOLD && blue_cnt_p > B_CNT_THRESHOLD/2) RESULT = 3'b101;
-		if (num_diag_u_b_p > DIA_THRESHOLD && blue_cnt_p > B_CNT_THRESHOLD/2) RESULT = 3'b011;
+		edge_shape = 2'b0;
+		edge_color = 2'b0;
+		width_color = 2'b0;
+		width_shape = 2'b0;
+		cons_shape = 2'b0;
+		
 		if (blue_cnt_p > B_CNT_THRESHOLD/2) begin
-			if (num_diag_d_b_p > TRI_THRESHOLD) RESULT = 3'b101;
-			if (num_diag_u_b_p > DIA_THRESHOLD) RESULT = 3'b011;
-//			if (num_diag_u_b_p > DIA_THRESHOLD_2 && num_diag_d_b_p > DIA_THRESHOLD_2) RESULT = 3'b011;
+			if (num_increase > 35 && num_decrease > 35)begin 
+//			   RESULT = 3'b011;
+				width_color = 2'b01;
+				width_shape = 2'b11;
+				end
+			if (num_increase > 35 && num_decrease < 30)begin
+//			    RESULT = 3'b101;
+				 width_color = 2'b01;
+				 width_shape = 2'b10;
+				 end
+			if (num_increase < 20 && num_decrease < 20 && num_stable > 30)begin 
+//				 RESULT = 3'b001;
+				 width_color = 2'b01;
+				 width_shape = 2'b01;
+				 end
+		end
+		if (red_cnt_p > R_CNT_THRESHOLD/2 && red_cnt_p > blue_cnt_p) begin
+			if (num_increase > 35 && num_decrease > 35)begin 
+//			   RESULT = 3'b100;
+				width_color = 2'b10;
+				width_shape = 2'b11;
+				end
+			if (num_increase > 40 && num_decrease < 20)begin
+//			    RESULT = 3'b110;
+				 width_color = 2'b10;
+				 width_shape = 2'b10;
+				 end
+			if (num_increase < 20 && num_decrease < 20 && num_stable > 40)begin 
+//				 RESULT = 3'b010;
+				 width_color = 2'b10;
+				 width_shape = 2'b01;
+				 end
+			end
+
+		if (blue_cnt_p > B_CNT_THRESHOLD) begin
+//			RESULT = 3'b001;
+			edge_color = 2'b01;
+			edge_shape = 2'b01;
+		end
+		if (blue_cnt_p > B_CNT_THRESHOLD/2) begin
+			if (num_diag_d_b_p > TRI_THRESHOLD) begin
+//				RESULT = 3'b101;
+				edge_color = 2'b01;
+				edge_shape = 2'b10;
+			end
+			if (num_diag_u_b_p > DIA_THRESHOLD) begin
+//				RESULT = 3'b011;
+				edge_color = 2'b01;
+				edge_shape = 2'b11;
+			end
 		end
 		
-		if (red_cnt_p > R_CNT_THRESHOLD) RESULT = 3'b010;
+		if (red_cnt_p > R_CNT_THRESHOLD) begin
+//			RESULT = 3'b001;
+			edge_color = 2'b10;
+			edge_shape = 2'b01;
+		end
 		if (red_cnt_p > R_CNT_THRESHOLD/2) begin
-			if (num_diag_d_r_p > TRI_THRESHOLD) RESULT = 3'b110;
-			if (num_diag_u_r_p > DIA_THRESHOLD) RESULT = 3'b100;
-//			if (num_diag_u_r_p > DIA_THRESHOLD_2 && num_diag_d_r_p > DIA_THRESHOLD_2) RESULT = 3'b100;
+			if (num_diag_d_r_p > TRI_THRESHOLD) begin
+//				RESULT = 3'b101;
+				edge_color = 2'b10;
+				edge_shape = 2'b10;
+			end
+			if (num_diag_u_r_p > DIA_THRESHOLD) begin
+//				RESULT = 3'b011;
+				edge_color = 2'b10;
+				edge_shape = 2'b11;
+			end
 		end
 		
-//		if (blue_cnt_p > B_CNT_THRESHOLD) begin
-//			if (num_diag_d_p > DIA_THRESHOLD) RESULT = 3'b011;
-//			else if (num_diag_u_p > TRI_THRESHOLD) RESULT = 3'b101;
-//			else RESULT = 3'b001;
-//		end
-//		if (red_cnt_p > R_CNT_THRESHOLD) begin
-//			if (num_diag_d_p > DIA_THRESHOLD) RESULT = 3'b100;
-//			else if (num_diag_u_p > TRI_THRESHOLD) RESULT = 3'b110;
-//			else RESULT = 3'b010;
-//		end
+		if (edge_shape == 2'b11) begin
+			// diamond - go with other one
+			cons_shape = width_shape;
+		end else if (edge_shape == 2'b10) begin
+			// triangle - probably a triangle
+			cons_shape = 2'b10;
+		end else begin
+			if (cons_shape != 2'b11)
+				cons_shape = width_shape;
+		end
 		
-//		RESULT = 3'b000;
-//		// currently blue is more sensitive so we prioritize red
-//		if (red_cnt_p > R_CNT_THRESHOLD) RESULT[1] = 1'b1;
-//		else if (blue_cnt_p > B_CNT_THRESHOLD) RESULT[2] = 1'b1;
-//		if (null_cnt > B_CNT_THRESHOLD) RESULT[0] = 1'b1;
-//		if (num_diag_p > DIA_THRESHOLD) RESULT[2:1] = 2'b10;
-//		else if (num_diag_p > TRI_THRESHOLD) RESULT[2:1] = 2'b01;
-//		else if (red_cnt_p > R_CNT_THRESHOLD) RESULT[2:1] = 2'b01;
-//		else RESULT[2:1] = 2'b00;
+		if (edge_color == width_color) begin
+			if (edge_color == 2'b01) begin
+				// blue
+				if (cons_shape == 2'b01) begin
+					// square
+					RESULT = 3'b001;
+				end else if (cons_shape == 2'b10) begin
+					// triangle
+					RESULT = 3'b101;
+				end else if (cons_shape == 2'b11) begin
+					// diamond
+					RESULT = 3'b011;
+				end 
+			end else if (edge_color == 2'b10) begin
+				// red
+				if (cons_shape == 2'b01) begin
+					// square
+					RESULT = 3'b010;
+				end else if (cons_shape == 2'b10) begin
+					// triangle
+					RESULT = 3'b110;
+				end else if (cons_shape == 2'b11) begin
+					// diamond
+					RESULT = 3'b100;
+				end 
+			end
+		end
+		
 	end else if (VGA_VSYNC_NEG & ~VGA_VSYNC_PREV) begin
 		// posedge VGA VSYNC - reset things
 		blue_cnt = 0;
@@ -284,8 +405,17 @@ always @(posedge CLK) begin
 		num_diag_u_r = 0;
 		num_diag_d_r = 0;
 		
+		prev_num_colored[4] = 0;
+		prev_num_colored[3] = 0;
+		prev_num_colored[2] = 0;
+		prev_num_colored[1] = 0;
+		prev_num_colored[0] = 0;
+		curr_num_colored = 0;
 		
-	end
+		num_increase = 0;
+		num_decrease = 0;
+		num_stable = 0;
+		end
 	
 	VGA_VSYNC_PREV = VGA_VSYNC_NEG;
 	prev_VGA_Y = VGA_PIXEL_Y;
