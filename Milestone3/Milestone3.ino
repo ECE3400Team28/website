@@ -88,6 +88,7 @@ struct Node
   struct Node * parent;
   struct Node *next;
   struct Node *prev;
+  StackArray<uint8_t> path;
 };
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
@@ -171,8 +172,11 @@ void loop() { // try not using stackarray- use doubly linked list
     n.x = x;
     n.y = y;
     n.parent = NULL;
+    n.path.push(y);
+    n.path.push(x);
     //Node n(x, y, 0, NULL, NULL, NULL);
     frontier.push(n);
+    
     while(!frontier.isEmpty()) {
       struct Node loc = frontier.pop();
       Serial.print(F("next loc: "));
@@ -192,6 +196,8 @@ void loop() { // try not using stackarray- use doubly linked list
           next.x = x-1;
           next.y = y;
           next.parent = &loc;
+          next.path.push(y);
+          next.path.push(x-1);
           moveTo(&next);
         } else if (loc.x > x && !(maze[x][y] & bm_wall_south)) {
           // the location is south, and there's no wall, so I can move
@@ -200,6 +206,8 @@ void loop() { // try not using stackarray- use doubly linked list
           next.x = x+1;
           next.y = y;
           next.parent = &loc;
+          next.path.push(y);
+          next.path.push(x+1);
           moveTo(&next);
         } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
           // the location is west, and there's no wall, so I can move
@@ -208,6 +216,8 @@ void loop() { // try not using stackarray- use doubly linked list
           next.x = x;
           next.y = y-1;
           next.parent = &loc;
+          next.path.push(y-1);
+          next.path.push(x);
           moveTo(&next);
         } else if (loc.y > y && !(maze[x][y] & bm_wall_east)) {
           // the location is east, and there's no wall, so I can move
@@ -216,6 +226,8 @@ void loop() { // try not using stackarray- use doubly linked list
           next.x = x;
           next.y = y+1;
           next.parent = &loc;
+          next.path.push(y+1);
+          next.path.push(x);
           moveTo(&next);
         } else {
           // the location is one away, but there is a wall so I have to run algorithm to find best path
@@ -239,7 +251,7 @@ void loop() { // try not using stackarray- use doubly linked list
         }
       }
       
-      // for each action we can take (move N/S/E/W), add the nodes to the frontier. **CHANGE THIS TO ADD NODES IN ORDER DEPENDING ON CURRENT DIR**
+      // for each action we can take (move N/S/E/W), add the nodes to the frontier.
       if (current_dir == S) {
         if (!(maze[x][y] & bm_wall_north)) {
           // there's no wall to the north
@@ -250,6 +262,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x-1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -262,6 +278,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y+1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -274,6 +294,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y-1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -286,6 +310,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x+1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -299,6 +327,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x+1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -311,6 +343,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y-1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -323,6 +359,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y+1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -335,6 +375,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x-1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -348,6 +392,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y-1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -360,6 +408,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x-1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -372,6 +424,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x+1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -384,6 +440,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y+1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         } 
@@ -397,6 +457,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y+1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -409,6 +473,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x+1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -421,6 +489,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x-1;
             n_new.y = y;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -433,6 +505,10 @@ void loop() { // try not using stackarray- use doubly linked list
             n_new.x = x;
             n_new.y = y-1;
             n_new.parent = NULL;
+            StackArray<uint8_t> p;
+            p.push(y);
+            p.push(x);
+            n_new.path = p;
             frontier.push(n_new);
           }
         }
@@ -467,17 +543,19 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
     struct Node *loc = findAndReturnMin(&rootNode); 
     const uint8_t locX = loc->x;
     const uint8_t locY = loc->y;
-    Serial.println(locX);
-    Serial.println(locY);
-    Serial.println(F("parent: "));
-    //Serial.println(loc->parent, HEX);
-    Serial.println(loc->parent->x);
-    Serial.println(loc->parent->y);
-    Serial.println(F("grandparent: "));
-    //Serial.println(loc->parent->parent, HEX);
-    Serial.println(loc->parent->parent->x);
-    Serial.println(loc->parent->parent->y);
-    
+    loc->path.push(locX);
+    loc->path.push(locY);
+//    Serial.println(locX);
+//    Serial.println(locY);
+//    Serial.println(F("parent: "));
+//    //Serial.println(loc->parent, HEX);
+//    Serial.println(loc->parent->x);
+//    Serial.println(loc->parent->y);
+//    Serial.println(F("grandparent: "));
+//    //Serial.println(loc->parent->parent, HEX);
+//    Serial.println(loc->parent->parent->x);
+//    Serial.println(loc->parent->parent->y);
+//    
     
     // remove this location from the search list
     if (loc == rootNode && loc == lastNode) {
@@ -516,6 +594,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           n_new.parent = &copy;
           struct Node * ptr = &(*loc);   // must be initialized here 
           addNode(&n_new, ptr, locX-1, locY, heuristic, &rootNode, &lastNode);
+          n_new.path.push(locY);
+          n_new.path.push(locX);
         }
       }
     }
@@ -532,6 +612,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           n_new.parent = &copy;
           struct Node * ptr = &(*loc);   // must be initialized here 
           addNode(&n_new, ptr, locX, locY+1, heuristic, &rootNode, &lastNode);
+          n_new.path.push(locY);
+          n_new.path.push(locX);
         }
       }
     }
@@ -548,7 +630,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           n_new.parent = &copy;
           struct Node * ptr = &(*loc);   // must be initialized here 
           addNode(&n_new, ptr, locX+1, locY, heuristic, &rootNode, &lastNode);
-
+          n_new.path.push(locY);
+          n_new.path.push(locX);
         }
       }
     }
@@ -565,6 +648,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           n_new.parent = &copy;
           struct Node * ptr = &(*loc);   // must be initialized here 
           addNode(&n_new, ptr, locX, locY-1, heuristic, &rootNode, &lastNode);
+          n_new.path.push(locY);
+          n_new.path.push(locX);
         }
       }
     }
@@ -663,24 +748,25 @@ void moveTo(struct Node *node) {
   }
   Serial.println(F("moving"));
   StackArray<uint8_t> path;
+  StackArray<uint8_t> real_path;
   if (n) {
     Serial.println(F("path exists"));
   }
-  while (n) { // the path does contain the starting (current) location.
-    n = n->parent;
+  while (!path.isEmpty()) { // the path does contain the starting (current) location.
     Serial.println(F("Added 1 loc to the path"));
-    path.push(goalY);
-    path.push(goalX);
+    uint8_t nextX = path.pop();
+    uint8_t nextY = path.pop();
+    real_path.push(nextY);
+    real_path.push(nextX);
     //p = n->parent;
-    goalX = n->x;
-    goalY = n->y;
-    Serial.println(goalX);
-    Serial.println(goalY);
+    
+    Serial.println(nextX);
+    Serial.println(nextY);
   }
   // get rid of current location
   path.pop();
   path.pop();
-  while (!path.isEmpty()){
+  while (!real_path.isEmpty()){
 //    struct Node next = path.pop();
 //    Serial.println(next.x);
 //    Serial.println(next.y);
