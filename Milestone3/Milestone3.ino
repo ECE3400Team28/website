@@ -220,8 +220,7 @@ void loop() { // try not using stackarray- use doubly linked list
         } else {
           // the location is one away, but there is a wall so I have to run algorithm to find best path
           Serial.println(F("need more than one step to reach it!"));
-          struct Node *next = greedy(loc.x, loc.y);
-          moveTo(next);
+          greedy(loc.x, loc.y);
         }
       } else {
         // location is more than one away, need to run algorithm
