@@ -197,15 +197,6 @@ void addNewNodeToStack(uint8_t dir) {
 }
 
 void loop() { // try not using stackarray- use doubly linked list
-//  while(1){
-//    readMux();
-//    Serial.println(F("center"));
-//    Serial.println(LightDataC);
-//    Serial.println(F("right"));
-//    Serial.println(LightDataR);
-//    Serial.println(F("left"));
-//    Serial.println(LightDataL);
-//  }
     Serial.println(F("start DFS"));
     struct Node n;
     n.x = x;
@@ -221,7 +212,7 @@ void loop() { // try not using stackarray- use doubly linked list
       Serial.print(F("next loc: "));
       Serial.print(loc.x);
       Serial.println(loc.y);
-      if (abs(loc.x-x) <= 1 && abs(loc.y-y) == 0 || abs(loc.x-x) == 0 && abs(loc.y-y) <= 1) {
+      if (abs(loc.x-x) + abs(loc.y-y) <= 1) {
         // we are one step away from the target location, don't need to greedy search
         Serial.println(F("one step away!"));
         if (loc.x == x && loc.y == y) {
@@ -247,7 +238,9 @@ void loop() { // try not using stackarray- use doubly linked list
           next.parent = &loc;
           next.path.push(y);
           next.path.push(x+1);
+          Serial.println(F("start fr moving south"));
           moveTo(&next);
+          Serial.println(F("done moving south"));
         } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
           // the location is west, and there's no wall, so I can move
           Serial.println(F("moving west"));
@@ -284,7 +277,7 @@ void loop() { // try not using stackarray- use doubly linked list
       explore();
       if (explored == rows*columns){
         // we've explored the entire maze!
-        Serial.println(F("done"));
+        Serial.println(F("done with whole maze"));
         while(1){
           MotorLeft.write(90);
           MotorRight.write(90);
@@ -694,18 +687,19 @@ void moveTo(struct Node *node) {
     }
     Serial.println(F("moving forward"));
     // move to the next intersection
-    forward();
-    while (!linefollow()) {
-      forward(); // keeps moving forward until reaches intersection
-    }
-    
+//    forward();
+//    while (!linefollow()) {
+//      forward(); // keeps moving forward until reaches intersection
+//    }
+    delay(100);
     MotorLeft.write(90);
     MotorRight.write(90);
     Serial.println(F("Arrived at destination"));
     x = nextX;
     y = nextY;
   }
-  Serial.println(F("done"));
+  Serial.println(F("done moving to"));
+  Serial.println(F("done moving to2"));
 }
 
 /*
@@ -713,7 +707,12 @@ void moveTo(struct Node *node) {
     Assumes the current location has not been explored yet.
 */
 void explore() {
-  if (maze[x][y] != 0 ) return; // we've already explored this tile
+  if (maze[x][y] != 0 ) {
+    Serial.print(F("We already explored "));
+    Serial.print(x);
+    Serial.println(y);
+    return; // we've already explored this tile
+  }
   MotorLeft.write(90);
   MotorRight.write(90);
   readMux();
@@ -774,39 +773,18 @@ void explore() {
 }
 
 void forward() {
-  MotorLeft.write(84);
-  MotorRight.write(99);
+  MotorLeft.write(90);
+  MotorRight.write(90);
 }
 
 // Turns robot left 90 degrees and updates the currently facing direction.
 void turnLeft() {
-  MotorLeft.write(80);
-  MotorRight.write(80);
-  delay(600); // move away from current line
-  readMux();
-  while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
-    // keep checking
-    readMux();
-  }
-  MotorLeft.write(90);
-  MotorRight.write(90);
-  if (current_dir == 0) current_dir = (facing_direction) 3;
-  else current_dir = (facing_direction) (current_dir - 1);
+  current_dir = (facing_direction) ((current_dir + 3) % 4);
   return;
 }
 
 // Turns robot right 90 degrees and updates the currently facing direction.
 void turnRight() {
-  MotorLeft.write(100);
-  MotorRight.write(100);
-  delay(600); // move away from current line
-  readMux();
-  while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
-    // keep checking
-    readMux();
-  }
-  MotorLeft.write(90);
-  MotorRight.write(90);
   current_dir = (facing_direction) ((current_dir + 1) % 4);
   return;
 }
@@ -818,11 +796,6 @@ boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
   readMux();
-  
-//  Serial.println("new data");
-//  Serial.println(LightDataL);
-//  Serial.println(LightDataC);
-//  Serial.println(LightDataR);
   
   bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
   bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
