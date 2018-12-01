@@ -451,7 +451,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
   addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
   //first_node.parent = NULL;
   while (rootNode) {
-    struct Node *loc = findAndReturnMin(&rootNode); 
+    Serial.println("in the loop");
+    struct Node *loc = findAndReturnMin(&rootNode);
     const uint8_t locX = loc->x;
     const uint8_t locY = loc->y;
     loc->path.push(locX);
@@ -502,8 +503,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(locX-1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
           n_new.path = loc->path;
-          n_new.path.push(locX);
-          n_new.path.push(locY);
+//          n_new.path.push(locX);
+//          n_new.path.push(locY);
 //          struct Node copy = *loc;
 //          n_new.parent = &copy;
 //          struct Node * ptr = &(*loc);   // must be initialized here 
@@ -521,8 +522,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(locX-loc_x) + abs(locY+1-loc_y);
           struct Node n_new;
           n_new.path = loc->path;
-          n_new.path.push(locX);
-          n_new.path.push(locY);
+//          n_new.path.push(locX);
+//          n_new.path.push(locY);
 //          struct Node copy = *loc;
 //          n_new.parent = &copy;
 //          struct Node * ptr = &(*loc);   // must be initialized here 
@@ -540,8 +541,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(locX+1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
           n_new.path = loc->path;
-          n_new.path.push(locX);
-          n_new.path.push(locY);
+//          n_new.path.push(locX);
+//          n_new.path.push(locY);
 //          struct Node copy = *loc;
 //          n_new.parent = &copy;
 //          struct Node * ptr = &(*loc);   // must be initialized here 
@@ -559,8 +560,8 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           uint8_t heuristic = abs(locX-loc_x) + abs(locY-1-loc_y);
           struct Node n_new;
           n_new.path = loc->path;
-          n_new.path.push(locX);
-          n_new.path.push(locY);
+//          n_new.path.push(locX);
+//          n_new.path.push(locY);
 //          struct Node copy = *loc;
 //          n_new.parent = &copy;
 //          struct Node * ptr = &(*loc);   // must be initialized here 
@@ -569,6 +570,7 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
       }
     }
   }
+  Serial.println(F("BADDDDD"));
 }
 
 /***
