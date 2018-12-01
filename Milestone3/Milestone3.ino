@@ -442,7 +442,6 @@ void loop() { // try not using stackarray- use doubly linked list
     Uses greedy search to find the shortest path of explored tiles if stuck.
 */
 struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
-  //StackArray<Node> frontier_g;
   Serial.println(F("calculating path"));
   bool visited[rows][columns] = { }; // initialized with zeros
   uint8_t heuristic = abs(x - loc_x) + abs(y - loc_y);
@@ -450,7 +449,7 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
   struct Node *lastNode = NULL;
   struct Node first_node;
   addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
-  first_node.parent = NULL;
+  //first_node.parent = NULL;
   while (rootNode) {
     struct Node *loc = findAndReturnMin(&rootNode); 
     const uint8_t locX = loc->x;
@@ -502,12 +501,13 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(F("N"));
           uint8_t heuristic = abs(locX-1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
-          struct Node copy = *loc;
-          n_new.parent = &copy;
-          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, ptr, locX-1, locY, heuristic, &rootNode, &lastNode);
-          n_new.path.push(locY);
+          n_new.path = loc->path;
           n_new.path.push(locX);
+          n_new.path.push(locY);
+//          struct Node copy = *loc;
+//          n_new.parent = &copy;
+//          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, NULL, locX-1, locY, heuristic, &rootNode, &lastNode);
         }
       }
     }
@@ -520,12 +520,13 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(F("E"));
           uint8_t heuristic = abs(locX-loc_x) + abs(locY+1-loc_y);
           struct Node n_new;
-          struct Node copy = *loc;
-          n_new.parent = &copy;
-          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, ptr, locX, locY+1, heuristic, &rootNode, &lastNode);
-          n_new.path.push(locY);
+          n_new.path = loc->path;
           n_new.path.push(locX);
+          n_new.path.push(locY);
+//          struct Node copy = *loc;
+//          n_new.parent = &copy;
+//          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, NULL, locX, locY+1, heuristic, &rootNode, &lastNode);
         }
       }
     }
@@ -538,12 +539,13 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.println(F("S"));
           uint8_t heuristic = abs(locX+1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
-          struct Node copy = *loc;
-          n_new.parent = &copy;
-          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, ptr, locX+1, locY, heuristic, &rootNode, &lastNode);
-          n_new.path.push(locY);
+          n_new.path = loc->path;
           n_new.path.push(locX);
+          n_new.path.push(locY);
+//          struct Node copy = *loc;
+//          n_new.parent = &copy;
+//          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, NULL, locX+1, locY, heuristic, &rootNode, &lastNode);
         }
       }
     }
@@ -556,12 +558,13 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
           Serial.print(F("W"));
           uint8_t heuristic = abs(locX-loc_x) + abs(locY-1-loc_y);
           struct Node n_new;
-          struct Node copy = *loc;
-          n_new.parent = &copy;
-          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, ptr, locX, locY-1, heuristic, &rootNode, &lastNode);
-          n_new.path.push(locY);
+          n_new.path = loc->path;
           n_new.path.push(locX);
+          n_new.path.push(locY);
+//          struct Node copy = *loc;
+//          n_new.parent = &copy;
+//          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, NULL, locX, locY-1, heuristic, &rootNode, &lastNode);
         }
       }
     }
@@ -595,11 +598,11 @@ void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCo
      return;
   }
 
-  //At this point, if there is no Parent, do not make node- exit function // SUUUUUUSSSSS
-  if(!ParentNode) {
-    Serial.println(F("there is no parent???"));
-    return;
-  }
+//  //At this point, if there is no Parent, do not make node- exit function // SUUUUUUSSSSS
+//  if(!ParentNode) {
+//    Serial.println(F("there is no parent???"));
+//    return;
+//  }
   
    // I can prob just use lastNode to find last element?????? this is safe but slow
    //Start search at top of list
@@ -666,8 +669,8 @@ void moveTo(struct Node *node) {
   }
   while (!path.isEmpty()) { // the path does contain the starting (current) location.
     Serial.println(F("Added 1 loc to the path"));
-    uint8_t nextX = path.pop();
     uint8_t nextY = path.pop();
+    uint8_t nextX = path.pop();
     real_path.push(nextY);
     real_path.push(nextX);
     //p = n->parent;
