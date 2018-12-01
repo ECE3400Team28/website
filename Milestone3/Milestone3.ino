@@ -104,6 +104,7 @@ void setup() {
     Serial.println(F("no input"));
     delay(10);
   }
+  
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
   int PWM2 = 3;
@@ -501,47 +502,48 @@ boolean linefollow() {
   }
 }
 
+// DELAYED THIS BY 2 INSTEAD OF 20 MS- SEE IF IT MAKES DIFFERENCE
 void readMux() { // change this so we only read once based on the input mux select value
   // 000 Front wall
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallFront = analogRead(A5);
 
   // 001 Right wall
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallRight = analogRead(A5);
 
   // 010 Left wall
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallLeft = analogRead(A5);
 
   // 011 front line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   LightDataC = analogRead(A5);
 
   // 100 right line
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delay(20);
+  delay(2);
   LightDataR = analogRead(A5);
 
   // 101 left line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delay(20);
+  delay(2);
   LightDataL = analogRead(A5);
 
   // 110 microphone
@@ -605,7 +607,8 @@ boolean readSignal() {
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, HIGH);
-  delay(10);
+  delay(2);
+  
   cli();  // UDRE interrupt slows this way down on arduino1.0
   for (int i = 0 ; i < FHT_N ; i ++) { // save 256 samples
     fht_input[i] = analogRead(A5); // put real data into even bins
@@ -618,9 +621,12 @@ boolean readSignal() {
   sei();
   Serial.println(fht_log_out[19]);
   for (int j = 17; j < 23; ++j) {
+    Serial.println(fht_log_out[j]);
     if (fht_log_out[j] >= 60) {
-      //We have detected another robot
-      // return settings to original
+      //We have detected 660 Hz
+      Serial.println("heard 660 Hz");
+      Serial.println(fht_log_out[j]);
+      Serial.println(j);
       return true;
     }
   }
