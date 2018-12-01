@@ -1243,11 +1243,11 @@ if ( radio.available() )
               <p class="mb-3 text-left">
                 The FPGA reads from the stored camera data on each clock cycle and outputs it to VGA alongside other signals determined by the horizontal and vertical positions of the pixels being displayed. We started by manually writing to the FPGA memory in the program, followed by testing communication with the camera and the use of downsampling by displaying a color bar test from the camera, which can be seen below. Note that we used a solid blue color background in order to differentiate the smaller camera/memory output from the static background display pixels.
               </p>
-              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/colorbar.jpg" alt="Color bar test output on monitor">
+              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/colorbar_s.jpg" alt="Color bar test output on monitor">
               <p class="mb-3 text-left">
                 One we were confident in our downsampling and camera stability, we were able to capture life-like images on the screen from the camera, after more experimentation with color and gain settings. An example can be seen below.
               </p>
-              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/kevinface.jpg" alt="Kevin face test output on monitor">
+              <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/kevinface3.jpg" alt="Kevin face test output on monitor">
               <p class="mb-3 text-left">
                 To then tell whether an image being read from memory contained a red or blue treasure, we generated estimates of whether each pixel was either red blue or neither based off of simple thresholding of pixel values. For instance, blue treasures tended to appear dark blue or black to our camera, so we required that the red, blue, and green bits all be fairly low to label a pixel blue. On the other hand, red pixels had a lower bound threshold for the red values, as well as other bands for the blue and green values. These bounds were experimentally determined in order to maximize the chance that treasures could be separated from their backgrounds and each other in a variety of different lighting conditions. 
               </p>
@@ -1258,7 +1258,7 @@ if ( radio.available() )
               <p class="mb-3 text-left">
                 We then counted the number of red or blue pixels in a single frame. If the number of red pixels, for example, exceeded another experimentally determined threshold, we would say that the image most likely contains a red treasure. This information was then communicated to the Arduino a pair of output pins which were connected to Arduino GPIO pins. We demonstrate the color detection capabilities with a program which simply writes all of the necessary registers on the camera, and then constantly polls the FPGA-to-Arduino pins in order to determine what the FPGA believes the current state of the presence of treasures is. A video of this code in action can be found below. Since we continued to multiplex analog signals, we were able to utilize a pin-heavy parallel communication protocol.
               </p>
-              <img class="img-fluid mb-5" style="max-height:300px" src="img/Lab4Photos/fpga2camera.jpg" alt="Schematic of FPGA to Camera Communication">
+              <img class="img-fluid mb-5" style="max-height:300px" src="img/Lab4Photos/fpga2camera_s.jpg" alt="Schematic of FPGA to Camera Communication">
               <p class="mb-3 text-left">
                 Note that some of the code on the GitHub has been updated to include parts of our shape recognition algorithm, part of Milestone 4. Although some of the details have changed, the majority of the colored section code remains the same - the FPGA still counts the number of red or blue pixels in an image in order to different the dominant color and if there is a treasure or not. A video of the demonstration communicating with the Arduino and outputting results to the computer through its Serial port is below.
               </p>
