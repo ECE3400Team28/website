@@ -1205,8 +1205,33 @@ if ( radio.available() )
                 The camera team's goal was to communicate to the camera in order to adjust settings to the parameters determined above. The camera team also needed to have some fake-treasure data arising from the FPGA which would test the capability of FPGA to Arduino communication. The details of this communication are detailed in the final integration section of this page.
               </p>
               <p class="mb-3 text-left">
-                To communicate with the camera, we use the Inter-Integrated Circuit protocol, also called I2C or the two-wire interface I2C. To do this, we use the dedicated I2C pins on the Arduino Uno, the SCL for clock and SDA for data. There are a number of intricacies to I2C, but the essentials of a transmission with most peripherals, including the OV7670, is as follows. The master device, in our case the Uno, sets the clock speed and sets or clears the SCL line at that rate. Transactions begin with the I2C address of the slave device the Uno is communicating with, followed by either a read command (the register wanting to be read) or a write command (the register, followed by the data desired). The slave then acknowledges writes to ensure that the data was written correctly, or sends back a response to reads.
+                To communicate with the camera, we use the Inter-Integrated Circuit protocol, also called I2C or the two-wire interface I2C. To do this, we use the dedicated I2C pins on the Arduino Uno, the SCL for clock and SDA for data. There are a number of intricacies to I2C, but Wire Arduino library makes reading and writing fairly easy. Simplified example code to read or write to a specific register is below. The master device, in our case the Uno, sets the clock speed on the SCL line at that rate. The master's message is then sent synchronously over SDA and acknowledged by the slave, and responses are requested by the master as necessary.
               </p>
+              <pre class="mb-0 text-left">
+                <code>
+byte read_register_value(int register_address){
+  byte data = 0;
+  Wire.beginTransmission(OV7670_I2C_ADDRESS);
+  Wire.write(register_address);
+  Wire.endTransmission();
+  Wire.requestFrom(OV7670_I2C_ADDRESS,1);
+  while(Wire.available()<1);
+  return Wire.read();
+}
+
+int OV7670_write_register(int reg_address, *byte data){{
+    int error;
+    Wire.beginTransmission(OV7670_I2C_ADDRESS);
+    Wire.write(start);
+    Wire.write(&Data, 1);
+    error = Wire.endTransmission(true);
+    if(error != 0){
+      return 0;
+    }
+    return 1;
+ }
+                </code>
+              </pre>
               <p class="mb-3 text-left">
                 For the OV7670, the registers we can read and write determine important details of the camera operation, including the clock source, the output format, and gain and white balancing settings. In particular, we took care to write to the following registers:
               </p>
@@ -1249,10 +1274,23 @@ if ( radio.available() )
               </p>
               <img class="img-fluid mb-5" style="max-height:400px" src="img/Lab4Photos/kevinface3.jpg" alt="Kevin face test output on monitor">
               <p class="mb-3 text-left">
-                To then tell whether an image being read from memory contained a red or blue treasure, we generated estimates of whether each pixel was either red blue or neither based off of simple thresholding of pixel values. For instance, blue treasures tended to appear dark blue or black to our camera, so we required that the red, blue, and green bits all be fairly low to label a pixel blue. On the other hand, red pixels had a lower bound threshold for the red values, as well as other bands for the blue and green values. These bounds were experimentally determined in order to maximize the chance that treasures could be separated from their backgrounds and each other in a variety of different lighting conditions. 
+                We generated estimates of whether each pixel was either red, blue, or neither based off of simple thresholding of pixel values, in order to help determine whether an image being read from memory contained a red or blue treasure. For instance, blue treasures tended to appear dark blue or black to our camera, so we required that the red, blue, and green bits all be fairly low to label a pixel blue. On the other hand, red pixels had a lower bound threshold for the red values, as well as other bands for the blue and green values. These bounds were experimentally determined in order to maximize the chance that treasures could be separated from their backgrounds and each other in a variety of different lighting conditions. A simplified version of our code is below.
               </p>
+              <pre class="mb-0 text-left"><code>
+// PIXEL_IN from RAM, PIXEL_OUT_C goes to VGA
+if (PIXEL_IN[1:0] <= 2'b10 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[7:5] < 3'b101) begin
+  // all fields dark - what tends to be blue
+  blue_cnt = blue_cnt + 24'b1;
+  PIXEL_OUT_C = 8'b000_000_11;
+end
+if (PIXEL_IN[7:5] >= 3'b010 && PIXEL_IN[4:2] < 3'b101 && PIXEL_IN[1:0] <= 2'b10) begin
+  // anything somewhat red and not too green / bright
+  red_cnt = red_cnt + 24'b1;
+  PIXEL_OUT_C = 8'b111_000_00;
+end
+              </code></pre>
               <p class="mb-3 text-left">
-                To more easily debug which pixels were believed were to be red, blue, or otherwise, we modified to VGA output to display a solid red pixel for red-thresholded pixels, blue for blue-thresholded, and black for other. We also found that sometimes, white pixels were being thresholded as red, so we generated a third category in order to show pixels the FPGA believed to be white, and therefore should not be counted as red. A video of camera footage post-processing can be seen below.
+                To more easily debug which pixels were believed were to be red, blue, or otherwise, we modified the VGA output to display a solid red pixel for red-thresholded pixels, blue for blue-thresholded, and black for other. We also found that sometimes, white pixels were being thresholded as red, so we generated a third category in order to show pixels the FPGA believed to be white, and therefore should not be counted as red. A video of camera footage post-processing can be seen below.
               </p>
               <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/51e3VvY_uiE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <p class="mb-3 text-left">
