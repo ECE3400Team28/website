@@ -85,7 +85,7 @@ struct Node
   uint8_t x;
   uint8_t y;
   uint8_t cost;
-  struct Node *parent;
+  struct Node * parent;
   struct Node *next;
   struct Node *prev;
 };
@@ -220,12 +220,13 @@ void loop() { // try not using stackarray- use doubly linked list
         } else {
           // the location is one away, but there is a wall so I have to run algorithm to find best path
           Serial.println(F("need more than one step to reach it!"));
-          moveTo(greedy(loc.x, loc.y));
+          struct Node *next = greedy(loc.x, loc.y);
+          moveTo(next);
         }
       } else {
         // location is more than one away, need to run algorithm
         Serial.println(F("need more than one step to reach it!"));
-        moveTo(greedy(loc.x, loc.y));
+        greedy(loc.x, loc.y);
       }
       // now we are at the new location, so explore it
       Serial.println(F("exploring"));
@@ -462,12 +463,23 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
   struct Node *lastNode = NULL;
   struct Node first_node;
   addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
+  first_node.parent = NULL;
   while (rootNode) {
-    struct Node *loc = findAndReturnMin(&rootNode);
-    Serial.println(loc->x);
-    Serial.println(loc->y);
-    Serial.println(loc_x);
-    Serial.println(loc_y);
+    struct Node *loc = findAndReturnMin(&rootNode); 
+    const uint8_t locX = loc->x;
+    const uint8_t locY = loc->y;
+    Serial.println(locX);
+    Serial.println(locY);
+    Serial.println(F("parent: "));
+    //Serial.println(loc->parent, HEX);
+    Serial.println(loc->parent->x);
+    Serial.println(loc->parent->y);
+    Serial.println(F("grandparent: "));
+    //Serial.println(loc->parent->parent, HEX);
+    Serial.println(loc->parent->parent->x);
+    Serial.println(loc->parent->parent->y);
+    
+    
     // remove this location from the search list
     if (loc == rootNode && loc == lastNode) {
       rootNode = NULL;
@@ -484,91 +496,76 @@ struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
     if (!rootNode && !lastNode) {
       Serial.println(F("greedy search is null"));
     }
-    visited[loc->x][loc->y] = true;
+    visited[locX][locY] = true;
     
-    if (loc->x == loc_x && loc->y == loc_y) {
+    if (locX == loc_x && locY == loc_y) {
       Serial.println(F("found loc"));
-      return &(*loc);
+      moveTo(loc);
     }
 
     // for each action we can take, add the nodes to the frontier.
-    if (!(maze[loc->x][loc->y] & bm_wall_north)) {
+    if (!(maze[locX][locY] & bm_wall_north)) {
       // there's no wall to the north
-      if (loc->x - 1 >= 0 && !visited[loc->x - 1][loc->y]) {
+      if (locX - 1 >= 0 && !visited[locX - 1][locY]) {
         // the new location is valid and we have not visited it
-        if (maze[loc->x - 1][loc->y] > 0 || (loc->x - 1 == loc_x && loc->y == loc_y)) {
+        if (maze[locX - 1][locY] > 0 || (locX - 1 == loc_x && locY == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("N"));
-          uint8_t heuristic = abs(loc->x-1-loc_x) + abs(loc->y-loc_y);
+          uint8_t heuristic = abs(locX-1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
-          addNode(&n_new, &(*loc), loc->x-1, loc->y, heuristic, &rootNode, &lastNode);
-          Serial.print(n_new.x);
-          Serial.println(n_new.y);
-          if (rootNode == NULL) {
-            Serial.println("yikes");
-            while(1){}
-          }
+          struct Node copy = *loc;
+          n_new.parent = &copy;
+          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, ptr, locX-1, locY, heuristic, &rootNode, &lastNode);
         }
       }
     }
-    if (!(maze[loc->x][loc->y] & bm_wall_east)) {
+    if (!(maze[locX][locY] & bm_wall_east)) {
       // there's no wall to the east
-      if (loc->y + 1 < columns && !visited[loc->x][loc->y + 1] ) {
+      if (locY + 1 < columns && !visited[locX][locY + 1] ) {
         // the new location is valid and we have not visited it
-        if (maze[loc->x][loc->y + 1] > 0 || (loc->x == loc_x && loc->y + 1 == loc_y)) {
+        if (maze[locX][locY + 1] > 0 || (locX == loc_x && locY + 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("E"));
-          uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y+1-loc_y);
+          uint8_t heuristic = abs(locX-loc_x) + abs(locY+1-loc_y);
           struct Node n_new;
-          addNode(&n_new, &(*loc), loc->x, loc->y+1, heuristic, &rootNode, &lastNode);
-          Serial.print(n_new.x);
-          Serial.println(n_new.y);
-          if (rootNode == NULL) {
-            Serial.println("yikes");
-            while(1){}
-          }
+          struct Node copy = *loc;
+          n_new.parent = &copy;
+          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, ptr, locX, locY+1, heuristic, &rootNode, &lastNode);
         }
       }
     }
-    if (!(maze[loc->x][loc->y] & bm_wall_south)) {
+    if (!(maze[locX][locY] & bm_wall_south)) {
       // there's no wall to the south
-      if (loc->x + 1 < rows && !visited[loc->x + 1][loc->y]) {
+      if (locX + 1 < rows && !visited[locX + 1][locY]) {
         // the new location is valid and it has not been explored
-        if (maze[loc->x + 1][loc->y] > 0 || (loc->x + 1 == loc_x && loc->y == loc_y)) {
+        if (maze[locX + 1][locY] > 0 || (locX + 1 == loc_x && locY == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.println(F("S"));
-          uint8_t heuristic = abs(loc->x+1-loc_x) + abs(loc->y-loc_y);
+          uint8_t heuristic = abs(locX+1-loc_x) + abs(locY-loc_y);
           struct Node n_new;
-          addNode(&n_new, &(*loc), loc->x+1, loc->y, heuristic, &rootNode, &lastNode);
-          Serial.print(n_new.x);
-          Serial.println(n_new.y);
-          if (rootNode == NULL) {
-            Serial.println("yikes");
-            while(1){}
-          }
+          struct Node copy = *loc;
+          n_new.parent = &copy;
+          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, ptr, locX+1, locY, heuristic, &rootNode, &lastNode);
+
         }
       }
     }
-    if (!(maze[loc->x][loc->y] & bm_wall_west)) {
+    if (!(maze[locX][locY] & bm_wall_west)) {
       // there's no wall to the west
-      if (loc->y - 1 >= 0 && !visited[loc->x][loc->y - 1]) {
+      if (locY - 1 >= 0 && !visited[locX][locY - 1]) {
         // the new location is valid and it has not been explored
-        if (maze[loc->x][loc->y - 1] > 0 || (loc->x == loc_x && loc->y - 1 == loc_y)) {
+        if (maze[locX][locY - 1] > 0 || (locX == loc_x && locY - 1 == loc_y)) {
           // we have explored this location before OR this location is the goal state
           Serial.print(F("W"));
-          uint8_t heuristic = abs(loc->x-loc_x) + abs(loc->y-1-loc_y);
+          uint8_t heuristic = abs(locX-loc_x) + abs(locY-1-loc_y);
           struct Node n_new;
-          Serial.print(loc->x);
-          Serial.println(loc->y);
-          uint8_t newX = loc->x;
-          uint8_t newY = loc->y;
-          addNode(&n_new, &(*loc), newX, newY-1, heuristic, &rootNode, &lastNode);
-          Serial.print(n_new.x);
-          Serial.println(n_new.y);
-          if (rootNode == NULL) {
-            Serial.println("yikes");
-            while(1){}
-          }
+          struct Node copy = *loc;
+          n_new.parent = &copy;
+          struct Node * ptr = &(*loc);   // must be initialized here 
+          addNode(&n_new, ptr, locX, locY-1, heuristic, &rootNode, &lastNode);
         }
       }
     }
@@ -596,7 +593,6 @@ void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCo
   if(!*LastNode) { //if empty list, this is the root element 
      i->next = NULL;        //Setup information for element
      i->prev = NULL;
-     i->parent = NULL;
      *LastNode = i;        //Setup information for list
      *RootNode = i;
      Serial.println(F("the list was empty"));
@@ -608,22 +604,19 @@ void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCo
     Serial.println(F("there is no parent???"));
     return;
   }
-
+  
    // I can prob just use lastNode to find last element?????? this is safe but slow
    //Start search at top of list
    p = *RootNode;
    old = NULL;
-
+  
    while(p){ //find last element
      old = p;
      p = p->next; 
    }
-
-   old->next = i;         //put on end
    i->next = NULL;        //Setup information for element
    i->prev = old;
-   i->parent = ParentNode;
-  
+   old->next = i;         //put on end
    *LastNode = i;         //Setup information for list
 }
 
@@ -654,7 +647,15 @@ struct Node* findAndReturnMin(struct Node **RootNode) {
    Assumptions: There is an open path to the node, but it might encounter enemy robots.
 */
 void moveTo(struct Node *node) {
-  if (x == node->x && y == node->y) {
+  struct Node *n = node;
+  uint8_t goalX = n->x;
+  uint8_t goalY = n->y;
+  //struct Node *p = n->parent;
+  Serial.println(goalX);
+  Serial.println(goalY);
+  Serial.println(x);
+  Serial.println(y);
+  if (goalX == x && goalY == y) {
     Serial.println(F("made it to the location that the greedy search chose"));
     // we are already at the location
     MotorLeft.write(90);
@@ -662,25 +663,33 @@ void moveTo(struct Node *node) {
     return;
   }
   Serial.println(F("moving"));
-  StackArray<struct Node> path;
-  struct Node *p = node->parent;
-  if (p) {
+  StackArray<uint8_t> path;
+  if (n) {
     Serial.println(F("path exists"));
   }
-  while (p) { // the path does not contain the starting (current) location.
-    Serial.println(node->x);
-    Serial.println(node->y);
-    path.push(*node);
-    node = p;
-    p = node->parent;
+  while (n) { // the path does contain the starting (current) location.
+    n = n->parent;
+    Serial.println(F("Added 1 loc to the path"));
+    path.push(goalY);
+    path.push(goalX);
+    //p = n->parent;
+    goalX = n->x;
+    goalY = n->y;
+    Serial.println(goalX);
+    Serial.println(goalY);
   }
+  // get rid of current location
+  path.pop();
+  path.pop();
   while (!path.isEmpty()){
-    struct Node next = path.pop();
-    Serial.print(next.x);
-    Serial.println(next.y);
+//    struct Node next = path.pop();
+//    Serial.println(next.x);
+//    Serial.println(next.y);
+    uint8_t nextX = path.pop();
+    uint8_t nextY = path.pop();
     // turn to face the correct direction: the next node should be one tile away.
-    int x_diff = next.x - x;
-    int y_diff = next.y - y;
+    int x_diff = nextX - x;
+    int y_diff = nextY - y; 
     facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
     while (current_dir != dir_to_face) {
       Serial.println(F("turning"));
@@ -697,8 +706,8 @@ void moveTo(struct Node *node) {
     MotorLeft.write(90);
     MotorRight.write(90);
     Serial.println(F("Arrived at destination"));
-    x = next.x;
-    y = next.y;
+    x = nextX;
+    y = nextY;
   }
   Serial.println(F("done"));
 }
