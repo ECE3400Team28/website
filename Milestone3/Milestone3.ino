@@ -30,7 +30,7 @@ const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
 const int LIGHT_CENTER_THRESHOLD = 600;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 750;//540;
+const int LIGHT_RIGHT_THRESHOLD = 700;//540;
 const int LIGHT_LEFT_THRESHOLD = 700;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
@@ -72,8 +72,8 @@ const uint8_t bm_not_explored = 0;
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const int rows = 9;
-const int columns = 9;
+const int rows = 4;
+const int columns = 5;
 int explored = 0;
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -86,14 +86,9 @@ struct Node
 {
   uint8_t x;
   uint8_t y;
-  uint8_t cost;
-  struct Node * parent;
-  struct Node *next;
-  struct Node *prev;
-  StackArray<uint8_t> path;
 };
 
-StackArray<Node> frontier;
+//StackArray<Node> frontier;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
 void setup() {
@@ -160,559 +155,156 @@ void setup() {
   delay(2000);
 }
 
-/*
- * Add new node
- */
-void addNewNodeToStack(uint8_t dir) {
-  struct Node n_new;
-  facing_direction dir_to_face = (facing_direction) dir;
-  switch (dir_to_face) {
-    case N:
-      n_new.x = x-1;
-      n_new.y = y;
-      break;
-    case E:
-      n_new.x = x;
-      n_new.y = y+1;
-      break;
-    case W:
-      n_new.x = x;
-      n_new.y = y-1;
-      break;
-    case S:
-      n_new.x = x+1;
-      n_new.y = y;
-      break;
-    default:
-      n_new.x = x;
-      n_new.y = y;
-      break;
-  }
-//  n_new.parent = NULL;
-//  StackArray<uint8_t> p;
-//  p.push(y);
-//  p.push(x);
-//  n_new.path = p;
-  frontier.push(n_new);
-}
+StackArray<uint8_t> path;
 
-void loop() { // try not using stackarray- use doubly linked list
-//  while(1){
-//    readMux();
-//    Serial.println(F("center"));
-//    Serial.println(LightDataC);
-//    Serial.println(F("right"));
-//    Serial.println(LightDataR);
-//    Serial.println(F("left"));
-//    Serial.println(LightDataL);
-//  }
-    Serial.println(F("start DFS"));
-    struct Node n;
-    n.x = x;
-    n.y = y;
-//    n.parent = NULL;
-//    n.path.push(y);
-//    n.path.push(x);
-    //Node n(x, y, 0, NULL, NULL, NULL);
-    frontier.push(n);
-    
-    while(!frontier.isEmpty()) {
-      struct Node loc = frontier.pop();
-      Serial.print(F("next loc: "));
-      Serial.print(loc.x);
-      Serial.println(loc.y);
-      if (abs(loc.x-x) <= 1 && abs(loc.y-y) == 0 || abs(loc.x-x) == 0 && abs(loc.y-y) <= 1) {
-        // we are one step away from the target location, don't need to greedy search
-        Serial.println(F("one step away!"));
-        if (loc.x == x && loc.y == y) {
-          //we are here
-          Serial.println(F("already here"));
-          moveOne(loc.x, loc.y); // doesn't do anything but added it for consistency
-        } else if (loc.x < x && !(maze[x][y] & bm_wall_north)) {
-          // the location is north, and there's no wall, so I can move
-          Serial.println(F("moving north"));
-//          struct Node next;
-//          next.x = x-1;
-//          next.y = y;
-//          next.parent = &loc;
-//          next.path.push(y);
-//          next.path.push(x-1);
-//          moveTo(&next);
-          moveOne(x-1, y);
-        } else if (loc.x > x && !(maze[x][y] & bm_wall_south)) {
-          // the location is south, and there's no wall, so I can move
-          Serial.println(F("moving south"));
-//          struct Node next;
-//          next.x = x+1;
-//          next.y = y;
-//          next.parent = &loc;
-//          next.path.push(y);
-//          next.path.push(x+1);
-          moveOne(x+1, y);
-        } else if (loc.y < y && !(maze[x][y] & bm_wall_west)) {
-          // the location is west, and there's no wall, so I can move
-          Serial.println(F("moving west"));
-//          struct Node next;
-//          next.x = x;
-//          next.y = y-1;
-//          next.parent = &loc;
-//          next.path.push(y-1);
-//          next.path.push(x);
-          moveOne(x, y-1);
-        } else if (loc.y > y && !(maze[x][y] & bm_wall_east)) {
-          // the location is east, and there's no wall, so I can move
-          Serial.println(F("moving east"));
-//          struct Node next;
-//          next.x = x;
-//          next.y = y+1;
-//          next.parent = &loc;
-//          next.path.push(y+1);
-//          next.path.push(x);
-          moveOne(x, y+1);
-        } else {
-          // the location is one away, but there is a wall so I have to run algorithm to find best path
-          Serial.println(F("need more than one step to reach it!"));
-          greedy(loc.x, loc.y);
-        }
-        Serial.println(F("done movingto"));
-      } else {
-        // location is more than one away, need to run algorithm
-        Serial.println(F("need more than one step to reach it!"));
-        greedy(loc.x, loc.y);
-      }
-      // now we are at the new location, so explore it
-      Serial.println(F("exploring"));
-      explore();
-      if (explored == rows*columns){
-        // we've explored the entire maze!
-        Serial.println(F("done"));
-        while(1){
-          MotorLeft.write(90);
-          MotorRight.write(90);
-        }
-      }
-      
-      // for each action we can take (move N/S/E/W), add the nodes to the frontier.
-      if (current_dir == S) {
-        if (!(maze[x][y] & bm_wall_north)) {
-          // there's no wall to the north
-          if (x-1 >= 0 && !(maze[x-1][y])) {
-            Serial.println(F("nodeN"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(N);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_east)) {
-          // there's no wall to the east
-          if (y+1 < columns && !(maze[x][y+1])) {
-            Serial.println(F("nodeE"));
-            // the new location is valid and it has not been explored 
-            addNewNodeToStack(E);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_west)) {
-          // there's no wall to the west
-          if (y-1 >= 0 && !(maze[x][y-1])) {
-            Serial.println(F("nodeW"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(W);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_south)) {
-          // there's no wall to the south
-          if (x+1 < rows && !(maze[x+1][y])) {
-            Serial.println(F("nodeS"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(S);
-          }
-        }
-      } else if (current_dir == N) {
-        if (!(maze[x][y] & bm_wall_south)) {
-          // there's no wall to the south
-          if (x+1 < rows && !(maze[x+1][y])) {
-            Serial.println(F("nodeS"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(S);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_west)) {
-          // there's no wall to the west
-          if (y-1 >= 0 && !(maze[x][y-1])) {
-            Serial.println(F("nodeW"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(W);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_east)) {
-          // there's no wall to the east
-          if (y+1 < columns && !(maze[x][y+1])) {
-            Serial.println(F("nodeE"));
-            // the new location is valid and it has not been explored 
-            addNewNodeToStack(E);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_north)) {
-          // there's no wall to the north
-          if (x-1 >= 0 && !(maze[x-1][y])) {
-            Serial.println(F("nodeN"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(N);
-          }
-        }
-      } else if (current_dir == E) {
-        if (!(maze[x][y] & bm_wall_west)) {
-          // there's no wall to the west
-          if (y-1 >= 0 && !(maze[x][y-1])) {
-            Serial.println(F("nodeW"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(W);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_north)) {
-          // there's no wall to the north
-          if (x-1 >= 0 && !(maze[x-1][y])) {
-            Serial.println(F("nodeN"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(N);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_south)) {
-          // there's no wall to the south
-          if (x+1 < rows && !(maze[x+1][y])) {
-            Serial.println(F("nodeS"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(S);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_east)) {
-          // there's no wall to the east
-          if (y+1 < columns && !(maze[x][y+1])) {
-            Serial.println(F("nodeE"));
-            // the new location is valid and it has not been explored 
-            addNewNodeToStack(E);
-          }
-        } 
-      } else if (current_dir == W) {
-        if (!(maze[x][y] & bm_wall_east)) {
-          // there's no wall to the east
-          if (y+1 < columns && !(maze[x][y+1])) {
-            Serial.println(F("nodeE"));
-            // the new location is valid and it has not been explored 
-            addNewNodeToStack(E);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_south)) {
-          // there's no wall to the south
-          if (x+1 < rows && !(maze[x+1][y])) {
-            Serial.println(F("nodeS"));
-            addNewNodeToStack(S);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_north)) {
-          // there's no wall to the north
-          if (x-1 >= 0 && !(maze[x-1][y])) {
-            Serial.println(F("nodeN"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(N);
-          }
-        }
-        if (!(maze[x][y] & bm_wall_west)) {
-          // there's no wall to the west
-          if (y-1 >= 0 && !(maze[x][y-1])) {
-            Serial.println(F("nodeW"));
-            // the new location is valid and it has not been explored
-            addNewNodeToStack(W);
-          }
-        }
-      }
-    }
-    Serial.println(F("frontier is empty: should not reach this"));
-    while (1) {}
-    // IR
-    
-//    if (detect()){
-//      turnLeft();
-//      digitalWrite(detectRobotLED, HIGH);
-//    } else {
-//      digitalWrite(detectRobotLED, LOW);
-//    }
-}
-
-/*
-    Uses greedy search to find the shortest path of explored tiles if stuck.
-*/
-struct Node* greedy(uint8_t loc_x, uint8_t loc_y) {
-  Serial.println(F("calculating path"));
-  bool visited[rows][columns] = { }; // initialized with zeros
-  uint8_t heuristic = abs(x - loc_x) + abs(y - loc_y);
-  struct Node *rootNode = NULL;
-  struct Node *lastNode = NULL;
-  struct Node first_node;
-  addNode(&first_node, NULL, x, y, heuristic, &rootNode, &lastNode);
-  //first_node.parent = NULL;
-  while (rootNode) {
-    Serial.println("in the loop");
-    struct Node *loc = findAndReturnMin(&rootNode);
-    const uint8_t locX = loc->x;
-    const uint8_t locY = loc->y;
-    loc->path.push(locX);
-    loc->path.push(locY);
-//    Serial.println(locX);
-//    Serial.println(locY);
-//    Serial.println(F("parent: "));
-//    //Serial.println(loc->parent, HEX);
-//    Serial.println(loc->parent->x);
-//    Serial.println(loc->parent->y);
-//    Serial.println(F("grandparent: "));
-//    //Serial.println(loc->parent->parent, HEX);
-//    Serial.println(loc->parent->parent->x);
-//    Serial.println(loc->parent->parent->y);
-//    
-    
-    // remove this location from the search list
-    if (loc == rootNode && loc == lastNode) {
-      rootNode = NULL;
-      lastNode = NULL;
-    } else if (loc == rootNode) {
-      rootNode = loc->next;
-      rootNode->prev = NULL;
-    } else if  (loc == lastNode) {
-      lastNode = loc->prev;
-      lastNode->next = NULL;
-    } else {
-      (loc->prev)->next = loc->next;
-    }
-    if (!rootNode && !lastNode) {
-      Serial.println(F("greedy search is null"));
-    }
-    visited[locX][locY] = true;
-    
-    if (locX == loc_x && locY == loc_y) {
-      Serial.println(F("found loc"));
-      moveTo(loc);
-    }
-
-    // for each action we can take, add the nodes to the frontier.
-    if (!(maze[locX][locY] & bm_wall_north)) {
-      // there's no wall to the north
-      if (locX - 1 >= 0 && !visited[locX - 1][locY]) {
-        // the new location is valid and we have not visited it
-        if (maze[locX - 1][locY] > 0 || (locX - 1 == loc_x && locY == loc_y)) {
-          // we have explored this location before OR this location is the goal state
-          Serial.println(F("N"));
-          uint8_t heuristic = abs(locX-1-loc_x) + abs(locY-loc_y);
-          struct Node n_new;
-          n_new.path = loc->path;
-//          n_new.path.push(locX);
-//          n_new.path.push(locY);
-//          struct Node copy = *loc;
-//          n_new.parent = &copy;
-//          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, NULL, locX-1, locY, heuristic, &rootNode, &lastNode);
-        }
-      }
-    }
-    if (!(maze[locX][locY] & bm_wall_east)) {
-      // there's no wall to the east
-      if (locY + 1 < columns && !visited[locX][locY + 1] ) {
-        // the new location is valid and we have not visited it
-        if (maze[locX][locY + 1] > 0 || (locX == loc_x && locY + 1 == loc_y)) {
-          // we have explored this location before OR this location is the goal state
-          Serial.println(F("E"));
-          uint8_t heuristic = abs(locX-loc_x) + abs(locY+1-loc_y);
-          struct Node n_new;
-          n_new.path = loc->path;
-//          n_new.path.push(locX);
-//          n_new.path.push(locY);
-//          struct Node copy = *loc;
-//          n_new.parent = &copy;
-//          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, NULL, locX, locY+1, heuristic, &rootNode, &lastNode);
-        }
-      }
-    }
-    if (!(maze[locX][locY] & bm_wall_south)) {
-      // there's no wall to the south
-      if (locX + 1 < rows && !visited[locX + 1][locY]) {
-        // the new location is valid and it has not been explored
-        if (maze[locX + 1][locY] > 0 || (locX + 1 == loc_x && locY == loc_y)) {
-          // we have explored this location before OR this location is the goal state
-          Serial.println(F("S"));
-          uint8_t heuristic = abs(locX+1-loc_x) + abs(locY-loc_y);
-          struct Node n_new;
-          n_new.path = loc->path;
-//          n_new.path.push(locX);
-//          n_new.path.push(locY);
-//          struct Node copy = *loc;
-//          n_new.parent = &copy;
-//          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, NULL, locX+1, locY, heuristic, &rootNode, &lastNode);
-        }
-      }
-    }
-    if (!(maze[locX][locY] & bm_wall_west)) {
-      // there's no wall to the west
-      if (locY - 1 >= 0 && !visited[locX][locY - 1]) {
-        // the new location is valid and it has not been explored
-        if (maze[locX][locY - 1] > 0 || (locX == loc_x && locY - 1 == loc_y)) {
-          // we have explored this location before OR this location is the goal state
-          Serial.print(F("W"));
-          uint8_t heuristic = abs(locX-loc_x) + abs(locY-1-loc_y);
-          struct Node n_new;
-          n_new.path = loc->path;
-//          n_new.path.push(locX);
-//          n_new.path.push(locY);
-//          struct Node copy = *loc;
-//          n_new.parent = &copy;
-//          struct Node * ptr = &(*loc);   // must be initialized here 
-          addNode(&n_new, NULL, locX, locY-1, heuristic, &rootNode, &lastNode);
-        }
-      }
-    }
-  }
-  Serial.println(F("BADDDDD"));
-}
-
-/***
- * Creates a new linked list node and adds it to the end of the given list (need a root node and a last node)
- */
-void addNode(struct Node *i, struct Node *ParentNode, uint8_t xCoor, uint8_t yCoor, uint8_t heuristic, struct Node **RootNode, struct Node **LastNode) {
-  struct Node *old, *p;
-  //If there is an input error, exit function
-  if(!RootNode || !LastNode) {
-    Serial.println(F("BADDD"));
-    return;
-  }
-  i->x = xCoor;  //Store data and name locations
-  i->y = yCoor;
-  Serial.println(i->x);
-  Serial.println(i->y);
-  Serial.print(F("Cost: "));
-  Serial.println(heuristic);
-  i->cost = heuristic;
-  
-  if(!*LastNode) { //if empty list, this is the root element 
-     i->next = NULL;        //Setup information for element
-     i->prev = NULL;
-     *LastNode = i;        //Setup information for list
-     *RootNode = i;
-     Serial.println(F("the list was empty"));
-     return;
-  }
-
-//  //At this point, if there is no Parent, do not make node- exit function // SUUUUUUSSSSS
-//  if(!ParentNode) {
-//    Serial.println(F("there is no parent???"));
-//    return;
-//  }
-  
-   // I can prob just use lastNode to find last element?????? this is safe but slow
-   //Start search at top of list
-   p = *RootNode;
-   old = NULL;
-  
-   while(p){ //find last element
-     old = p;
-     p = p->next; 
-   }
-   i->next = NULL;        //Setup information for element
-   i->prev = old;
-   old->next = i;         //put on end
-   *LastNode = i;         //Setup information for list
-}
-
-/***
- * Finds and returns a pointer to the node with the lowest cost. Assumes that the node passed in is not NULL.
- */
-struct Node* findAndReturnMin(struct Node **RootNode) {
-  struct Node *n = *RootNode;
-  uint8_t min_cost = n->cost;
-  struct Node *min_node = *RootNode;
-  while (n) {
-    if (n->cost < min_cost) {
-      min_cost = n->cost;
-      min_node = n;
-    }
-    Serial.println(F("returnmin"));
-    Serial.println(n->x);
-    Serial.println(n->y);
-    n = n->next;
-  }
-  Serial.println(F("found min node"));
-  return min_node;
-}
-
-
-/*
-   Moves robot to the location described by the node. Obtains the path through the node's parent.
-   Assumptions: There is an open path to the node, but it might encounter enemy robots.
-*/
-void moveTo(struct Node *node) {
-  struct Node *n = node;
-  uint8_t goalX = n->x;
-  uint8_t goalY = n->y;
-  //struct Node *p = n->parent;
-  Serial.println(goalX);
-  Serial.println(goalY);
+void dfs(uint8_t xCoor, uint8_t yCoor) {
+  Serial.println(F("start DFS: "));
+  Serial.println(xCoor);
+  Serial.println(yCoor);
+  Serial.println(F("currently at"));
   Serial.println(x);
   Serial.println(y);
-  if (goalX == x && goalY == y) {
-    Serial.println(F("made it to the location that the greedy search chose"));
-    // we are already at the location
-    MotorLeft.write(90);
-    MotorRight.write(90);
-    return;
-  }
-  Serial.println(F("moving"));
-  StackArray<uint8_t> path = n->path;
-  StackArray<uint8_t> real_path;
-  if (n) {
-    Serial.println(F("path exists"));
-  }
-  while (!path.isEmpty()) { // the path does contain the starting (current) location.
-    Serial.println(F("Added 1 loc to the path"));
-    uint8_t nextY = path.pop();
-    uint8_t nextX = path.pop();
-    real_path.push(nextY);
-    real_path.push(nextX);
-    //p = n->parent;
-    
-    Serial.println(nextX);
-    Serial.println(nextY);
-  }
-  // get rid of current location
-//  real_path.pop();
-//  real_path.pop();
-  while (!real_path.isEmpty()){
-//    struct Node next = path.pop();
-//    Serial.println(next.x);
-//    Serial.println(next.y);
-    uint8_t nextX = real_path.pop();
-    uint8_t nextY = real_path.pop();
-    // turn to face the correct direction: the next node should be one tile away.
-    int x_diff = nextX - x;
-    int y_diff = nextY - y; 
-    facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
-    while (current_dir != dir_to_face) {
-      Serial.println(F("turning"));
-      if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
-      else turnRight();
+  // check if we can move to xCoor, yCoor
+  if (shouldMove(xCoor, yCoor)) {
+    Serial.println(F("moving to: "));
+    Serial.println(xCoor);
+    Serial.println(yCoor);
+    moveOne(xCoor, yCoor);
+    path.push(yCoor);
+    path.push(xCoor);
+    Serial.println(F("exploring"));
+    explore();
+    Serial.println(explored);
+    if (explored == rows*columns){
+      // we've explored the entire maze!
+      Serial.println(F("done"));
+      while(1){
+        MotorLeft.write(90);
+        MotorRight.write(90);
+      }
     }
-    Serial.println(F("moving forward"));
-    // move to the next intersection
-    forward();
-    while (!linefollow()) {
-      forward(); // keeps moving forward until reaches intersection
+    if (current_dir == S) {
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+          dfs(xCoor+1, yCoor);
+        }
+        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
+          dfs(xCoor, yCoor-1);
+        }
+        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
+          Serial.println("made it");
+          dfs(xCoor, yCoor+1);
+        }
+        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
+          dfs(xCoor-1, yCoor);
+        }
+    } else if (current_dir == N) {
+        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
+          dfs(xCoor-1, yCoor);
+        }
+        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
+          dfs(xCoor, yCoor+1);
+        }
+        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
+          dfs(xCoor, yCoor-1);
+        }
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+          dfs(xCoor+1, yCoor);
+        }
+    } else if (current_dir == E) {
+        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
+          dfs(xCoor, yCoor+1);
+        }
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+          Serial.println("huhhhh");
+          dfs(xCoor+1, yCoor);
+        }
+        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
+          dfs(xCoor-1, yCoor);
+        }
+        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
+          dfs(xCoor, yCoor-1);
+        }
+    } else if (current_dir == W) {
+        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
+          dfs(xCoor, yCoor-1);
+        }
+        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
+          dfs(xCoor-1, yCoor);
+        }
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+          dfs(xCoor+1, yCoor);
+        }
+        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
+          dfs(xCoor, yCoor+1);
+        }
     }
-    
-    MotorLeft.write(90);
-    MotorRight.write(90);
-    Serial.println(F("Arrived at destination"));
-    x = nextX;
-    y = nextY;
+    Serial.println("dead end- backtracking");
+    // remove current loc from stack
+    // backtrack one,
+    path.pop();
+    path.pop();
+    uint8_t backX = path.pop();
+    uint8_t backY = path.peek();
+    path.push(backX);
+    Serial.println(backX);
+    Serial.println(backY);
+    moveOne(backX, backY);
   }
-  Serial.println(F("done"));
 }
+
+void loop() {
+    Serial.println(F("exploring"));
+    explore();
+    path.push(y);
+    path.push(x);
+    dfs(1, 0);
+    uint8_t backX = path.pop();
+    uint8_t backY = path.pop();
+    Serial.println(backX);
+    Serial.println(backY);
+    moveOne(backX, backY);
+    dfs(0, 1);
+    Serial.println("somehow finished");
+    while(1){}
+}
+
+/***
+ * checks if we can move to given location (no walls) AND it has not been explored yet.
+ */
+bool shouldMove(uint8_t xCoor, uint8_t yCoor) {
+  Serial.println(maze[xCoor][yCoor]);
+  if (((abs(xCoor-x) == 1 && abs(yCoor-y) ==0) || (abs(xCoor-x) == 0 && abs(yCoor-y) == 1)) && maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
+    if (x - xCoor == 1) {
+      // tile is north of us
+      if (maze[x][y] & bm_wall_north) {
+        // wall to north
+        return false;
+      }
+    } else if (y - yCoor == 1) {
+      // tile is west of us
+      if (maze[x][y] & bm_wall_west) {
+        // wall to west
+        return false;
+      }
+    } else if (y - yCoor == 0) {
+      // tile is south of us
+      if (maze[x][y] & bm_wall_south) {
+        // wall to south
+        return false;
+      }
+    } else {
+      // tile is east of us
+      if (maze[x][y] & bm_wall_east) {
+        // wall to east
+        return false;
+      }
+    }
+    Serial.println("should move!");
+    return true;
+  }
+  return false;
+}
+
 
 void moveOne(uint8_t xCoor, uint8_t yCoor) {
   // turn to face the correct direction: the next node should be one tile away.
@@ -743,7 +335,7 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   Serial.println(F("Arrived at destination"));
   x = xCoor;
   y = yCoor;
-  Serial.println(F("done"));
+  Serial.println(F("done moving"));
 }
 
 /*
