@@ -1636,7 +1636,104 @@ void wallfollow(){
             <div class="col-lg-8 mx-auto">
               <h2 class="text-secondary text-uppercase mb-0">Milestone 3</h2>
               <hr class="star-dark mb-5">
-              <img class="img-fluid mb-5" src="img/portfolio/submarine.png" alt="">
+              <h4 class="text-secondary text-left mb-3">Goal</h4>
+              <p class="mb-5 text-left">
+                The goal of Milestone 3 was to make our robot capable of complete maze exploration using a search algorithm (or a combination) from the following common algorithms: DFS, BFS, Dijkstra, or A* search. We decided to use a simple DFS for a more safe, easy-to-debug graph traversal after failing to incorporate a greedy search into our DFS due to problems with pointers, but we will continue to try incorporating the greedy search!
+              </p>
+              <hr class="mb-5">
+              <p class="mb-5 text-left">
+                To quickly demonstrate the goal of this milestone, here is a quick video of our robot doing a DFS exploration on a small (3x2) grid:
+              </p>
+              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/D40u1aN-03o?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">DFS</h4>
+              <p class="mb-3 text-left">
+                We use a recursive strategy for our DFS. At each location, we call <code>dfs()</code> on all the possible locations we can move to from the current location, so that they are all one step away in one of the four (N, S, E, W) directions. We only call <code>dfs()</code> on valid exploration locations, i.e. locations that are in the grid and have not been explored. This way we don't create an enormous call stack. Before we actually move to a location, we check if we shouldMove() (no walls blocking us). 
+              </p>
+              <p class="mb-0 text-left">The following code snippet illustrates our DFS algorithm:</p>
+              <pre class="mb-0 text-left">
+                <code>
+StackArray&ltuint8_t&gt path; // maintains the current path
+
+void dfs(uint8_t xCoor, uint8_t yCoor) { // xCoor and yCoor are the next location to move to, guaranteed to be one away, a valid location, and not explored
+  if (shouldMove(xCoor, yCoor)) { // check if a wall is blocking our way- if so, we shouldn't move there.
+    moveOne(xCoor, yCoor); // this function physically moves the robot one step to (xCoor, yCoor), updating the current location
+    path.push(yCoor); // add the y coordinate to the stack (this is the current lcoation)
+    path.push(xCoor); // add the x coordinate to the stack (this is the current lcoation)
+    explore(); // old code that reads sensors to explore the location for walls and treasures
+    if (explored == rows*columns){
+      // we've explored the entire maze!
+      while(1){
+        // stops moving
+        MotorLeft.write(90);
+        MotorRight.write(90);
+      }
+    }
+    // here we call dfs() recursively on the 4 possible ways to move, but only if it's a valid location
+    // our call order for the 4 directions is different based on the current direction- we show one of our if-statements below
+    if (current_dir == S) {
+        // only call dfs() for locations that haven't been explored and are on the grid to minimize call stack
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+          dfs(xCoor+1, yCoor);
+        }
+        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
+          dfs(xCoor, yCoor-1);
+        }
+        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
+          Serial.println("made it");
+          dfs(xCoor, yCoor+1);
+        }
+        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
+          dfs(xCoor-1, yCoor);
+        }
+    } 
+    // ... and so on, with a different order for each of the other 3 directions
+    // at this point, if we get here, this means we hit a dead end, so we backtrack
+    // remove current loc from stack
+    path.pop();
+    path.pop();
+    // get the previous location to move to- just a peek
+    uint8_t backX = path.pop();
+    uint8_t backY = path.peek();
+    path.push(backX);
+    // move to the location- it is already guaranteed reachable
+    moveOne(backX, backY);
+  }
+}
+                </code>
+              </pre>
+              <p class="mb-0 text-left">
+                As seen above, to make our search easier to implement, we imported a library called <code>StackArray</code> to maintain a stack of our current path, which allows us to easily backtrack when we hit a dead end. All we do is pop the current location off the stack (we pop twice, once for the x-coordinate and once for the y-coordinate), and then peek at the next two coordinates to get the location we want to move to. The invariant is that the location we move to is always one step away and is physically reachable from the current location, i.e. there are no walls blocking our path. <br />
+                <br />
+                We start the DFS in <code>loop()</code> by exploring the first (0, 0) location, then adding (0, 0) to the path stack, and then calling dfs() twice on the south and east locations, because those are the only two that are valid based on our starting location and direction (south). The code is below:
+              </p>
+              <pre class="mb-0 text-left">
+                <code>
+void loop() {
+  explore();
+  path.push(y);
+  path.push(x);
+  dfs(1, 0);
+  uint8_t backX = path.pop();
+  uint8_t backY = path.pop();
+  moveOne(backX, backY); // move back to the starting location to branch to the other side of DFS
+  dfs(0, 1);
+  // we should have explored the entire maze at this point- this is just for debugging
+  Serial.println("somehow finished");
+  while(1){}
+}
+                </code>
+              </pre>
+              <p class="mb-5 text-left">
+                We've run this algorithm on two different 4x5 grids- one is more simple, one is quite complex. The following two videos show the results. One quick note is that in the videos, we correct the robot's course quite a few times due to the robot missing the lines (we filmed during sunrise so the light kept changing, and different parts of the maze were lighter than others). Even so, it is easy to prove that our algorithm is still correct, because once we put the robot on its intended path, it continues to explore smoothly, which means it knows where it is, and that indeed where we moved it is where it was intended to go.
+              </p>
+              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/-l_l9L6xsmo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/rsmMVJcRQ0Q?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Updating the GUI</h4>
+              <p class="mb-5 text-left">
+                The following is a video of the robot updating the GUI as it explores the maze! The GUI was implemented in Lab 3. Treasures are not included yet.
+              </p>
              
 
               <hr class="mb-5">
