@@ -29,9 +29,9 @@ const int leftWallLED = 18;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 600;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 700;//540;
-const int LIGHT_LEFT_THRESHOLD = 700;//620;
+const int LIGHT_CENTER_THRESHOLD = 750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 750;//540;
+const int LIGHT_LEFT_THRESHOLD = 750;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -72,8 +72,8 @@ const uint8_t bm_not_explored = 0;
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const int rows = 4;
-const int columns = 5;
+const int rows = 9;
+const int columns = 9;
 int explored = 0;
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -465,7 +465,7 @@ boolean linefollow() {
     return false;
   } else if (leftOnLine && rightOnLine) {
     forward();
-    delay(650);
+    delay(550);
     Serial.println(F("intersection"));
     return true;
   } else if (centerOnLine && leftOnLine) {
@@ -546,7 +546,7 @@ void readMux() { // change this so we only read once based on the input mux sele
   delay(2);
   LightDataL = analogRead(A5);
 
-  // 110 microphone
+  // 110 microphon
   // 111 IR maybe?
 }
 
