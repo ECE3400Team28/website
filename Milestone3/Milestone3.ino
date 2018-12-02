@@ -29,9 +29,9 @@ const int leftWallLED = 18;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 750;//540;
-const int LIGHT_LEFT_THRESHOLD = 750;//620;
+const int LIGHT_CENTER_THRESHOLD = 880;//750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 880;//750;//540;
+const int LIGHT_LEFT_THRESHOLD = 880;//750;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -94,6 +94,13 @@ struct Node
 void setup() {
   // put your setup code here, to run once:
   pinMode(pin_Button, INPUT);
+  
+  pinMode(leftWallLED, OUTPUT);
+  pinMode(rightWallLED, OUTPUT);
+  pinMode(frontWallLED, OUTPUT);
+
+  int setup_ctr = 0;
+  
   //pinMode(A4, INPUT);           //USED for microphone input
   Serial.begin(115200); // use the serial port
 
@@ -103,7 +110,18 @@ void setup() {
   while (!readSignal() && !digitalRead(pin_Button) == HIGH) {
     Serial.println(F("no input"));
     delay(10);
+    setup_ctr ++;
+    if (setup_ctr == 10) {
+      digitalWrite(rightWallLED, HIGH);
+      digitalWrite(frontWallLED, LOW);
+    } else if (setup_ctr == 2*10) {
+      digitalWrite(rightWallLED, LOW);
+      digitalWrite(frontWallLED, HIGH);
+      setup_ctr = 0;
+    }
   }
+  digitalWrite(rightWallLED, LOW);
+  digitalWrite(frontWallLED, LOW);
   
   pinMode(A0, INPUT);           //ADC for other robot FFT detection
   int PWM1 = 5;
@@ -112,9 +130,6 @@ void setup() {
   pinMode(PWM2, OUTPUT); 
   pinMode(A5, INPUT);           //MUX output 
   // pinMode(detectRobotLED, OUTPUT);
-  pinMode(leftWallLED, OUTPUT);
-  pinMode(rightWallLED, OUTPUT);
-  pinMode(frontWallLED, OUTPUT);
   pinMode(mux_sel_0, OUTPUT);
   pinMode(mux_sel_1, OUTPUT);
   pinMode(mux_sel_2, OUTPUT);
@@ -465,7 +480,7 @@ boolean linefollow() {
     return false;
   } else if (leftOnLine && rightOnLine) {
     forward();
-    delay(550);
+    delay(500);
     Serial.println(F("intersection"));
     return true;
   } else if (centerOnLine && leftOnLine) {
@@ -645,6 +660,19 @@ boolean readSignal() {
 
 boolean broadcast() {
   uint8_t cell = maze[x][y];
+  if (x == 0) {
+    // robot does not see behind itself on starting square.
+    cell |= bm_wall_north;
+  }
+  if (x == 8) {
+    cell |= bm_wall_south;
+  }
+  if (y == 0) {
+    cell |= bm_wall_west;
+  }
+  if (y == 8) {
+    cell |= bm_wall_east;
+  }
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
   Serial.println(message, BIN);
