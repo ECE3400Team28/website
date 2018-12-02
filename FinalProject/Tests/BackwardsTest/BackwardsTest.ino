@@ -88,6 +88,8 @@ struct Node
   uint8_t y;
 };
 
+uint8_t relative_line_position; // 0 for centered, 1 for left, 2 for right
+
 //StackArray<Node> frontier;
 
 // *************** MUST HAVE BARRIERS ALL AROUND SO IT DOESN'T FALSELY THINK SOMETHING IS IN FRONT OF IT ******************* //
@@ -253,20 +255,37 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
 }
 
 void loop() {
-    Serial.println(F("exploring"));
-    explore();
-    path.push(y);
-    path.push(x);
-    dfs(1, 0);
-    uint8_t backX = path.pop();
-    uint8_t backY = path.pop();
-    Serial.println(backX);
-    Serial.println(backY);
-    moveOne(backX, backY);
-    dfs(0, 1);
-    Serial.println("somehow finished");
-    while(1){}
+//  while(1){
+//    MotorRight.write(87);
+//    MotorLeft.write(120);
+//    delay(10);
+//  }
+  while (!linefollow(1)) {
+    forward(); // keeps moving forward until reaches intersection
+  }
+  backward();
+  delay(1000);
+  while (!linefollow(0)) {
+    backward(); // keeps moving forward until reaches intersection
+  }
+  forward();
+  delay(1000);
 }
+//void loop() {
+//    Serial.println(F("exploring"));
+//    explore();
+//    path.push(y);
+//    path.push(x);
+//    dfs(1, 0);
+//    uint8_t backX = path.pop();
+//    uint8_t backY = path.pop();
+//    Serial.println(backX);
+//    Serial.println(backY);
+//    moveOne(backX, backY);
+//    dfs(0, 1);
+//    Serial.println("somehow finished");
+//    while(1){}
+//}
 
 /***
  * checks if we can move to given location (no walls) AND it has not been explored yet.
@@ -326,7 +345,7 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   Serial.println(F("moving forward"));
   // move to the next intersection
   forward();
-  while (!linefollow()) {
+  while (!linefollow(1)) {
     forward(); // keeps moving forward until reaches intersection
   }
   
@@ -404,8 +423,13 @@ void explore() {
 }
 
 void forward() {
-  MotorLeft.write(84);
-  MotorRight.write(99);
+  MotorLeft.write(50);
+  MotorRight.write(130);
+}
+
+void backward() {
+  MotorLeft.write(95);
+  MotorRight.write(80);
 }
 
 // Turns robot left 90 degrees and updates the currently facing direction.
@@ -441,10 +465,59 @@ void turnRight() {
   return;
 }
 
+volatile int start_time;
+
+/*
+ * Deal with reaching an intersection
+ */
+void intersection(){
+  Serial.println(F("intersection"));
+  start_time = millis();
+  delay(650);
+//  Serial.println(millis() - start_time);
+//  while (millis() - start_time < 650) {
+////    linefollow(1);
+////    Serial.println(millis() - start_time);
+//  }
+  Serial.println(F("intersection end"));
+}
+
+/*
+ * Tries to find way back to line
+ */
+boolean backToLine(int errorType, int forwards) {
+  relative_line_position = errorType;
+
+  int cnt;
+  for (cnt = 0; cnt < 5; cnt++) {
+    if (forwards) {
+      delay(10);
+    } else {
+      delay(5);
+    }
+//    delay(10);
+    readMux();
+    bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
+    bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
+    bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
+    if (leftOnLine && rightOnLine) {
+      if (forwards) {
+        forward();
+      } else {
+        backward();
+      }
+      intersection();
+      return true;
+    }
+  }
+  
+  return false;
+}
+
 /***
  * Returns true upon seeing an intersection. Else returns false, and continues to follow the line.
  */
-boolean linefollow() {
+boolean linefollow(int forwards) {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
   readMux();
@@ -461,42 +534,97 @@ boolean linefollow() {
   if (centerOnLine && !leftOnLine && !rightOnLine) {
     // centered
     Serial.println(F("Centered"));
+    relative_line_position = 0;
     return false;
   } else if (leftOnLine && rightOnLine) {
-    forward();
-    delay(650);
-    Serial.println(F("intersection"));
+    if (forwards) {
+      forward();
+    } else {
+      backward();
+    }
+    intersection();
     return true;
   } else if (centerOnLine && leftOnLine) {
     // bot is veering right slightly, so we turn it left a bit
-    MotorRight.write(93);
-    MotorLeft.write(83);
+    if (forwards) {
+      MotorRight.write(93);
+      MotorLeft.write(83);
+    } else {
+//      MotorRight.write(83);
+//      MotorLeft.write(92);
+
+//      MotorRight.write(89);
+//      MotorLeft.write(120);
+
+      MotorRight.write(87);
+      MotorLeft.write(97);
+    }
     Serial.println(F("Veering slightly right"));
-    delay(100);
-    return false;
+    return backToLine(2, forwards);
   } else if (centerOnLine && rightOnLine) {
     // bot is veering left slightly, so we turn it right a bit
-    MotorRight.write(95);
-    MotorLeft.write(80);
+    if (forwards) {
+      MotorRight.write(95);
+      MotorLeft.write(80);
+    } else {
+      MotorRight.write(85);
+      MotorLeft.write(100);
+    }
     Serial.println(F("Veering slightly left"));
-    delay(100);
-    return false;
+    return backToLine(1, forwards);
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
     Serial.println(F("A lot right"));
-    MotorRight.write(90); //edit
-    MotorLeft.write(80);
-    delay(100);
-    return false;
+    if (forwards) {
+      MotorRight.write(90); //edit
+      MotorLeft.write(80);
+    } else {
+      MotorRight.write(87);
+      MotorLeft.write(97);
+    }
+    return backToLine(2, forwards);
   } else if (rightOnLine) {
     // bot is veering left a lot, so we turn it right more
     Serial.println(F("A lot left"));
-    MotorLeft.write(90);
-    MotorRight.write(100);
-    delay(100);
-    return false;
+    if (forwards) {
+      MotorLeft.write(88);
+      MotorRight.write(100);
+    } else {
+      MotorLeft.write(95);
+      MotorRight.write(88);
+    }
+    return backToLine(1, forwards);
   } else {
-    Serial.println(F("other"));
+    Serial.print(F("other: "));
+    switch(relative_line_position) {
+      case 1:
+        // left
+        Serial.println(F("left"));
+        if (forwards) {
+          MotorRight.write(100);
+          MotorLeft.write(88);
+        } else {
+          MotorRight.write(88);
+          MotorLeft.write(100);
+        }
+        return backToLine(1, forwards);
+        break;
+      case 2:
+        // right
+        Serial.println(F("right"));
+        if (forwards) {
+          MotorRight.write(93);
+          MotorLeft.write(83);
+        } else {
+          MotorRight.write(87);
+          MotorLeft.write(97);
+        }
+        return backToLine(2, forwards);
+        break;
+      default:
+        Serial.println(F("who knows how"));
+        break;
+    }
     return false;
   }
 }
@@ -506,42 +634,42 @@ void readMux() { // change this so we only read once based on the input mux sele
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallFront = analogRead(A5);
 
   // 001 Right wall
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallRight = analogRead(A5);
 
   // 010 Left wall
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   wallLeft = analogRead(A5);
 
   // 011 front line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, HIGH);
   digitalWrite(mux_sel_2, LOW);
-  delay(20);
+  delay(2);
   LightDataC = analogRead(A5);
 
   // 100 right line
   digitalWrite(mux_sel_0, LOW);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delay(20);
+  delay(2);
   LightDataR = analogRead(A5);
 
   // 101 left line
   digitalWrite(mux_sel_0, HIGH);
   digitalWrite(mux_sel_1, LOW);
   digitalWrite(mux_sel_2, HIGH);
-  delay(20);
+  delay(2);
   LightDataL = analogRead(A5);
 
   // 110 microphone
@@ -616,24 +744,11 @@ boolean readSignal() {
   fht_run(); // process the data in the fft
   fht_mag_log(); // take the output of the fft
   sei();
-//  Serial.println(fht_log_out[19]);
-  int max_other = 0;
-  for (int l = 28; l < 35; ++l) {
-    if (fht_log_out[l] > max_other) {
-      max_other = fht_log_out[l];
-    }
-  }
-  Serial.print("max: ");
-  Serial.println(max_other);
-  max_other = (max_other > 45) ? max_other : 45;
-  for (int j = 18; j < 21; ++j) {
-    Serial.println(fht_log_out[j]);
-    if (fht_log_out[j] >= max_other) {
+  Serial.println(fht_log_out[19]);
+  for (int j = 17; j < 23; ++j) {
+    if (fht_log_out[j] >= 60) {
       //We have detected another robot
       // return settings to original
-      for (int k = 0; k < 128; k++) {
-        Serial.println(fht_log_out[k]);
-      }
       return true;
     }
   }

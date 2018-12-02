@@ -1,0 +1,27 @@
+backward
+	right 80
+	left 95
+
+A lot left										slightly left
+	right 88										right 85
+	left 95											left 100
+	
+A lot right										slightly right
+	right 80										right 80
+	left 90											left 92
+	
+	
+forward
+	left 50
+	right 130
+	
+	84 99
+
+a lot left
+	right 100
+	left 88
+
+a lot right
+	right 90
+	left 80
+	
