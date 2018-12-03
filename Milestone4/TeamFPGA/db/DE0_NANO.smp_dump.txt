@@ -1,4 +1,37 @@
 
+State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|cons_shape
+Name cons_shape.11 cons_shape.10 cons_shape.01 cons_shape.00 
+cons_shape.00 0 0 0 0 
+cons_shape.01 0 0 1 1 
+cons_shape.10 0 1 0 1 
+cons_shape.11 1 0 0 1 
+
+State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|width_shape
+Name width_shape.11 width_shape.10 width_shape.01 width_shape.00 
+width_shape.00 0 0 0 0 
+width_shape.01 0 0 1 1 
+width_shape.10 0 1 0 1 
+width_shape.11 1 0 0 1 
+
+State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|width_color
+Name width_color.00 width_color.10 width_color.01 
+width_color.00 0 0 0 
+width_color.01 1 0 1 
+width_color.10 1 1 0 
+
+State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|edge_color
+Name edge_color.00 edge_color.10 edge_color.01 
+edge_color.00 0 0 0 
+edge_color.01 1 0 1 
+edge_color.10 1 1 0 
+
+State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|edge_shape
+Name edge_shape.11 edge_shape.10 edge_shape.01 edge_shape.00 
+edge_shape.00 0 0 0 0 
+edge_shape.01 0 0 1 1 
+edge_shape.10 0 1 0 1 
+edge_shape.11 1 0 0 1 
+
 State Machine - |DE0_NANO|IMAGE_PROCESSOR:proc|PIXEL_OUT_C
 Name PIXEL_OUT_C.01100000 PIXEL_OUT_C.00000000 PIXEL_OUT_C.11100000 PIXEL_OUT_C.00000011 
 PIXEL_OUT_C.00000000 0 0 0 0 
