@@ -34,8 +34,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
     forward();
-    linefollow();
-    delay(20);
+//    linefollow();
+//    delay(20);
   // getValues();
 }
 void forward(){
