@@ -179,10 +179,7 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
 //    Serial.println(F("moving to: "));
 //    Serial.println(xCoor);
 //    Serial.println(yCoor);
-    if (moveOne(xCoor, yCoor)){
-      // detected a robot
-      return;
-    }
+    moveOne(xCoor, yCoor);
     path.push(yCoor);
     path.push(xCoor);
 //    Serial.println(F("exploring"));
@@ -259,9 +256,180 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
     path.push(backX);
 //    Serial.println(backX);
 //    Serial.println(backY);
-    while (moveOne(backX, backY));
+    moveOne(backX, backY);
   }
 }
+//bool found = false;
+//void dfs(uint8_t xCoor, uint8_t yCoor) {
+//  // check if location is valid and unexplored
+//  if (maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
+//    // calculate path to location
+//    memset(visited, 0, sizeof(visited));
+//    greedy(xCoor, yCoor, x, y);
+//    found = false;
+//    while (!greedy_path.isEmpty()) {
+//      reversed_greedy_path.push(greedy_path.pop());
+//    }
+//    // move to location using path returned by greedy
+//    while (!reversed_greedy_path.isEmpty()){
+//      uint8_t nextX = reversed_greedy_path.pop();
+//      uint8_t nextY = reversed_greedy_path.pop();
+//      Serial.println(nextX);
+//      Serial.println(nextY);
+//      moveOne(nextX, nextY);
+//    }
+//    explore();
+//    if (explored == rows*columns){
+//      // we've explored the entire maze! 
+//      while(1){
+//        MotorLeft.write(90);
+//        MotorRight.write(90);
+//      }
+//    }
+//    if (current_dir == S) {
+//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_south)) {
+//          dfs(xCoor+1, yCoor);
+//        }
+//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns && !(maze[xCoor][yCoor] & bm_wall_west)) {
+//          dfs(xCoor, yCoor-1);
+//        }
+//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns && !(maze[xCoor][yCoor] & bm_wall_east)) {
+//          dfs(xCoor, yCoor+1);
+//        }
+//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_north)) {
+//          dfs(xCoor-1, yCoor);
+//        }
+//    } else if (current_dir == N) {
+//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_north)) {
+//          dfs(xCoor-1, yCoor);
+//        }
+//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns && !(maze[xCoor][yCoor] & bm_wall_east)) {
+//          dfs(xCoor, yCoor+1);
+//        }
+//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns && !(maze[xCoor][yCoor] & bm_wall_west)) {
+//          dfs(xCoor, yCoor-1);
+//        }
+//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_south)) {
+//          dfs(xCoor+1, yCoor);
+//        }
+//    } else if (current_dir == E) {
+//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns && !(maze[xCoor][yCoor] & bm_wall_east)) {
+//          dfs(xCoor, yCoor+1);
+//        }
+//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_south)) {
+//          dfs(xCoor+1, yCoor);
+//        }
+//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_north)) {
+//          dfs(xCoor-1, yCoor);
+//        }
+//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns && !(maze[xCoor][yCoor] & bm_wall_west)) {
+//          dfs(xCoor, yCoor-1);
+//        }
+//    } else if (current_dir == W) {
+//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns && !(maze[xCoor][yCoor] & bm_wall_west)) {
+//          dfs(xCoor, yCoor-1);
+//        }
+//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_north)){
+//          dfs(xCoor-1, yCoor);
+//        }
+//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns && !(maze[xCoor][yCoor] & bm_wall_south)) {
+//          dfs(xCoor+1, yCoor);
+//        }
+//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns && !(maze[xCoor][yCoor] & bm_wall_east)) {
+//          dfs(xCoor, yCoor+1);
+//        }
+//    }
+//    Serial.println("dead end");
+//  }
+//}
+//
+///***
+// * Given a valid coordinate (that we are not at currently) from the DFS, calculates a greedy path to that coordinate using a Manhattan distance heuristic, saving the path in a stack (greedy_path)
+// */
+//void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
+//  // add current node to path
+//  greedy_path.push(xCoor);
+//  greedy_path.push(yCoor);
+//  Serial.println(xCoor);
+//  Serial.println(yCoor);
+//  Serial.println(goalX);
+//  Serial.println(goalY);
+//  if (xCoor == goalX && yCoor == goalY) {
+//    found = true;
+//    return;
+//  }
+//  // add nodes that we've explored and no wall blocking and not visited OR are the goal, in order of least to greatest cost
+//  int costN = -1;
+//  int costS = -1;
+//  int costE = -1;
+//  int costW = -1;
+//  if (xCoor+1 < rows && !visited[xCoor+1][yCoor] && (maze[xCoor+1][yCoor] > 0 || (xCoor+1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_south)) {
+//    costS = abs(xCoor+1-goalX) + abs(yCoor-goalY);
+//    Serial.println("lol1");
+//    visited[xCoor+1][yCoor] = true;
+//  }
+//  if (yCoor-1 >= 0 && !visited[xCoor][yCoor-1] && (maze[xCoor][yCoor-1] > 0 || (xCoor == goalX && yCoor-1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_west)) {
+//    costW = abs(xCoor-goalX) + abs(yCoor-1-goalY);
+//    Serial.println("lol2");
+//    visited[xCoor][yCoor-1] = true;
+//  }
+//  if (yCoor+1 < columns && !visited[xCoor][yCoor+1] && (maze[xCoor][yCoor+1] > 0 || (xCoor == goalX && yCoor+1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_east)) {
+//    costE = abs(xCoor-goalX) + abs(yCoor+1-goalY);
+//    Serial.println("lol3");
+//    visited[xCoor][yCoor+1] = true;
+//  }
+//  if (xCoor-1 >= 0 && !visited[xCoor-1][yCoor] && (maze[xCoor-1][yCoor] > 0 || (xCoor-1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_north)) {
+//    costN = abs(xCoor-1-goalX) + abs(yCoor-goalY);
+//    Serial.println("lol4");
+//    visited[xCoor-1][yCoor] = true;
+//  }
+//  facing_direction min_dir = NULL;
+//  
+//  while (!found && (costN != -1 || costS != -1 || costE != -1 || costW != -1)) { // there is still a valid direction we haven't searched
+//    // find min cost
+//    int minimum = 1000;
+//    if (costN != -1 && costN < minimum) {
+//      minimum = costN;
+//      min_dir = N;
+//    }
+//    if (costS != -1 && costS < minimum) {
+//      minimum = costS;
+//      min_dir = S;
+//    }
+//    if (costE != -1 && costE < minimum) {
+//      minimum = costE;
+//      min_dir = E;
+//    }
+//    if (costW != -1 && costW < minimum) {
+//      minimum = costW;
+//      min_dir = W;
+//    }
+//    // call greedy
+//    Serial.println(min_dir);
+//    if (min_dir == S) {
+//      costS = -1;
+//      greedy(goalX, goalY, xCoor+1, yCoor);
+//    }
+//    else if (min_dir == W) {
+//      costW = -1;
+//      greedy(goalX, goalY, xCoor, yCoor-1);
+//    }
+//    else if (min_dir == E) {
+//      costE = -1;
+//      greedy(goalX, goalY, xCoor, yCoor+1);
+//    }
+//    else if (min_dir == N) {
+//      costN = -1;
+//      greedy(goalX, goalY, xCoor-1, yCoor);
+//    }
+//  }
+//  if (!found) {
+//    Serial.println("dead end in greedy search- backtracking");
+//    // remove current loc from stack
+//    greedy_path.pop();
+//    greedy_path.pop();
+//  }
+//}
 
 void loop() {
     //Serial.println(F("exploring"));
@@ -273,7 +441,7 @@ void loop() {
     uint8_t backY = path.pop();
 //    Serial.println(backX);
 //    Serial.println(backY);
-    while(moveOne(backX, backY));
+    moveOne(backX, backY);
     dfs(0, 1);
     MotorRight.write(90);
     MotorLeft.write(90);
@@ -318,7 +486,7 @@ bool shouldMove(uint8_t xCoor, uint8_t yCoor) {
   return false;
 }
 
-bool moveOne(uint8_t xCoor, uint8_t yCoor) {
+void moveOne(uint8_t xCoor, uint8_t yCoor) {
   // turn to face the correct direction: the next node should be one tile away.
 //  MotorLeft.detach();
 //  MotorRight.detach();
@@ -329,7 +497,7 @@ bool moveOne(uint8_t xCoor, uint8_t yCoor) {
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
-    return false;
+    return;
   }
   int x_diff = xCoor - x;
   int y_diff = yCoor - y; 
@@ -342,9 +510,6 @@ bool moveOne(uint8_t xCoor, uint8_t yCoor) {
   // move to the next intersection
   forward();
   while (!linefollow()) {
-    if (detect()) {
-      return true;
-    }
     forward(); // keeps moving forward until reaches intersection
   }
   
@@ -354,7 +519,6 @@ bool moveOne(uint8_t xCoor, uint8_t yCoor) {
   x = xCoor;
   y = yCoor;
   //Serial.println(F("done moving"));
-  return false;
 }
 
 /*
@@ -468,15 +632,10 @@ boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
   readMux();
-  int detect_ctr = 0;
   while (detect()) {
-    detect_ctr ++;
     MotorLeft.write(90);
     MotorRight.write(90);
-    delay(500);
-    if (detect_ctr > 10) {
-      return false;
-    }
+    delay(3000);
   }
 //  Serial.println("new data");
 //  Serial.println(LightDataL);
