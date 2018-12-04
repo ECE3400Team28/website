@@ -7,7 +7,7 @@
 #include <StackArray.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include "printf.h"
+//#include "printf.h"
 
 Servo MotorLeft;
 Servo MotorRight;
@@ -18,7 +18,6 @@ int wallRight;
 int wallFront;
 int wallLeft;
 
-//const int detectRobotLED = ??;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
 const int mux_sel_2 = 17;
@@ -31,9 +30,9 @@ int PWM2 = 3;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 300;//750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 300;//750;//540;
-const int LIGHT_LEFT_THRESHOLD = 300;//750;//620;
+const int LIGHT_CENTER_THRESHOLD = 200;//750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 200;//750;//540;
+const int LIGHT_LEFT_THRESHOLD = 200;//750;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -74,8 +73,8 @@ const uint8_t bm_not_explored = 0;
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const int rows = 6;
-const int columns = 6;
+const int rows = 9;
+const int columns = 9                             ;
 int explored = 0;
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -160,49 +159,48 @@ void setup() {
   // Dump the configuration of the rf unit for debugging
   //radio.printDetails();
 
-  delay(2000);
+  delay(100);
 }
 
 StackArray<uint8_t> path;
 //StackArray<uint8_t> greedy_path;
 //StackArray<uint8_t> reversed_greedy_path;
-bool visited[rows][columns] = {};
+//bool visited[rows][columns] = {};
 
 void dfs(uint8_t xCoor, uint8_t yCoor) {
-  Serial.println(F("start DFS: "));
-  Serial.println(xCoor);
-  Serial.println(yCoor);
-  Serial.println(F("currently at"));
-  Serial.println(x);
-  Serial.println(y);
+//  Serial.println(F("start DFS: "));
+//  Serial.println(xCoor);
+//  Serial.println(yCoor);
+//  Serial.println(F("currently at"));
+//  Serial.println(x);
+//  Serial.println(y);
   // check if we can move to xCoor, yCoor
   if (shouldMove(xCoor, yCoor)) {
-    Serial.println(F("moving to: "));
-    Serial.println(xCoor);
-    Serial.println(yCoor);
+//    Serial.println(F("moving to: "));
+//    Serial.println(xCoor);
+//    Serial.println(yCoor);
     moveOne(xCoor, yCoor);
     path.push(yCoor);
     path.push(xCoor);
-    Serial.println(F("exploring"));
+//    Serial.println(F("exploring"));
     explore();
-    Serial.println(explored);
+//    Serial.println(explored);
     if (explored == rows*columns){
       // we've explored the entire maze!
-      Serial.println(F("done"));
+      // Serial.println(F("done"));
       while(1){
         MotorLeft.write(90);
         MotorRight.write(90);
       }
     }
     if (current_dir == S) {
-        if (maze[xCoor+1][yCoor] > 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
+        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
           dfs(xCoor+1, yCoor);
         }
         if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
           dfs(xCoor, yCoor-1);
         }
         if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
-          Serial.println("made it");
           dfs(xCoor, yCoor+1);
         }
         if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
@@ -226,7 +224,6 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
           dfs(xCoor, yCoor+1);
         }
         if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
-          Serial.println("huhhhh");
           dfs(xCoor+1, yCoor);
         }
         if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
@@ -249,7 +246,7 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
           dfs(xCoor, yCoor+1);
         }
     }
-    Serial.println("dead end- backtracking");
+//    Serial.println("dead end- backtracking");
     // remove current loc from stack
     // backtrack one,
     path.pop();
@@ -257,8 +254,8 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
     uint8_t backX = path.pop();
     uint8_t backY = path.peek();
     path.push(backX);
-    Serial.println(backX);
-    Serial.println(backY);
+//    Serial.println(backX);
+//    Serial.println(backY);
     moveOne(backX, backY);
   }
 }
@@ -442,13 +439,13 @@ void loop() {
     dfs(1, 0);
     uint8_t backX = path.pop();
     uint8_t backY = path.pop();
-    Serial.println(backX);
-    Serial.println(backY);
+//    Serial.println(backX);
+//    Serial.println(backY);
     moveOne(backX, backY);
     dfs(0, 1);
     MotorRight.write(90);
     MotorLeft.write(90);
-    Serial.println("somehow finished");
+//    Serial.println("somehow finished");
     while(1){}
 }
 
@@ -456,7 +453,7 @@ void loop() {
  * checks if we can move to given location (no walls) AND it has not been explored yet.
  */
 bool shouldMove(uint8_t xCoor, uint8_t yCoor) {
-  Serial.println(maze[xCoor][yCoor]);
+//  Serial.println(maze[xCoor][yCoor]);
   if (((abs(xCoor-x) == 1 && abs(yCoor-y) ==0) || (abs(xCoor-x) == 0 && abs(yCoor-y) == 1)) && maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
     if (x - xCoor == 1) {
       // tile is north of us
@@ -491,8 +488,12 @@ bool shouldMove(uint8_t xCoor, uint8_t yCoor) {
 
 void moveOne(uint8_t xCoor, uint8_t yCoor) {
   // turn to face the correct direction: the next node should be one tile away.
+//  MotorLeft.detach();
+//  MotorRight.detach();
+//  MotorLeft.attach(PWM1);
+//  MotorRight.attach(PWM2);
   if (xCoor == x && yCoor == y) {
-    Serial.println("already here");
+    //Serial.println("already here");
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -502,7 +503,7 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   int y_diff = yCoor - y; 
   facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
   while (current_dir != dir_to_face) {
-    Serial.println(F("turning"));
+    //Serial.println(F("turning"));
     if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
     else turnRight();
   }
@@ -514,10 +515,10 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   
   MotorLeft.write(90);
   MotorRight.write(90);
-  Serial.println(F("Arrived at destination"));
+  //Serial.println(F("Arrived at destination"));
   x = xCoor;
   y = yCoor;
-  Serial.println(F("done moving"));
+  //Serial.println(F("done moving"));
 }
 
 /*
@@ -647,43 +648,43 @@ boolean linefollow() {
  
   if (centerOnLine && !leftOnLine && !rightOnLine) {
     // centered
-    Serial.println(F("Centered"));
+    //Serial.println(F("Centered"));
     return false;
   } else if (leftOnLine && rightOnLine) {
     forward();
     delay(250);
-    Serial.println(F("intersection"));
+    //Serial.println(F("intersection"));
     return true;
   } else if (centerOnLine && leftOnLine) {
     // bot is veering right slightly, so we turn it left a bit
     MotorRight.write(95);
     MotorLeft.write(84);
-    Serial.println(F("Veering slightly right"));
+    //Serial.println(F("Veering slightly right"));
     delay(30);
     return false;
   } else if (centerOnLine && rightOnLine) {
     // bot is veering left slightly, so we turn it right a bit
     MotorRight.write(96);
     MotorLeft.write(85);
-    Serial.println(F("Veering slightly left"));
+    //Serial.println(F("Veering slightly left"));
     delay(30);
     return false;
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
-    Serial.println(F("A lot right"));
-    MotorRight.write(94); //edit
+    //Serial.println(F("A lot right"));
+    MotorRight.write(94);
     MotorLeft.write(83);
     delay(30);
     return false;
   } else if (rightOnLine) {
     // bot is veering left a lot, so we turn it right more
-    Serial.println(F("A lot left"));
+    //Serial.println(F("A lot left"));
     MotorRight.write(97);
     MotorLeft.write(86);
     delay(30);
     return false;
   } else {
-    Serial.println(F("other"));
+    //Serial.println(F("other"));
     return false;
   }
 }
@@ -812,16 +813,16 @@ boolean readSignal() {
       max_other = fht_log_out[l];
     }
   }
-  Serial.print("max: ");
-  Serial.println(max_other);
+//  Serial.print("max: ");
+//  Serial.println(max_other);
   max_other = (max_other > 45) ? max_other : 45;
   for (int j = 18; j < 21; ++j) {
-    Serial.println(fht_log_out[j]);
+    //Serial.println(fht_log_out[j]);
     if (fht_log_out[j] >= max_other) {
       //We have detected another robot
       // return settings to original
       for (int k = 0; k < 128; k++) {
-        Serial.println(fht_log_out[k]);
+        //Serial.println(fht_log_out[k]);
       }
       return true;
     }
@@ -846,7 +847,7 @@ boolean broadcast() {
   }
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
-  Serial.println(message, BIN);
+  //Serial.println(message, BIN);
 
   //
   // Ping out role.  Repeatedly send the current time
@@ -855,13 +856,13 @@ boolean broadcast() {
   // First, stop listening so we can talk.
   radio.stopListening();
 
-  printf("Now sending %lu...", message);
+  //printf("Now sending %lu...", message);
   bool ok = radio.write( &message, sizeof(uint16_t) );
 
-  if (ok)
-    printf("ok...\n");
-  else
-    printf("failed.\n\r");
+//  if (ok)
+//    printf("ok...\n");
+//  else
+//    printf("failed.\n\r");
 
   // Now, continue listening
   radio.startListening();
@@ -876,7 +877,7 @@ boolean broadcast() {
   // Describe the results
   if ( timeout )
   {
-    printf("Failed, response timed out.\n\r");
+    //printf("Failed, response timed out.\n\r");
     // Try again 1s later
     return false;
   }

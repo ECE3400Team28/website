@@ -7,7 +7,7 @@
 #include <StackArray.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include "printf.h"
+//#include "printf.h"
 
 Servo MotorLeft;
 Servo MotorRight;
@@ -18,7 +18,6 @@ int wallRight;
 int wallFront;
 int wallLeft;
 
-//const int detectRobotLED = ??;
 const int mux_sel_0 = 2;
 const int mux_sel_1 = 7;
 const int mux_sel_2 = 17;
@@ -31,9 +30,9 @@ int PWM2 = 3;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 880;//750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 880;//750;//540;
-const int LIGHT_LEFT_THRESHOLD = 880;//750;//620;
+const int LIGHT_CENTER_THRESHOLD = 200;//750;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 200;//750;//540;
+const int LIGHT_LEFT_THRESHOLD = 200;//750;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -63,19 +62,13 @@ const uint8_t bm_treasure_r_tr = 96 ; // 6 << 4
 // whether square explored
 const uint8_t bm_explored    = 128;
 const uint8_t bm_not_explored = 0;
-//#define explored_shift  7
-
-//// presence of other robot
-//#define bm_robot    1 << 1
-//#define bm_no_robot 0 << 1
-//#define robot_shift 1
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
-const int rows = 6;
-const int columns = 9;
+const int rows = 9;
+const int columns = 9                             ;
 int explored = 0;
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -155,17 +148,19 @@ void setup() {
   // Start listening
   radio.startListening();
 
+  Serial.println(F("setup done!"));
+
   // Dump the configuration of the rf unit for debugging
   //radio.printDetails();
 
-  delay(2000);
+  delay(100);
 }
 
-//StackArray<uint8_t> path;
 StackArray<uint8_t> greedy_path;
 StackArray<uint8_t> reversed_greedy_path;
 bool visited[rows][columns] = {};
 bool found = false;
+
 void dfs(uint8_t xCoor, uint8_t yCoor) {
   // check if location is valid and unexplored
   if (maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
@@ -180,6 +175,8 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
     while (!reversed_greedy_path.isEmpty()){
       uint8_t nextX = reversed_greedy_path.pop();
       uint8_t nextY = reversed_greedy_path.pop();
+//      Serial.println(nextX);
+//      Serial.println(nextY);
       moveOne(nextX, nextY);
     }
     explore();
@@ -253,6 +250,10 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
   // add current node to path
   greedy_path.push(xCoor);
   greedy_path.push(yCoor);
+//  Serial.println(xCoor);
+//  Serial.println(yCoor);
+//  Serial.println(goalX);
+//  Serial.println(goalY);
   if (xCoor == goalX && yCoor == goalY) {
     found = true;
     return;
@@ -264,18 +265,22 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
   int costW = -1;
   if (xCoor+1 < rows && !visited[xCoor+1][yCoor] && (maze[xCoor+1][yCoor] > 0 || (xCoor+1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_south)) {
     costS = abs(xCoor+1-goalX) + abs(yCoor-goalY);
+    //Serial.println("lol1");
     visited[xCoor+1][yCoor] = true;
   }
   if (yCoor-1 >= 0 && !visited[xCoor][yCoor-1] && (maze[xCoor][yCoor-1] > 0 || (xCoor == goalX && yCoor-1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_west)) {
     costW = abs(xCoor-goalX) + abs(yCoor-1-goalY);
+    //Serial.println("lol2");
     visited[xCoor][yCoor-1] = true;
   }
   if (yCoor+1 < columns && !visited[xCoor][yCoor+1] && (maze[xCoor][yCoor+1] > 0 || (xCoor == goalX && yCoor+1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_east)) {
     costE = abs(xCoor-goalX) + abs(yCoor+1-goalY);
+    //Serial.println("lol3");
     visited[xCoor][yCoor+1] = true;
   }
   if (xCoor-1 >= 0 && !visited[xCoor-1][yCoor] && (maze[xCoor-1][yCoor] > 0 || (xCoor-1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_north)) {
     costN = abs(xCoor-1-goalX) + abs(yCoor-goalY);
+    //Serial.println("lol4");
     visited[xCoor-1][yCoor] = true;
   }
   facing_direction min_dir = NULL;
@@ -300,6 +305,7 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
       min_dir = W;
     }
     // call greedy
+    //Serial.println(min_dir);
     if (min_dir == S) {
       costS = -1;
       greedy(goalX, goalY, xCoor+1, yCoor);
@@ -325,17 +331,19 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
 }
 
 void loop() {
+    //Serial.println(F("exploring"));
     explore();
     dfs(1, 0);
     dfs(0, 1);
-    MotorLeft.write(90);
     MotorRight.write(90);
+    MotorLeft.write(90);
     while(1){}
 }
 
 void moveOne(uint8_t xCoor, uint8_t yCoor) {
   // turn to face the correct direction: the next node should be one tile away.
   if (xCoor == x && yCoor == y) {
+    //Serial.println("already here");
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -353,8 +361,10 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   while (!linefollow()) {
     forward(); // keeps moving forward until reaches intersection
   }
+  
   MotorLeft.write(90);
   MotorRight.write(90);
+  //Serial.println(F("Arrived at destination"));
   x = xCoor;
   y = yCoor;
 }
@@ -463,7 +473,6 @@ void turnRight() {
   return;
 }
 
-
 /***
  * Returns true upon seeing an intersection. Else returns false, and continues to follow the line.
  */
@@ -476,7 +485,7 @@ boolean linefollow() {
     MotorRight.write(90);
     delay(3000);
   }
-  
+
   bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
   bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
   bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
@@ -517,6 +526,7 @@ boolean linefollow() {
   }
 }
 
+// DELAYED THIS BY 2 INSTEAD OF 20 MS- SEE IF IT MAKES DIFFERENCE
 void readMux() { // change this so we only read once based on the input mux select value
   // 000 Front wall
   digitalWrite(mux_sel_0, LOW);
@@ -640,17 +650,12 @@ boolean readSignal() {
       max_other = fht_log_out[l];
     }
   }
-  Serial.print("max: ");
-  Serial.println(max_other);
+
   max_other = (max_other > 45) ? max_other : 45;
   for (int j = 18; j < 21; ++j) {
-    Serial.println(fht_log_out[j]);
     if (fht_log_out[j] >= max_other) {
       //We have detected another robot
       // return settings to original
-      for (int k = 0; k < 128; k++) {
-        Serial.println(fht_log_out[k]);
-      }
       return true;
     }
   }
@@ -674,7 +679,7 @@ boolean broadcast() {
   }
   uint16_t coordinate = x << 4 | y;
   uint16_t message = coordinate << 8 | cell;
-  Serial.println(message, BIN);
+  //Serial.println(message, BIN);
 
   //
   // Ping out role.  Repeatedly send the current time
@@ -683,13 +688,13 @@ boolean broadcast() {
   // First, stop listening so we can talk.
   radio.stopListening();
 
-  printf("Now sending %lu...", message);
+  //printf("Now sending %lu...", message);
   bool ok = radio.write( &message, sizeof(uint16_t) );
 
-  if (ok)
-    printf("ok...\n");
-  else
-    printf("failed.\n\r");
+//  if (ok)
+//    printf("ok...\n");
+//  else
+//    printf("failed.\n\r");
 
   // Now, continue listening
   radio.startListening();
@@ -704,7 +709,7 @@ boolean broadcast() {
   // Describe the results
   if ( timeout )
   {
-    printf("Failed, response timed out.\n\r");
+    //printf("Failed, response timed out.\n\r");
     // Try again 1s later
     return false;
   }

@@ -29,9 +29,9 @@ const int leftWallLED = 18;
 const int FRONTTHRESHOLD = 150;
 const int RIGHTTHRESHOLD = 150;
 const int LEFTTHRESHOLD  = 150;
-const int LIGHT_CENTER_THRESHOLD = 600;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
-const int LIGHT_RIGHT_THRESHOLD = 700;//540;
-const int LIGHT_LEFT_THRESHOLD = 700;//620;
+const int LIGHT_CENTER_THRESHOLD = 200;//550; // noticed that left right and middle sensors have different "thresholds", and this is super buggy when slight shadows exist.
+const int LIGHT_RIGHT_THRESHOLD = 200;//540;
+const int LIGHT_LEFT_THRESHOLD = 200;//620;
 
 // *************** RADIO & GUI STUFF *************************************************************************************** //
 // Hardware configuration
@@ -260,6 +260,7 @@ void loop() {
 //    MotorLeft.write(120);
 //    delay(10);
 //  }
+  forward();
   while (!linefollow(1)) {
     forward(); // keeps moving forward until reaches intersection
   }
@@ -268,8 +269,11 @@ void loop() {
   while (!linefollow(0)) {
     backward(); // keeps moving forward until reaches intersection
   }
+  MotorRight.write(90);
+  MotorLeft.write(90);
+  delay(100);
   forward();
-  delay(1000);
+  delay(500);
 }
 //void loop() {
 //    Serial.println(F("exploring"));
@@ -423,13 +427,13 @@ void explore() {
 }
 
 void forward() {
-  MotorLeft.write(50);
-  MotorRight.write(130);
+  MotorLeft.write(82);
+  MotorRight.write(98);
 }
 
 void backward() {
   MotorLeft.write(95);
-  MotorRight.write(80);
+  MotorRight.write(85);
 }
 
 // Turns robot left 90 degrees and updates the currently facing direction.
@@ -534,99 +538,103 @@ boolean linefollow(int forwards) {
   if (centerOnLine && !leftOnLine && !rightOnLine) {
     // centered
     Serial.println(F("Centered"));
-    relative_line_position = 0;
+    //relative_line_position = 0;
     return false;
   } else if (leftOnLine && rightOnLine) {
     if (forwards) {
       forward();
+      delay(250);
     } else {
       backward();
+      delay(20);  // get off line
     }
-    intersection();
+    //intersection();
     return true;
   } else if (centerOnLine && leftOnLine) {
     // bot is veering right slightly, so we turn it left a bit
     if (forwards) {
-      MotorRight.write(93);
-      MotorLeft.write(83);
+      MotorRight.write(95);
+      MotorLeft.write(84);
     } else {
-//      MotorRight.write(83);
-//      MotorLeft.write(92);
-
-//      MotorRight.write(89);
-//      MotorLeft.write(120);
-
-      MotorRight.write(87);
-      MotorLeft.write(97);
+      MotorRight.write(85);
+      MotorLeft.write(96);
     }
+    delay(30);
     Serial.println(F("Veering slightly right"));
-    return backToLine(2, forwards);
+    return false;
+    //return backToLine(2, forwards);
   } else if (centerOnLine && rightOnLine) {
     // bot is veering left slightly, so we turn it right a bit
     if (forwards) {
-      MotorRight.write(95);
-      MotorLeft.write(80);
+      MotorRight.write(96);
+      MotorLeft.write(85);
     } else {
-      MotorRight.write(85);
-      MotorLeft.write(100);
+      MotorRight.write(84);
+      MotorLeft.write(95);
     }
+    delay(30);
     Serial.println(F("Veering slightly left"));
-    return backToLine(1, forwards);
+    return false;
+    //return backToLine(1, forwards);
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
     Serial.println(F("A lot right"));
     if (forwards) {
-      MotorRight.write(90); //edit
-      MotorLeft.write(80);
+      MotorRight.write(94);
+      MotorLeft.write(83);
     } else {
-      MotorRight.write(87);
-      MotorLeft.write(97);
+      MotorRight.write(85);
+      MotorLeft.write(98);
     }
-    return backToLine(2, forwards);
+    delay(30);
+    return false;
+    //return backToLine(2, forwards);
   } else if (rightOnLine) {
     // bot is veering left a lot, so we turn it right more
     Serial.println(F("A lot left"));
     if (forwards) {
-      MotorLeft.write(88);
-      MotorRight.write(100);
+      MotorRight.write(97);
+      MotorLeft.write(86);
     } else {
+      MotorRight.write(81);
       MotorLeft.write(95);
-      MotorRight.write(88);
     }
-    return backToLine(1, forwards);
-  } else {
-    Serial.print(F("other: "));
-    switch(relative_line_position) {
-      case 1:
-        // left
-        Serial.println(F("left"));
-        if (forwards) {
-          MotorRight.write(100);
-          MotorLeft.write(88);
-        } else {
-          MotorRight.write(88);
-          MotorLeft.write(100);
-        }
-        return backToLine(1, forwards);
-        break;
-      case 2:
-        // right
-        Serial.println(F("right"));
-        if (forwards) {
-          MotorRight.write(93);
-          MotorLeft.write(83);
-        } else {
-          MotorRight.write(87);
-          MotorLeft.write(97);
-        }
-        return backToLine(2, forwards);
-        break;
-      default:
-        Serial.println(F("who knows how"));
-        break;
-    }
+    delay(30);
     return false;
+    //return backToLine(1, forwards);
   }
+//  } else {
+//    Serial.print(F("other: "));
+//    switch(relative_line_position) {
+//      case 1:
+//        // left
+//        Serial.println(F("left"));
+//        if (forwards) {
+//          MotorRight.write(100);
+//          MotorLeft.write(88);
+//        } else {
+//          MotorRight.write(88);
+//          MotorLeft.write(100);
+//        }
+//        return backToLine(1, forwards);
+//        break;
+//      case 2:
+//        // right
+//        Serial.println(F("right"));
+//        if (forwards) {
+//          MotorRight.write(93);
+//          MotorLeft.write(83);
+//        } else {
+//          MotorRight.write(87);
+//          MotorLeft.write(97);
+//        }
+//        return backToLine(2, forwards);
+//        break;
+//      default:
+//        Serial.println(F("who knows how"));
+//        break;
+//    }
+    return false;
 }
 
 void readMux() { // change this so we only read once based on the input mux select value
