@@ -603,37 +603,6 @@ boolean linefollow(int forwards) {
     return false;
     //return backToLine(1, forwards);
   }
-//  } else {
-//    Serial.print(F("other: "));
-//    switch(relative_line_position) {
-//      case 1:
-//        // left
-//        Serial.println(F("left"));
-//        if (forwards) {
-//          MotorRight.write(100);
-//          MotorLeft.write(88);
-//        } else {
-//          MotorRight.write(88);
-//          MotorLeft.write(100);
-//        }
-//        return backToLine(1, forwards);
-//        break;
-//      case 2:
-//        // right
-//        Serial.println(F("right"));
-//        if (forwards) {
-//          MotorRight.write(93);
-//          MotorLeft.write(83);
-//        } else {
-//          MotorRight.write(87);
-//          MotorLeft.write(97);
-//        }
-//        return backToLine(2, forwards);
-//        break;
-//      default:
-//        Serial.println(F("who knows how"));
-//        break;
-//    }
     return false;
 }
 
