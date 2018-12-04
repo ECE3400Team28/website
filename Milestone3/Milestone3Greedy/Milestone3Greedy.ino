@@ -75,7 +75,7 @@ const uint64_t pipes[2] = { 0x000000004ALL, 0x000000004BLL };
 uint8_t x = 0;
 uint8_t y = 0;
 const int rows = 6;
-const int columns = 6;
+const int columns = 9;
 int explored = 0;
 uint8_t maze[rows][columns] = { }; // initialized with zeros
 typedef enum { N = 0, S = 2, E = 1, W = 3 } facing_direction;
@@ -155,8 +155,6 @@ void setup() {
   // Start listening
   radio.startListening();
 
-  Serial.println(F("setup done!"));
-
   // Dump the configuration of the rf unit for debugging
   //radio.printDetails();
 
@@ -166,106 +164,13 @@ void setup() {
 //StackArray<uint8_t> path;
 StackArray<uint8_t> greedy_path;
 StackArray<uint8_t> reversed_greedy_path;
-//
-//void dfs(uint8_t xCoor, uint8_t yCoor) {
-//  Serial.println(F("start DFS: "));
-//  Serial.println(xCoor);
-//  Serial.println(yCoor);
-//  Serial.println(F("currently at"));
-//  Serial.println(x);
-//  Serial.println(y);
-//  // check if we can move to xCoor, yCoor
-//  if (shouldMove(xCoor, yCoor)) {
-//    Serial.println(F("moving to: "));
-//    Serial.println(xCoor);
-//    Serial.println(yCoor);
-//    moveOne(xCoor, yCoor);
-//    path.push(yCoor);
-//    path.push(xCoor);
-//    Serial.println(F("exploring"));
-//    explore();
-//    Serial.println(explored);
-//    if (explored == rows*columns){
-//      // we've explored the entire maze!
-//      Serial.println(F("done"));
-//      while(1){
-//        MotorLeft.write(90);
-//        MotorRight.write(90);
-//      }
-//    }
-//    if (current_dir == S) {
-//        if (maze[xCoor+1][yCoor] > 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
-//          dfs(xCoor+1, yCoor);
-//        }
-//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
-//          dfs(xCoor, yCoor-1);
-//        }
-//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
-//          Serial.println("made it");
-//          dfs(xCoor, yCoor+1);
-//        }
-//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
-//          dfs(xCoor-1, yCoor);
-//        }
-//    } else if (current_dir == N) {
-//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
-//          dfs(xCoor-1, yCoor);
-//        }
-//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
-//          dfs(xCoor, yCoor+1);
-//        }
-//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
-//          dfs(xCoor, yCoor-1);
-//        }
-//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
-//          dfs(xCoor+1, yCoor);
-//        }
-//    } else if (current_dir == E) {
-//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
-//          dfs(xCoor, yCoor+1);
-//        }
-//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
-//          Serial.println("huhhhh");
-//          dfs(xCoor+1, yCoor);
-//        }
-//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
-//          dfs(xCoor-1, yCoor);
-//        }
-//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
-//          dfs(xCoor, yCoor-1);
-//        }
-//    } else if (current_dir == W) {
-//        if (maze[xCoor][yCoor-1] == 0 && xCoor >= 0 && yCoor-1 >= 0 && xCoor < rows && yCoor-1 < columns) {
-//          dfs(xCoor, yCoor-1);
-//        }
-//        if (maze[xCoor-1][yCoor] == 0 && xCoor-1 >= 0 && yCoor >= 0 && xCoor-1 < rows && yCoor < columns) {
-//          dfs(xCoor-1, yCoor);
-//        }
-//        if (maze[xCoor+1][yCoor] == 0 && xCoor+1 >= 0 && yCoor >= 0 && xCoor+1 < rows && yCoor < columns) {
-//          dfs(xCoor+1, yCoor);
-//        }
-//        if (maze[xCoor][yCoor+1] == 0 && xCoor >= 0 && yCoor+1 >= 0 && xCoor < rows && yCoor+1 < columns) {
-//          dfs(xCoor, yCoor+1);
-//        }
-//    }
-//    Serial.println("dead end- backtracking");
-//    // remove current loc from stack
-//    // backtrack one,
-//    path.pop();
-//    path.pop();
-//    uint8_t backX = path.pop();
-//    uint8_t backY = path.peek();
-//    path.push(backX);
-//    Serial.println(backX);
-//    Serial.println(backY);
-//    moveOne(backX, backY);
-//  }
-//}
+bool visited[rows][columns] = {};
 bool found = false;
 void dfs(uint8_t xCoor, uint8_t yCoor) {
   // check if location is valid and unexplored
   if (maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
     // calculate path to location
+    memset(visited, 0, sizeof(visited));
     greedy(xCoor, yCoor, x, y);
     found = false;
     while (!greedy_path.isEmpty()) {
@@ -275,8 +180,6 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
     while (!reversed_greedy_path.isEmpty()){
       uint8_t nextX = reversed_greedy_path.pop();
       uint8_t nextY = reversed_greedy_path.pop();
-      Serial.println(nextX);
-      Serial.println(nextY);
       moveOne(nextX, nextY);
     }
     explore();
@@ -340,7 +243,6 @@ void dfs(uint8_t xCoor, uint8_t yCoor) {
           dfs(xCoor, yCoor+1);
         }
     }
-    Serial.println("dead end");
   }
 }
 
@@ -351,34 +253,30 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
   // add current node to path
   greedy_path.push(xCoor);
   greedy_path.push(yCoor);
-  Serial.println(xCoor);
-  Serial.println(yCoor);
-  Serial.println(goalX);
-  Serial.println(goalY);
   if (xCoor == goalX && yCoor == goalY) {
     found = true;
     return;
   }
-  // add nodes that we've explored OR are the goal, in order of least to greatest cost
+  // add nodes that we've explored and no wall blocking and not visited OR are the goal, in order of least to greatest cost
   int costN = -1;
   int costS = -1;
   int costE = -1;
   int costW = -1;
-  if (xCoor+1 < rows && (maze[xCoor+1][yCoor] > 0 || (xCoor+1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_south)) {
+  if (xCoor+1 < rows && !visited[xCoor+1][yCoor] && (maze[xCoor+1][yCoor] > 0 || (xCoor+1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_south)) {
     costS = abs(xCoor+1-goalX) + abs(yCoor-goalY);
-    Serial.println("lol1");
+    visited[xCoor+1][yCoor] = true;
   }
-  if (yCoor-1 >= 0 && (maze[xCoor][yCoor-1] > 0 || (xCoor == goalX && yCoor-1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_west)) {
+  if (yCoor-1 >= 0 && !visited[xCoor][yCoor-1] && (maze[xCoor][yCoor-1] > 0 || (xCoor == goalX && yCoor-1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_west)) {
     costW = abs(xCoor-goalX) + abs(yCoor-1-goalY);
-    Serial.println("lol2");
+    visited[xCoor][yCoor-1] = true;
   }
-  if (yCoor+1 < columns && (maze[xCoor][yCoor+1] > 0 || (xCoor == goalX && yCoor+1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_east)) {
+  if (yCoor+1 < columns && !visited[xCoor][yCoor+1] && (maze[xCoor][yCoor+1] > 0 || (xCoor == goalX && yCoor+1 == goalY)) && !(maze[xCoor][yCoor] & bm_wall_east)) {
     costE = abs(xCoor-goalX) + abs(yCoor+1-goalY);
-    Serial.println("lol3");
+    visited[xCoor][yCoor+1] = true;
   }
-  if (xCoor-1 >= 0 && (maze[xCoor-1][yCoor] > 0 || (xCoor-1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_north)) {
+  if (xCoor-1 >= 0 && !visited[xCoor-1][yCoor] && (maze[xCoor-1][yCoor] > 0 || (xCoor-1 == goalX && yCoor == goalY)) && !(maze[xCoor][yCoor] & bm_wall_north)) {
     costN = abs(xCoor-1-goalX) + abs(yCoor-goalY);
-    Serial.println("lol4");
+    visited[xCoor-1][yCoor] = true;
   }
   facing_direction min_dir = NULL;
   
@@ -402,7 +300,6 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
       min_dir = W;
     }
     // call greedy
-    Serial.println(min_dir);
     if (min_dir == S) {
       costS = -1;
       greedy(goalX, goalY, xCoor+1, yCoor);
@@ -421,7 +318,6 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
     }
   }
   if (!found) {
-    Serial.println("dead end in greedy search- backtracking");
     // remove current loc from stack
     greedy_path.pop();
     greedy_path.pop();
@@ -429,66 +325,17 @@ void greedy(uint8_t goalX, uint8_t goalY, uint8_t xCoor, uint8_t yCoor) {
 }
 
 void loop() {
-    Serial.println(F("exploring"));
     explore();
-//    path.push(y);
-//    path.push(x);
     dfs(1, 0);
-//    uint8_t backX = path.pop();
-//    uint8_t backY = path.pop();
-//    Serial.println(backX);
-//    Serial.println(backY);
-//    moveOne(backX, backY);
     dfs(0, 1);
-    Serial.println("somehow finished");
+    MotorLeft.write(90);
+    MotorRight.write(90);
     while(1){}
 }
-//
-///***
-// * checks if we can move to given location (no walls) AND it has not been explored yet.
-// */
-//bool shouldMove(uint8_t xCoor, uint8_t yCoor) {
-//  Serial.println(maze[xCoor][yCoor]);
-//  if (((abs(xCoor-x) == 1 && abs(yCoor-y) ==0) || (abs(xCoor-x) == 0 && abs(yCoor-y) == 1)) && maze[xCoor][yCoor] == 0 && xCoor>=0 && yCoor >=0 && xCoor < rows && yCoor < columns) {
-//    if (x - xCoor == 1) {
-//      // tile is north of us
-//      if (maze[x][y] & bm_wall_north) {
-//        // wall to north
-//        return false;
-//      }
-//    } else if (y - yCoor == 1) {
-//      // tile is west of us
-//      if (maze[x][y] & bm_wall_west) {
-//        // wall to west
-//        return false;
-//      }
-//    } else if (y - yCoor == 0) {
-//      // tile is south of us
-//      if (maze[x][y] & bm_wall_south) {
-//        // wall to south
-//        return false;
-//      }
-//    } else {
-//      // tile is east of us
-//      if (maze[x][y] & bm_wall_east) {
-//        // wall to east
-//        return false;
-//      }
-//    }
-//    Serial.println("should move!");
-//    return true;
-//  }
-//  return false;
-//}
 
 void moveOne(uint8_t xCoor, uint8_t yCoor) {
-  MotorLeft.detach();
-  MotorRight.detach();
-  MotorRight.attach(PWM2);
-  MotorLeft.attach(PWM1);
   // turn to face the correct direction: the next node should be one tile away.
   if (xCoor == x && yCoor == y) {
-    Serial.println("already here");
     // we are already at the location
     MotorLeft.write(90);
     MotorRight.write(90);
@@ -498,23 +345,18 @@ void moveOne(uint8_t xCoor, uint8_t yCoor) {
   int y_diff = yCoor - y; 
   facing_direction dir_to_face = x_diff == 1 ? S : x_diff == -1 ? N : y_diff == 1 ? E : W;
   while (current_dir != dir_to_face) {
-    Serial.println(F("turning"));
     if (current_dir - dir_to_face == 1 || current_dir - dir_to_face == -3) turnLeft();
     else turnRight();
   }
-  Serial.println(F("moving forward"));
   // move to the next intersection
   forward();
   while (!linefollow()) {
     forward(); // keeps moving forward until reaches intersection
   }
-  
   MotorLeft.write(90);
   MotorRight.write(90);
-  Serial.println(F("Arrived at destination"));
   x = xCoor;
   y = yCoor;
-  Serial.println(F("done moving"));
 }
 
 /*
@@ -583,22 +425,22 @@ void explore() {
 }
 
 void forward() {
-  MotorLeft.write(84);
-  MotorRight.write(99);
+  MotorLeft.write(82);
+  MotorRight.write(98);
 }
 
 // Turns robot left 90 degrees and updates the currently facing direction.
 void turnLeft() {
   MotorLeft.write(80);
   MotorRight.write(80);
-  delay(600); // move away from current line
+  delay(300); // move away from current line
   readMux();
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
     readMux();
   }
-  MotorLeft.write(90);
-  MotorRight.write(90);
+  MotorRight.write(88);
+  MotorLeft.write(88);
   if (current_dir == 0) current_dir = (facing_direction) 3;
   else current_dir = (facing_direction) (current_dir - 1);
   return;
@@ -608,17 +450,19 @@ void turnLeft() {
 void turnRight() {
   MotorLeft.write(100);
   MotorRight.write(100);
-  delay(600); // move away from current line
+  delay(300); // move away from current line
   readMux();
   while (!(LightDataC <= LIGHT_CENTER_THRESHOLD && LightDataL > LIGHT_LEFT_THRESHOLD && LightDataR > LIGHT_RIGHT_THRESHOLD)) {
     // keep checking
     readMux();
   }
-  MotorLeft.write(90);
-  MotorRight.write(90);
+  MotorRight.write(92);
+  MotorLeft.write(92);
+  
   current_dir = (facing_direction) ((current_dir + 1) % 4);
   return;
 }
+
 
 /***
  * Returns true upon seeing an intersection. Else returns false, and continues to follow the line.
@@ -627,11 +471,11 @@ boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
   readMux();
-  
-//  Serial.println("new data");
-//  Serial.println(LightDataL);
-//  Serial.println(LightDataC);
-//  Serial.println(LightDataR);
+  while (detect()) {
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    delay(3000);
+  }
   
   bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
   bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
@@ -639,48 +483,40 @@ boolean linefollow() {
  
   if (centerOnLine && !leftOnLine && !rightOnLine) {
     // centered
-    Serial.println(F("Centered"));
     return false;
   } else if (leftOnLine && rightOnLine) {
     forward();
-    delay(500);
-    Serial.println(F("intersection"));
+    delay(250);
     return true;
   } else if (centerOnLine && leftOnLine) {
     // bot is veering right slightly, so we turn it left a bit
-    MotorRight.write(93);
-    MotorLeft.write(83);
-    Serial.println(F("Veering slightly right"));
-    delay(100);
+    MotorRight.write(95);
+    MotorLeft.write(84);
+    delay(30);
     return false;
   } else if (centerOnLine && rightOnLine) {
     // bot is veering left slightly, so we turn it right a bit
-    MotorRight.write(95);
-    MotorLeft.write(80);
-    Serial.println(F("Veering slightly left"));
-    delay(100);
+    MotorRight.write(96);
+    MotorLeft.write(85);
+    delay(30);
     return false;
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
-    Serial.println(F("A lot right"));
-    MotorRight.write(90); //edit
-    MotorLeft.write(80);
-    delay(100);
+    MotorRight.write(94); //edit
+    MotorLeft.write(83);
+    delay(30);
     return false;
   } else if (rightOnLine) {
     // bot is veering left a lot, so we turn it right more
-    Serial.println(F("A lot left"));
-    MotorLeft.write(90);
-    MotorRight.write(100);
-    delay(100);
+    MotorRight.write(97);
+    MotorLeft.write(86);
+    delay(30);
     return false;
   } else {
-    Serial.println(F("other"));
     return false;
   }
 }
 
-// DELAYED THIS BY 2 INSTEAD OF 20 MS- SEE IF IT MAKES DIFFERENCE
 void readMux() { // change this so we only read once based on the input mux select value
   // 000 Front wall
   digitalWrite(mux_sel_0, LOW);
