@@ -90,7 +90,7 @@ void setup(void)
   radio.setRetries(15,15);
   radio.setAutoAck(true);
   // set the channel
-  radio.setChannel(0x50);
+  radio.setChannel(0x2b);
   // set the power
   // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
   radio.setPALevel(RF24_PA_HIGH);

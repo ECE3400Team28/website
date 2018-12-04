@@ -135,7 +135,7 @@ void setup() {
   radio.setRetries(15, 15);
   radio.setAutoAck(true);
   // set the channel
-  radio.setChannel(0x50);
+  radio.setChannel(0x2b);
   // set the power
   // *****REAL: RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, and RF24_PA_MAX*****
   // RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_MED=-6dBM, and RF24_PA_HIGH=0dBm.
@@ -635,7 +635,7 @@ boolean linefollow() {
   while (detect()) {
     MotorLeft.write(90);
     MotorRight.write(90);
-    delay(3000);
+    delay(1500);
   }
 //  Serial.println("new data");
 //  Serial.println(LightDataL);
