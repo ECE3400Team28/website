@@ -341,13 +341,8 @@ bool moveOne(uint8_t xCoor, uint8_t yCoor) {
   }
   // move to the next intersection
   forward();
-  while (!linefollow(true)) {
+  while (!linefollow()) {
     if (detect()) {
-      while (!linefollow(false)){
-        backward();
-      }
-      forward();
-      delay(250);
       return true;
     }
     forward(); // keeps moving forward until reaches intersection
@@ -432,11 +427,6 @@ void forward() {
   MotorRight.write(98);
 }
 
-void backward() {
-  MotorLeft.write(95);
-  MotorRight.write(85);
-}
-
 // Turns robot left 90 degrees and updates the currently facing direction.
 void turnLeft() {
   MotorLeft.write(80);
@@ -474,11 +464,20 @@ void turnRight() {
 /***
  * Returns true upon seeing an intersection. Else returns false, and continues to follow the line.
  */
- boolean linefollow(int forwards) {
+boolean linefollow() {
   //Below LIGHTTHRESHOLD is white tape
   //Above LIGHTTHRESHOLD is dark
   readMux();
-  
+  int detect_ctr = 0;
+  while (detect()) {
+    detect_ctr ++;
+    MotorLeft.write(90);
+    MotorRight.write(90);
+    delay(500);
+    if (detect_ctr > 10) {
+      return false;
+    }
+  }
 //  Serial.println("new data");
 //  Serial.println(LightDataL);
 //  Serial.println(LightDataC);
@@ -490,140 +489,46 @@ void turnRight() {
  
   if (centerOnLine && !leftOnLine && !rightOnLine) {
     // centered
-    Serial.println(F("Centered"));
-    //relative_line_position = 0;
+    //Serial.println(F("Centered"));
     return false;
   } else if (leftOnLine && rightOnLine) {
-    if (forwards) {
-      forward();
-      delay(250);
-    } else {
-      backward();
-      delay(20);  // get off line
-    }
-    //intersection();
+    forward();
+    delay(250);
+    //Serial.println(F("intersection"));
     return true;
   } else if (centerOnLine && leftOnLine) {
     // bot is veering right slightly, so we turn it left a bit
-    if (forwards) {
-      MotorRight.write(95);
-      MotorLeft.write(84);
-    } else {
-      MotorRight.write(85);
-      MotorLeft.write(96);
-    }
+    MotorRight.write(95);
+    MotorLeft.write(84);
+    //Serial.println(F("Veering slightly right"));
     delay(30);
-    Serial.println(F("Veering slightly right"));
     return false;
-    //return backToLine(2, forwards);
   } else if (centerOnLine && rightOnLine) {
     // bot is veering left slightly, so we turn it right a bit
-    if (forwards) {
-      MotorRight.write(96);
-      MotorLeft.write(85);
-    } else {
-      MotorRight.write(84);
-      MotorLeft.write(95);
-    }
+    MotorRight.write(96);
+    MotorLeft.write(85);
+    //Serial.println(F("Veering slightly left"));
     delay(30);
-    Serial.println(F("Veering slightly left"));
     return false;
-    //return backToLine(1, forwards);
   } else if (leftOnLine) {
     // bot is veering right a lot, so we turn it left more
-    Serial.println(F("A lot right"));
-    if (forwards) {
-      MotorRight.write(94);
-      MotorLeft.write(83);
-    } else {
-      MotorRight.write(85);
-      MotorLeft.write(98);
-    }
+    //Serial.println(F("A lot right"));
+    MotorRight.write(94);
+    MotorLeft.write(83);
     delay(30);
     return false;
-    //return backToLine(2, forwards);
   } else if (rightOnLine) {
     // bot is veering left a lot, so we turn it right more
-    Serial.println(F("A lot left"));
-    if (forwards) {
-      MotorRight.write(97);
-      MotorLeft.write(86);
-    } else {
-      MotorRight.write(81);
-      MotorLeft.write(95);
-    }
+    //Serial.println(F("A lot left"));
+    MotorRight.write(97);
+    MotorLeft.write(86);
     delay(30);
     return false;
-    //return backToLine(1, forwards);
-  }
+  } else {
+    //Serial.println(F("other"));
     return false;
+  }
 }
-
-//boolean linefollow() {
-//  //Below LIGHTTHRESHOLD is white tape
-//  //Above LIGHTTHRESHOLD is dark
-//  readMux();
-//  int detect_ctr = 0;
-//  while (detect()) {
-//    detect_ctr ++;
-//    MotorLeft.write(90);
-//    MotorRight.write(90);
-//    delay(500);
-//    if (detect_ctr > 10) {
-//      return false;
-//    }
-//  }
-////  Serial.println("new data");
-////  Serial.println(LightDataL);
-////  Serial.println(LightDataC);
-////  Serial.println(LightDataR);
-//  
-//  bool leftOnLine = LightDataL <= LIGHT_LEFT_THRESHOLD;
-//  bool centerOnLine = LightDataC <= LIGHT_CENTER_THRESHOLD;
-//  bool rightOnLine = LightDataR <= LIGHT_RIGHT_THRESHOLD;
-// 
-//  if (centerOnLine && !leftOnLine && !rightOnLine) {
-//    // centered
-//    //Serial.println(F("Centered"));
-//    return false;
-//  } else if (leftOnLine && rightOnLine) {
-//    forward();
-//    delay(250);
-//    //Serial.println(F("intersection"));
-//    return true;
-//  } else if (centerOnLine && leftOnLine) {
-//    // bot is veering right slightly, so we turn it left a bit
-//    MotorRight.write(95);
-//    MotorLeft.write(84);
-//    //Serial.println(F("Veering slightly right"));
-//    delay(30);
-//    return false;
-//  } else if (centerOnLine && rightOnLine) {
-//    // bot is veering left slightly, so we turn it right a bit
-//    MotorRight.write(96);
-//    MotorLeft.write(85);
-//    //Serial.println(F("Veering slightly left"));
-//    delay(30);
-//    return false;
-//  } else if (leftOnLine) {
-//    // bot is veering right a lot, so we turn it left more
-//    //Serial.println(F("A lot right"));
-//    MotorRight.write(94);
-//    MotorLeft.write(83);
-//    delay(30);
-//    return false;
-//  } else if (rightOnLine) {
-//    // bot is veering left a lot, so we turn it right more
-//    //Serial.println(F("A lot left"));
-//    MotorRight.write(97);
-//    MotorLeft.write(86);
-//    delay(30);
-//    return false;
-//  } else {
-//    //Serial.println(F("other"));
-//    return false;
-//  }
-//}
 
 // DELAYED THIS BY 2 INSTEAD OF 20 MS- SEE IF IT MAKES DIFFERENCE
 void readMux() { // change this so we only read once based on the input mux select value
