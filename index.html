@@ -264,6 +264,7 @@
 		    <a class="btn btn-primary btn-lg btn-block" href="https://github.com/ECE3400Team28/website/">View Code on GitHub</a>
 		    <a class="portfolio-item btn btn-secondary btn-lg btn-block" href="#contract-modal">View Team Contract</a>
         <a class="portfolio-item btn btn-primary btn-lg btn-block" href="#ethics-modal">View Ethics Assignment</a>
+        <a class="portfolio-item btn btn-secondary btn-lg btn-block" href="#report-modal">View Final Report</a>
 		  </div>
         </div>
       </div>
@@ -2081,6 +2082,184 @@ With the addition of treasure data, we now required a more advanced form of comm
               </p>
               <p class="mb-3 text-left" style="margin-left: 40px">
                 (1) "Autonomous Weapons: An Open Letter from AI & Robotics Researchers." <a href="https://futureoflife.org/open-letter-autonomous-weapons/?cn-reloaded=1">https://futureoflife.org/open-letter-autonomous-weapons/?cn-reloaded=1</a>
+              </p>
+              <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
+                <i class="fa fa-close"></i>
+                Close
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Report Modal -->
+    <div class="portfolio-modal mfp-hide" id="report-modal">
+      <div class="portfolio-modal-dialog bg-white">
+        <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h2 class="text-secondary text-uppercase mb-0">Team 28: Final Robot Design Report</h2>
+              <hr class="star-dark mb-5">
+              <h4 class="text-left">Objective</h4>
+              <p class="mb-5 text-left">
+                The goal of the class was to design and implement a fully autonomous robot capable of line following, wall detection, tone detection, IR detection, radio communication, avoidance of other robots, and complete maze exploration. It communicated its location and surroundings using an RF transceiver to an external GUI base station as it mapped the maze. The robot was also supposed to use a camera and FPGA to detect visual treasures in the maze, analyzing them for color and shape, but unfortunately, this was not integrated into the final system for reasons explained later. Our robot, the Angry Bot, performed all these tasks so well that it obliterated the competition and won first place!!
+              </p>
+              <figure class="mb-5">
+                <img class="img-fluid mb-3" src="img/report/team.jpg" alt="Team photo!"></img>
+                <figcaption>
+                  <i>Figure 1. Our team with Angry Bot and his new bear friend. Thanks to Professor Peterson for the picture!</i>
+                </figcaption>
+              </figure>
+              <hr class="mb-5">
+              <h4 class="text-left">Matierals &amp Cost</h4>
+              <ul class="mb-3 text-left">
+                <li class="li-center">1 Arduino Uno</li>
+                <li class="li-center">3 <a href="https://www.sparkfun.com/products/9453">Line sensors</a></li>
+                <li class="li-center">3 Wall sensors (short range IR proximity sensors)</li>
+                <li class="li-center">2 Parallax Continuous Rotation Servos</li>
+                <li class="li-center">1 <a href="https://www.mouser.com/datasheet/2/670/cma-4544pf-w-1309465.pdf">Microphone</a></li>
+                <li class="li-center">1 <a href="http://www.mouser.com/ds/2/414/OP593-598-6739.pdf">IR phototransistor</a></li>
+                <li class="li-center">2 Radios (nRF24L01+) and breakout board</li>
+                <li class="li-center">1 Pushbutton</li>
+                <li class="li-center">1 9V Battery and plastic housing clip connector</li>
+                <li class="li-center">1 Power Bank and USB-A to USB-B cable</li>
+                <li class="li-center">2 Small breadboards</li>
+                <li class="li-center">Various resistors and capacitors</li>
+                <li class="li-center">Various mechanical components (wheels, mounts, etc.)</li>
+              </ul>
+              <figure>
+                <img class="img-fluid mb-3" src="img/report/cost.png" alt="Cost table"></img>
+                <figcaption>
+                  <i>Figure 2. Table of our robot's cost breakdown.</i>
+                </figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                Not included in the cost include the provided IR hat, which allows other robots to detect our robot's presence, as well as various simple electronic components, such as wires, LEDs, op-amps, capacitors, and a small section of a perf board, which connected our robot together electrically. In addition, we used various mechanical components for which the cost can be difficult to estimate, such as the chassis, wheels, and 3D printed screws.
+                <br />
+                <br />
+                The robot also requires a base station to communicate to, which consists of:
+              </p>
+              <ul class="mb-5 text-left">
+                <li class="li-center">1 Arduino Uno</li>
+                <li class="li-center">1 radio (nRF24L01+) and breakout board</li>
+                <li class="li-center">A computer</li>
+              </ul>
+              <hr class="mb-5">
+              <h4 class="mb-3 text-left">Design</h4>
+              <figure>
+                <img class="img-fluid mb-3" src="img/report/diagram.png" alt="Labeled diagram of Angry Bot"></img>
+                <figcaption>
+                  <i>Figure 3. The winning robot!</i>
+                </figcaption>
+              </figure>
+              <p class="mb-5 text-left">
+                Generally, our robot consists of a laser-cut chassis, to which various sensors are mounted. Seen at the bottom front are our three line sensors, attached to 3D printed parts for stability. Behind that is a ball bearing for stability, the location of our velcro-attached battery pack (not pictured), and the pair of Parallax continuous rotation servos and accompanying wheels. On the middle layer of the robot lies our Arduino brains, the three wall sensors, and our radio transceiver. On the top layer, our microphone circuit, IR circuit, backup start button, and analog multiplexer. Not pictured is the IR hat needed for competition, or the new, larger blue wheels used in competition.
+              </p>
+              <hr class="mb-5">
+              <h4 class="mb-3 text-left">Hardware and Software</h4>
+              <p class="mb-3 text-left">
+                <b><i>Line Sensors and Line Following</i></b><br /><br />
+                To successfully follow white lines on a dark surface, we mounted three line sensors (<a href="https://www.sparkfun.com/products/9453">SparkFun QRE113 breakout boards</a>) to the front of the robot, attaching them so that they were only a couple millimeters from the ground. We chose to use three sensors in order to be able to tell when we were on the line (using the center sensor), and if we were off of the line, then in which direction and by how far, depending on what combination of side and center sensors were still on the line. By placing these reflectivity sensors very close to the maze surface, we were able to achieve a stark contrast between light and dark surfaces: the analog input from light surfaces ranged between 0 to 70, while the values from dark surfaces ranged between around 700-900. This clean result easily allowed us to set a simple threshold for all the line sensors, which we placed at 400, so if a value read was below 400, the robot would think the sensor is on the line, and if it was higher, the robot would think the sensor is off the line.
+                <br /><br />
+                We only made this greatly beneficial change a day before the competition- throughout the semester, our line sensors were slightly further from the ground, resulting in closer line-sensor output ranges and therefore less reliable line detection and line following.
+                <br /><br />
+                A quick design note: because we ended up having so many analog inputs and not enough analog pins, we connected all our analog signals to an <a href="http://www.ti.com/lit/ds/symlink/cd74hc4051.pdf">analog multiplexer</a>, using two digital pins and an analog pin (because the radio and our debugging LEDs used up the other digital pins) to output select bits controlled by our code, and using an analog pin to read in the output of the mux. We wrote a neat little method called readMux() to go through the possible select bit patterns and read the analog values, storing each in its corresponding global variable that represents the signal connected to each mux channel. So whenever we wanted to read the values of the line sensors, for example, we just called readMux() and used the updated global variables to calculate if the robot was on the line or not.
+                <br /><br />
+                To briefly describe how the line sensors work: they each have an IR emitting LED and an IR sensitive phototransistor to detect the IR light reflected back to the sensor. The analog output depends on the amount of reflected light- the more light reflected, the lower the output voltage to the board.
+                <br /><br />
+                <b><i>Wall sensors and Wall Detection</i></b><br /><br />
+                Our wall sensors are proximity sensors. They work by sending an IR signal at an angle. Assuming that the signal is received back from the wall, and that the angle of incidence equals the angle of reflection, the farther that the robot is from a wall, the more horizontal distance is between the emitting IR LED and the sensors that detect the returning signal. The wall sensors then report this distance as an analog voltage which our Arduino reads. This lets our robot detect walls in a color-independent way, since it is only measuring distance and not the intensity of the IR wall reflection.
+                <br /><br />
+                We were then able to experimentally determine thresholds which determined whether a wall was present or not. We aimed to set the threshold at 4 to 6 inches away from the robot, as to leave little ambiguity if there was a wall or not. These wall sensors were then mounted onto a 3D printed mount, which was attached to the robot chassis with metal screws, such that they faced all three directions walls could be, forwards, left or right. We did not require a wall on the back of the robot, since when we explored a new square, we knew that there must not have been a wall behind us to allow us to arrive in that square.
+                <br /><br />
+                We used three colored LEDs to represent whenever the robot detected a wall on each side. This made debugging much easier as we could see what the robot saw, and predict what it would do from there. We also wrote a nifty, separate Arduino sketch to test both the wall sensors and the line sensors, so that at the beginning of every lab/open lab, we would test our robot to make sure those basic features were working, saving us a great deal of time when debugging!
+                <br /><br />
+                <b><i>Microphone</i></b><br /><br />
+                Part of the competition is to start the robot automatically at a 660Hz signal. In order to do this, we added a microphone, which converts mechanical motion of an electromagnet into an electrical signal.
+                <br /><br />
+                The output signal from just the provided microphone was too noisy, and so the correct 660 Hz frequency could not be identified using an FFT. The signal was also very small, making it harder to detect. Therefore, we decided it was necessary to put the microphone output through an active filter to low-pass and amplify the signal. We then used a voltage divider to center the voltage between 2.5V (because the Arduino’s I/O pins can only handle input voltages between 0 to 5V). The circuit design we used comes from the 2017 TA team’s solution (Team Alpha), so we’d like to thank them for this working solution! This gave us a nice signal that was later processed to determine if there was a peak frequency at 660Hz. We were then consistently detecting the 660 Hz signal that the Angry Bot used to start. This functionality was very reliable and helped Angry Bot start on-the-dot during the competition! We also included a pushbutton to start the robot upon restarts or if the microphone circuit failed.
+                <br /><br />
+                Our signal processing also ended up being one of our greatest secret weapons. Instead of using the standard ArduinoFFT library, we instead used the similar ArduinoFHT library, which implements the Fast Hartley Transform, or FHT. The FHT is analogous to the Cooley-Tukey FFT algorithm, with the distinction that it transforms real inputs to real outputs, instead of handling complex data. This limitation became very useful, since the library only requires one byte per input or output data point, instead of two to store real and imaginary parts. This halved the global variable memory taken up by the FFT and allowed us to store the maze data and DFS stack separately without fear of running out of memory.
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/report/mic.png" alt="Mic circuit diagram"></img>
+                <figcaption>
+                  <i>Figure 4. Microphone circuit. LM358 op-amp used.</i>
+                </figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                <b><i>IR Detection (and IR Hat)</i></b><br /><br />
+                Another part of the competition was to be able to avoid other robots within the 9x9 maze in which we were exploring. In order to help us do so, each robot was outfitted with an IR hat PCB, which emitted 6.2kHz infrared from 8 LEDs spaced out evenly along its perimeter. This hat was then mounted on each robot flat, over the center of the robot, and at 5.5in from the ground.
+                <br /><br />
+                To detect the presence of a nearby hat, we utilized an IR phototransistor, which allows greater current to flow when an IR source is nearby. As with the microphone circuit, this phototransistor needed to be placed in series with a resistance in order to prevent shorts between VDD and ground. This resistance was tuned to best modulate the range of our circuit. Note that in order to avoid the noise of the other components on our Arduino, we actually utilized a linear voltage regulator to isolate our power supply to the IR and microphone circuits. Both were very intolerant to noise.
+                <br /><br />
+                We then had to filter this signal as well before it was input to the Arduino. This time, the goal was to high-pass the signal and amplify its high-frequency components, since we expected any relevant IR signals to be fairly high frequency. To do this, we used a simple RC high-pass filter, followed by a non-inverting amplifier. Since the IR signal tended to be even more faint than the microphone, we used a large amplification factor of 20. We then further amplified the output, first putting the output of the second stage through a unity-gain buffer in order to mitigate any unintended RLC effects, followed by a voltage comparator with another experimentally determined voltage level which we found to generate clear waveforms. We used a comparator in order to drive the voltage to the rails of our op-amp's operation, which allowed us to have a fairly square output from the IR circuitry to the Arduino. This very large amplitude helped us identify the IR signal from its surrounding noise. Note that was used non-inverting amplifiers as a side-effect of the op-amp available, the LM358, which only handles positive voltages.
+                <br /><br />
+                Once again, we utilized the FHT library, re-using the same array for input/output data in order to save memory.
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/report/ir.png" alt="IR circuit diagram"></img>
+                <figcaption>
+                  <i>Figure 5. IR circuit. We changed the circuit very slightly to only have one phototransistor instead of two, and all voltages were set to 3.3V through a linear voltage regulator to prevent noise.</i>
+                </figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                <b><i>Broadcasting Information and the GUI</i></b><br /><br />
+                All of our radio communication and GUI setup was done in Lab 3 and hasn’t changed since then, as it worked perfectly back then and for the rest of the semester. We used a pair of Nordic nRF24L01+ transceivers, each attached to our two Arduinos to allow communication. The base station Arduino was connected to a laptop to display the GUI, which is run from a Python script and is written by the TAs. The GUI requires Python 2.7, can be found <a href="https://github.com/backhous/ece3400-maze-gui">here</a>.
+                <br /><br />
+                To use the radios in our code, we included the <a href="https://github.com/maniacbug/RF24">RF24 Arduino library</a>. The radio is set up in the setup() method of the Arduino code, which is based on the “Getting Started” sketch. We changed the pipe identifier numbers according to Lab 3’s requirements. We also wrote a broadcast() method that covers broadcasting a location’s information to the other radio. In the method, we first build the packet/message to be broadcast, then we send the message and wait for a response from the other radio. If we timeout, which means no response was received, the method returns false so we can try again, otherwise it returns true because it was a success. We found that the radio communication worked fine even when standing 15 feet apart, which we deemed more than enough for the final competition. We also have never lost a packet, so we did not have to deal with what to do when a packet is lost. We only call broadcast() when we explore a new node, which saves time when traversing already discovered areas. Our other Arduino has its own code that sets up its radio in a similar fashion and continuously listens for new packets, breaking them down when received according to the protocol below and sending the extracted information to the GUI.
+                <br /><br />
+                Our protocol used when broadcasting is a total of 16 bits (2 bytes) and breaks down like so:
+                <br />
+                (4 bits) x, (4 bits) y, [(1 bit) explored, (3 bits) treasures, (4 bits) walls: NSEW]
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Lab 3 Photos/Protocol.png" alt="Protocol of our communication method"></img>
+                <figcaption>
+                  <i>Figure 6. Packet design breakdown.</i>
+                </figcaption>
+              </figure>
+              <p class="mb-3 text-left">
+                The 8 bits in square brackets represent the bits we store in our global maze 2-D array that the robot updates as it explores. The rows of the 2-D array represent x coordinates and the columns are y coordinates. Although fairly unoptimized, this simple encoding scheme allowed the GUI to act independently from the robot entirely, remaining unchanged as the robot's capabilities changed. We also included global constants that represented, when converted to binary, the one set bit of each piece of information that we want to check for later on in the code, making it much easier to write code. For example, if we want to check if an explored node has a north wall, we would take the 8 bits representing the information about that node, which is stored in the maze 2-D array, and bitwise AND it with our bit-mask for a north wall, which is 00001000, or decimal 8. If the result is 0, then there is no wall, otherwise there is! Having the GUI's presence simplified testing immensely.
+                <br /><br />
+                <b><i>DFS Algorithm</i></b><br /><br />
+                We decided to use the depth first search (DFS) algorithm because it is a simple and complete search technique, good enough for a 9x9 maze within the limited memory available on the Arduino. Using this algorithm, the robot would traverse the maze by moving forward as far as it could (until reaching a dead end- either by being surrounded by walls, explored nodes, or both). When it could not move any further, it would backtrack until reaching a node with unexplored edges, continuing the DFS.
+              </p>
+              <figure>
+                <img class="img-fluid mb-3" src="img/Milestone3Photos/DFS.jpg" alt="DFS explained visually"></img>
+                <figcaption>
+                  <i>Figure 7. Diagram illustrating how DFS works.</i>
+                </figcaption>
+              </figure>
+              <p class="mb-5 text-left">
+                Because this algorithm could potentially cause the robot to backtrack multiple times, wasting time that could be spent mapping unexplored nodes, we also implemented a greedy DFS algorithm that would use a greedy method to calculate the shortest path to get to the next unexplored node chosen by DFS, reducing the amount of time spent going back. The path would be calculated only using previously explored nodes, which guarantees a path to the next node. It is a more efficient algorithm than just DFS because DFS has to backtrack the exact path it came from. Our greedy heuristic was Manhattan distance. After implementing the greedy DFS and having a successful run on a practice 10x4 maze, we unfortunately found that this algorithm used more dynamic memory than was available on the Arduino for larger mazes, so ultimately we did not use it for the competition because simple DFS was able to complete 9x9 mazes without memory issues.
+                <br /><br />
+                The following paragraph goes a little more in-depth as to how we implemented our DFS. First, we imported a data structure called a <a href="https://playground.arduino.cc/Code/StackArray">Stack Array</a>, which we used to record the current path we’re on in the DFS. Then, we wrote a recursive DFS method, which takes in a coordinate (represented with x and y values) that we have not explored yet. In that method, we first check if we should move to the location with a helper method that returns true if this location is valid, is one step away, has not been explored yet, and is immediately reachable (no walls blocking the way). Then, if we are able to move to the location, we physically move the robot there, also with  a helper method that takes a coordinate, under the assumption that it is immediately reachable. We push this new location onto the path stack, and explore it with a helper method that reads the wall sensors and updates the information we know about this location, marking it as explored. Then, we check if we’ve explored all the locations (which is rows times columns), and if we did then we stop the robot, otherwise we continue the DFS. We then call DFS on every valid coordinate in the four cardinal directions- the order of the calls depends on the current direction of the robot, so that we prioritize the north location, then east, then west, then south. This allows us to minimize the number of turns our robot makes. Lastly, if the robot hits a dead end, which happens when the robot is unable to call DFS on any of the adjacent locations, or all the possible DFS calls have returned, then it knows it must backtrack because there are more unexplored locations to discover, just not down this branch of DFS. It pops the current location from the path stack, peeks at the previous location, and then uses our helper move function to move back to that location, which is definitely one away and immediately reachable, since it came this way before. To start the DFS in the main loop() Arduino method, we first explore the starting location, which is (0, 0). Then we add (0, 0) to the path stack, and call DFS on (1, 0). After that call returns, the robot ends up at (1, 0), so we move the robot back to (0, 0) and call DFS on (0, 1) to explore the rest of the maze, since if nothing remained then the robot would have stopped sometime within the first DFS call. After the second DFS returns, which it shouldn’t unless some location is completely unreachable somehow, we stop the robot. This implementation allowed our robot to successfully avoid the wall right in front of it at the starting location in the competition’s final maze, because it first explored the node, seeing the wall in front of it, which caused the DFS on (1, 0) to immediately return, calling the DFS on (0, 1) next to explore the maze!
+              </p>
+              <hr class="mb-5">
+              <h4 class="mb-3 text-left">Unintegrated Components</h4>
+              <p class="text-left" style="margin: 0px">
+                <b><i>Camera and FPGA</i></b><br /><br />
+              </p>
+              <ul class="mb-3 text-left">
+                <li class="li-center">1 DE0 Nano Altera FPGA</li>
+                <li class="li-center">1 OV7670 Camera</li>
+              </ul>
+              <p class="mb-5 text-left">
+                An explanation of how our treasure detection algorithm narrowed down both colors and shapes can be seen in the Lab 4 and Milestone 4 pages on our website. An explanation of how to program the DE0-Nano to load our algorithm on boot can be found here. Although we had fairly reliable treasure detection, especially for red treasures, we ultimately did not integrate the camera and FPGA to the final design because this would have taken more time that we decided to use to improve our DFS algorithm and speed up our robot so we could map more of the maze in the alloted time. The additional components also would have increased our robot's weight, shifting its center of gravity backwards and increasing the chance of a capsize.
+              </p>
+              <hr class="mb-5">
+              <h4 class="mb-3 text-left">Conclusion &amp Future Improvements</h4>
+              <p class="mb-3 text-left">
+                At the competition, the Angry Bot more than exceeded our expectations, but some improvements to the system could have been done if we had more time and less restricting physical constraints. To start out, the camera and FPGA could have been mounted and integrated to the robot to provide treasure detection functionality. A better algorithm for handling robot avoidance could have been implemented. For example, we were working on an algorithm where the Angry Bot would move backwards to the previous intersection and continue with DFS from there, but we did not have enough time to get this working properly and there was also the issue that if there was a robot behind it, the Angry Bot would not be able to detect it due to its limited field of detection with the provided components. We also had a working greedy DFS algorithm that worked faster than a regular DFS (as mentioned in the DFS section), but due to the limited memory on the Arduino, we were not able to use this at the competition.
+                <br /><br />
+                If given more time, we would look further into alternative algorithm implementations which would decrease backtracking, as well as better utilize simulations in order to determine the correctness and efficiency of our algorithm. Lastly, we found that during the competition, our robot would sometimes “jump” a bit over some intersections, causing it to miss those intersections. We had never seen it do that before, so we are not entirely sure of the problem, but we think it may lie in both the slightly uneven maze and also our sudden stopping and starting of our motors at every intersection, even though it hasn’t caused a problem before. Given more time, we would try to fix this issue to allow for smooth driving and consistent maze exploration.
+                <br /><br />
+                All other functionality however, was very reliable. Changing the size of the robot’s wheels to be significantly larger a day before the competition was, although risky, a huge boost to speed and line-sensing accuracy. After many hours of work, line following, wall detection, tone detection, base station communication and the DFS worked very well together, which was the edge the Angry Bot needed to take home the first place trophy.
               </p>
               <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
                 <i class="fa fa-close"></i>
