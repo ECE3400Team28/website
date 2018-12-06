@@ -1647,9 +1647,13 @@ void wallfollow(){
               <p class="mb-5 text-left">
                 To quickly demonstrate the goal of this milestone, here is a quick video of our robot doing a DFS exploration on a small (3x2) grid:
               </p>
-              <iframe class="mb-3" width="560" height="315" src="https://www.youtube.com/embed/D40u1aN-03o?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              <iframe class="mb-5" width="560" height="315" src="https://www.youtube.com/embed/D40u1aN-03o?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
               <hr class="mb-5">
               <h4 class="text-secondary text-left mb-3">DFS</h4>
+              <p class="mb-3 text-left">
+                Here is an image that gives an overview of how DFS works, taken from <a href="https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/tutorial/">here</a>: 
+              </p>
+              <img class="img-fluid mb-3" style="max-height:300px" src="img/Milestone3Photos/DFS.jpg" alt="DFS explained visually">
               <p class="mb-3 text-left">
                 We use a recursive strategy for our DFS. At each location, we call <code>dfs()</code> on all the possible locations we can move to from the current location, so that they are all one step away in one of the four (N, S, E, W) directions. We only call <code>dfs()</code> on valid exploration locations, i.e. locations that are in the grid and have not been explored. This way we don't create an enormous call stack. Before we actually move to a location, we check if we shouldMove() (no walls blocking us). 
               </p>
