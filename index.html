@@ -92,7 +92,8 @@
           </div>
           <div class="col-lg-7 mr-auto">
             <p class="lead">Team 28, also known as :ANGRY: or the Angry Reacts, is the highest numbered - and highest quality - team in the ECE 3400 maze exploration robot competition.</p>
-            <p>Our robot is fully autonomous and capable of line following, wall-following, tone detection, and IR detection and avoidance of other robots. In addition, it communicates its current location and surroundings <a class="portfolio-item" href="#portfolio-modal-3">using an RF transceiver</a> to an external GUI base station as we map it. Our robot explores its surroundings with the <a class="portfolio-item" href="#portfolio-modal-7">Depth First Search graph algorithm</a>, and while not included in the competition robot, we <a class="portfolio-item" href="#portfolio-modal-4">integrated a camera and FPGA</a> to detect visual treasures. Our robots were built with an Arduino Uno, a DE0-nano FPGA, custom 3D-printed components, and various sensors and servos. To hear more about the competition, please take a look at the <a href="https://cei-lab.github.io/ece3400-2018/">ECE 3400 course page</a>.</p>
+            <p>The AngryBot is fully autonomous and capable of line following, wall-following, tone detection, and IR detection and avoidance of other robots. In addition, it communicates its current location and surroundings <a class="portfolio-item" href="#portfolio-modal-3">using an RF transceiver</a> to an external GUI base station as we map it. Our robot explores its surroundings with the <a class="portfolio-item" href="#portfolio-modal-7">Depth First Search graph algorithm</a>, and while not included in the competition robot, we <a class="portfolio-item" href="#portfolio-modal-4">integrated a camera and FPGA</a> to detect visual treasures. Our robots were built with an Arduino Uno, a DE0-nano FPGA, custom 3D-printed components, and various sensors and servos. For more about the competition, please take a look at the <a href="https://cei-lab.github.io/ece3400-2018/">ECE 3400 course page</a> or the <a href="#footer">final design write-up.</a></p>
+            <p>To the surprise of our team, our quick quip about being the highest quality team proved true; AngryBot mapped out the most squares in both the first and final rounds of the ECE 3400 competition on December 4th, leading us to a 1st place finish! Click on the photo to the photo of our robot to see a video of the final round.</p>
           </div>
         </div>
       </div>
@@ -131,7 +132,7 @@
               <a href="https://kevinzying.github.io/resume/"><img class="mx-auto rounded-circle" src="img/Kevin.jpg" alt="A Picture of Kevin Ying at the One World Trade Center"></a>
               <h4 class="ex1">Kevin Ying</h4>
               <h5 class="font-weight-light">Junior, ECE</h5>
-              <p class="mb-1 small" id="moreinfo">My focus so far has been on IR detection, radio communication, and taking charge for treasure detection (camera I2C communication and FPGA image processor). </p>
+              <p class="mb-1 small" id="moreinfo">My focus during the final weeks was on IR detection, radio communication, and treasure detection (camera I2C communication and FPGA image processor). </p>
               <p class="mb-1 small" id="moreinfo">To check out more of my work, take a look at my online resume <a href="https://kevinzying.github.io/resume/">here</a>. </p>
               <p class="mb-0 small" id="moreinfo">I really just wanted to show off that I found this cool CSS transition on StackExchange. </p>
               <!-- Aforementioned stackexchange link: https://stackoverflow.com/a/30531678 -->
@@ -190,7 +191,7 @@
                   <i class="fa fa-search-plus fa-3x"></i>
                 </div>
               </div>
-              <img class="img-fluid" src="img/portfolio/cake.png" alt="">
+              <img class="img-fluid" src="img/Lab4Photos/l4cover.png" alt="">
             </a>
             <p class="mb-1" id="moreinfo">FPGA and Shape Detection</p>
             <p class="mb-1 small" id="moreinfo">In which we add a camera and learn the joys of visual processing.</p>
@@ -236,7 +237,7 @@
                   <i class="fa fa-search-plus fa-3x"></i>
                 </div>
               </div>
-              <img class="img-fluid" src="img/portfolio/submarine.png" alt="">
+              <img class="img-fluid" src="img/Milestone3Photos/m3cover.png" alt="">
             </a>
             <p class="mb-1" id="moreinfo">Maze Exploration</p>
             <p class="mb-1 small" id="moreinfo">In which our robot learns to search for what it wants.</p>
@@ -248,7 +249,7 @@
                   <i class="fa fa-search-plus fa-3x"></i>
                 </div>
               </div>
-              <img class="img-fluid" src="img/portfolio/cabin.png" alt="">
+              <img class="img-fluid" src="img/Milestone4Photos/m4cover.png" alt="">
             </a>
             <p class="mb-1" id="moreinfo">Treasure Detection</p>
             <p class="mb-1 small" id="moreinfo">In which our robot learns to tell triangles from squares.</p>
@@ -257,7 +258,7 @@
       </div>
     </section>
 
-	  <footer class="bg-info footer text-center">
+	  <footer class="bg-info footer text-center" id="footer">
       <div class="container">
         <div class="row">
           <div class="col-md-6 mb-0 mb-lg-0">
@@ -1837,16 +1838,19 @@ endcase
                   We then utilize this edge detection to differentiate between the shape types. In particular, slanted edges are a strong indicator of triangles and diamonds. As the diagram below indicates, triangles tend to have edge patterns with the colored pixels in the lower half, whereas diamonds are an even mix of upper and lower diagonals, and squares have very few of either. A predefined threshold would then separate noise from meaningful indicators of the presence of a triangle or diamond.
               </p>
               <img class="img-fluid mb-5" style="max-height:300px" src="img/Milestone4Photos/edgedetect.jpg" alt="Showcasing square, triangle, diamond edge patterns">
-              <p class="mb-5 text-left">
+              <p class="mb-1 text-left">
                   We also found that while our color and shape detection usually remained accurate, there were still frequent blips on the information received by the Arduino. We combatted this by adding simple low-pass filters over many of the counting signals inside of the image processor module. This averaging spreads out the effect of outlier frames and reducing the chance that the Arduino will randomly sample an output which does not accurately represent the shape that the FPGA tends to believe the shape is. One example assignment for a low pass filter is below.
               </p>
               <pre class="mb-1 text-left"><code>
 
 num_diag_u_r_p = (num_diag_u_r_p - (num_diag_u_r_p >> 3) ) + (num_diag_u_r >> 3);
- 
-Updated Arduino Communication
-With the addition of treasure data, we now required a more advanced form of communication with the Arduino. We found that since we already had a 3-bit encoding for treasure data which was present in our Arduino GUI updating code and maze information storage, that it was natural to extend this to also be the format that the FPGA to Arduino communication took place. Instead of a pair of wires, now three wires run from the FPGA to the Arduino, each one being a bit in the three-bit treasure representation established in Lab 3. Below is the code running on the robot Arduino which reads the FPGA communication pins to determine treasure information.
- 
+              </code> </pre>
+              <hr class="mb-5">
+              <h4 class="text-secondary text-left mb-3">Updated Arduino Communication</h4>
+              <p class="mb-3 text-left">
+                With the addition of treasure data, we now required a more advanced form of communication with the Arduino. We found that since we already had a 3-bit encoding for treasure data which was present in our Arduino GUI updating code and maze information storage, that it was natural to extend this to also be the format that the FPGA to Arduino communication took place. Instead of a pair of wires, now three wires run from the FPGA to the Arduino, each one being a bit in the three-bit treasure representation established in Lab 3. Below is the code running on the robot Arduino which reads the FPGA communication pins to determine treasure information.
+              </p>
+              <pre class="mb-1 text-left"><code>
   int FPGA_read = 0;
  
   FPGA_read += (digitalRead(FPGA_PIN_2) << 2);
